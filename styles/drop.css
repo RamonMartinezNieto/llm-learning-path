@@ -1,0 +1,13 @@
+.drop{margin:1.25rem 0 1.75rem;border:1px solid var(--border);border-radius:10px;background:#f8fafc}
+.drop summary{list-style:none;cursor:pointer;padding:0.9rem 1rem;font-family:var(--sans);font-weight:700;color:#1e3a8a}
+.drop summary::-webkit-details-marker{display:none}
+.drop summary::before{content:'▸ ';color:#1e3a8a}
+.drop[open] summary::before{content:'▾ '}
+
+.drop-content{padding:0 1rem 0.9rem}
+.drop-content p{margin-bottom:0.95rem}
+.drop-content h3{font-family:var(--sans);font-size:1rem;line-height:1.35;margin:1rem 0 0.65rem;color:#0f172a}
+.drop-content ol,.drop-content ul{margin:0.4rem 0 1rem 1.4rem;padding-left:0.3rem}
+.drop-content li{margin:0.35rem 0;padding-left:0.2rem}
+.drop-content ul li::marker{color:#1d4ed8}
+.drop-content .mini-title{font-family:var(--sans);font-weight:700;color:#1e3a8a;margin:0.8rem 0 0.35rem}

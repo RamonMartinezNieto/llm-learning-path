@@ -1,0 +1,14 @@
+/* Quiz */
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt:hover{background:#f0f4ff}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.check-btn:hover{background:#1e40af}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
