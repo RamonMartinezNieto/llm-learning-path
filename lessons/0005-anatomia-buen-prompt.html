@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1.1 — Anatomía de un buen prompt</title>
 <style>
-  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#1d4ed8;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
   nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
@@ -26,15 +26,6 @@
   .ba-good{background:#f0fdf4;border:1px solid #bbf7d0}
   .ba-card strong{font-family:var(--sans);font-size:0.75rem;display:block;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em}
   .ba-bad strong{color:#dc2626}.ba-good strong{color:#16a34a}
-  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
-  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
-  .q{margin-bottom:1.75rem}.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
-  .options{display:flex;flex-direction:column;gap:0.5rem}
-  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
-  .opt:hover{background:#f5f3ff}.opt input{accent-color:var(--accent)}
-  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
-  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
-  .feedback.ok{color:var(--ok)}.feedback.err{color:var(--err)}
   .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
   .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
   .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
@@ -42,6 +33,7 @@
   .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
   .lesson-nav a{color:var(--accent);text-decoration:none}
 </style>
+<link rel="stylesheet" href="../styles/quiz.css">
 </head>
 <body>
 <nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 1: Prompt Engineering</a> › Lección 1.1</nav>

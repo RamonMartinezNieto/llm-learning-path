@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>3.5 — Documentación automática de código con IA</title>
 <style>
-  :root{--accent:#059669;--serif:Georgia,serif;--sans:system-ui,sans-serif;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  :root{--accent:#1d4ed8;--serif:Georgia,serif;--sans:system-ui,sans-serif;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:var(--sans);background:var(--bg);color:#1f2937;line-height:1.7;font-size:1rem}
   a{color:var(--accent);text-decoration:none}
@@ -24,7 +24,6 @@
   pre{background:#f3f4f6;border-radius:8px;padding:1rem 1.25rem;overflow-x:auto;margin-bottom:1rem;font-size:.88rem;line-height:1.6}
   .callout{border-left:3px solid var(--accent);background:#ecfdf5;padding:.85rem 1.1rem;border-radius:0 6px 6px 0;margin:1.5rem 0;font-style:italic;color:#065f46}
   .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem}
-  .quiz{margin:2.5rem 0}
   .quiz h2{margin-top:0}
   .question{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem}
   .question p{font-weight:600;margin-bottom:.75rem}
@@ -33,9 +32,6 @@
   .question input[type=radio]{margin-right:.5rem;accent-color:var(--accent)}
   .btn{display:inline-block;margin-top:.75rem;padding:.45rem 1.1rem;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.9rem;font-family:var(--sans);font-weight:600;transition:opacity .15s}
   .btn:hover{opacity:.88}
-  .feedback{display:none;margin-top:.65rem;padding:.45rem .75rem;border-radius:5px;font-size:.9rem;font-weight:600}
-  .feedback.ok{background:#dcfce7;color:var(--ok)}
-  .feedback.err{background:#fee2e2;color:var(--err)}
   .source{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.4rem;margin:2rem 0}
   .source strong{display:block;margin-bottom:.3rem;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
   .teacher{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:1.1rem 1.4rem;margin:1.5rem 0}
@@ -46,6 +42,7 @@
   .lesson-nav .prev::before{content:'← '}
   .lesson-nav .next::after{content:' →'}
 </style>
+<link rel="stylesheet" href="../styles/quiz.css">
 </head>
 <body>
 <div class="wrap">
