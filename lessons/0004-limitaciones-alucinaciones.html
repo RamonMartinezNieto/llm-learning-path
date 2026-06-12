@@ -34,6 +34,21 @@
   .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
   .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
   .teacher strong{display:block;margin-bottom:0.3rem}
+  .drop{margin:1.25rem 0 1.75rem;border:1px solid var(--border);border-radius:10px;background:#f8fafc}
+  .drop summary{list-style:none;cursor:pointer;padding:0.9rem 1rem;font-family:var(--sans);font-weight:700;color:#1e3a8a}
+  .drop summary::-webkit-details-marker{display:none}
+  .drop summary::before{content:'▸ ';color:#1e3a8a}
+  .drop[open] summary::before{content:'▾ '}
+  .drop-content{padding:0 1rem 0.9rem}
+  .drop-content p{margin-bottom:0.95rem}
+  .drop-content h3{font-family:var(--sans);font-size:1rem;line-height:1.35;margin:1rem 0 0.65rem;color:#0f172a}
+  .drop-content ul{margin:0.4rem 0 1rem 1.4rem;padding-left:0.3rem}
+  .drop-content li{margin:0.35rem 0;padding-left:0.2rem}
+  .drop-content ul li::marker{color:#1d4ed8}
+  .drop-content .mini-title{font-family:var(--sans);font-weight:700;color:#1e3a8a;margin:0.8rem 0 0.35rem}
+  .tool-table{width:100%;border-collapse:collapse;margin:1rem 0 1.25rem;font-family:var(--sans);font-size:0.88rem}
+  .tool-table th{background:#eef2ff;color:#1e3a8a;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  .tool-table td{padding:0.6rem 0.8rem;border:1px solid var(--border);vertical-align:top}
   .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
   .lesson-nav a{color:var(--accent);text-decoration:none}
 </style>
@@ -50,6 +65,50 @@
   <strong>Nunca confundas confianza con precisión</strong>
   Un LLM que escribe "La batalla de Hastings ocurrió en 1066" suena igual de confiado que uno que escribe una fecha inventada. La fluidez del lenguaje no es garantía de corrección factual.
 </div>
+
+<details class="drop">
+  <summary>¿Cómo puedo detectar si un LLM está alucinando en un output concreto?</summary>
+  <div class="drop-content">
+    <p>Detectar las alucinaciones en un LLM (cuando el modelo inventa datos con total seguridad) en un output concreto es uno de los mayores retos de la IA actual. No existe un botón mágico, pero sí una combinación de estrategias técnicas y de ingeniería de <em>prompts</em> que puedes aplicar.</p>
+
+    <p>Aquí tienes los métodos más efectivos divididos por su enfoque:</p>
+
+    <h3>1. Métodos basados en prompts (self-evaluation)</h3>
+    <p>A veces, el propio LLM (o uno secundario) puede ayudarte a auditar la respuesta.</p>
+    <ul>
+      <li><strong>Prompt de auto-reflexión (self-reflection):</strong> Pasa el output generado a un segundo prompt y pídele al modelo que actúe como un corrector crítico. Ejemplo: "Analiza el siguiente texto y busca afirmaciones fácticas. Verifica si son lógicas o si entran en contradicción. Señala posibles inventos."</li>
+      <li><strong>Técnica de los N-votos (self-consistency):</strong> Genera la misma respuesta 3 o 5 veces subiendo un poco la temperatura (por ejemplo, a 0.7). Si en las respuestas el modelo da datos radicalmente distintos (nombres, fechas, cifras), es muy probable que esté alucinando. La consistencia suele ser sinónimo de veracidad.</li>
+    </ul>
+
+    <h3>2. Métodos de verificación externa (ground truth)</h3>
+    <p>La forma más segura es contrastar el output con una fuente de verdad indiscutible.</p>
+    <ul>
+      <li><strong>RAG (Retrieval-Augmented Generation):</strong> Obliga al modelo a extraer la información de una base de datos o documento que tú le proporciones. Para detectar la alucinación, extrae las afirmaciones del output y busca si existen literalmente en tu documento fuente.</li>
+      <li><strong>Búsqueda en tiempo real (web search):</strong> Si el output contiene datos recientes o fácticos, utiliza una API de búsqueda para verificar las entidades (nombres, empresas, eventos) mencionadas.</li>
+    </ul>
+
+    <h3>3. Métodos técnicos y de probabilidad (métricas)</h3>
+    <p>Si accedes al LLM a través de una API, puedes mirar detrás del capó.</p>
+    <ul>
+      <li><strong>Probabilidad de tokens:</strong> Al activar <code>logprobs</code> en la API, el modelo te devuelve la probabilidad que asignó a cada palabra. Si la probabilidad de datos críticos (como cifras) es baja o está muy dividida, el modelo puede estar adivinando.</li>
+      <li><strong>Métricas de similitud semántica:</strong> Si tienes un texto de referencia (por ejemplo, un PDF origen), puedes usar embeddings para medir distancia semántica entre el output y la fuente. Herramientas como <strong>BERTScore</strong> o <strong>ROUGE</strong> ayudan a detectar desviaciones.</li>
+    </ul>
+
+    <h3>4. Herramientas y frameworks especializados</h3>
+    <p>No tienes que programar esto desde cero. Ya existen librerías de código abierto diseñadas para evaluar y detectar alucinaciones en outputs.</p>
+    <table class="tool-table">
+      <tr><th>Herramienta</th><th>¿Qué hace?</th></tr>
+      <tr><td><strong>Ragas</strong></td><td>Especializada en evaluar sistemas RAG. Mide la fidelidad del output respecto al contexto proporcionado.</td></tr>
+      <tr><td><strong>DeepEval</strong></td><td>Framework de pruebas unitarias para LLMs. Incluye tests específicos de alucinación, como <code>HallucinationMetric</code>.</td></tr>
+      <tr><td><strong>TruLens</strong></td><td>Evalúa la triada RAG: relevancia del contexto, fundamentación (evitar alucinaciones) y relevancia de la respuesta.</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>Truco rápido de diseño</strong>
+      Si estás diseñando el sistema, una forma simple de reducir y detectar alucinaciones es combinar el enfoque paso a paso con una regla estricta: "Si no sabes la respuesta basándote en los hechos, di 'No lo sé'". Si el modelo rompe esa regla y entrega un dato largo sin base clara, sospecha de inmediato.
+    </div>
+  </div>
+</details>
 
 <h2>Las limitaciones fundamentales</h2>
 <div class="limitations">
