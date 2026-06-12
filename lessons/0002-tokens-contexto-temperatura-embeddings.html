@@ -79,6 +79,41 @@
   ~1 token ≈ 0.75 palabras en inglés; ~0.6 palabras en español. 1000 tokens ≈ 750 palabras. Los costes de la API se miden en tokens.
 </div>
 
+<details class="drop">
+  <summary>¿Por qué el número de tokens en español es mayor que en inglés?</summary>
+  <div class="drop-content">
+    <p>La razón por la que el español genera más tokens que el inglés se reduce a dos factores principales: <strong>cómo se entrenó a la IA</strong> y <strong>la propia naturaleza de nuestro idioma</strong>.</p>
+
+    <p>Aquí tienes los tres motivos clave explicados de forma sencilla:</p>
+
+    <h3>1. El "diccionario" de la IA habla inglés</h3>
+    <p>Antes de lanzar una IA al mundo, se crea su <strong>"vocabulario de tokens"</strong> (un diccionario con los pedazos de palabras que el modelo reconocerá). Como la inmensa mayoría del texto en internet está en inglés, los creadores de la IA optimizan ese diccionario para el inglés.</p>
+    <ul>
+      <li>En <strong>inglés</strong>, palabras enteras y comunes como <code>butterfly</code> o <code>tomorrow</code> suelen existir como <strong>un solo token</strong> porque la IA las ve constantemente.</li>
+      <li>En <strong>español</strong>, palabras comunes como <code>mariposa</code> o <code>mañana</code> no tienen su propio token reservado. La IA no las tiene en su "lista VIP", así que se ve obligada a romperlas en pedazos más pequeños (<code>mari</code> + <code>posa</code>).</li>
+    </ul>
+
+    <h3>2. El español es morfológicamente más complejo (tenemos muchos más cambios)</h3>
+    <p>El español es un idioma maravilloso, pero lleno de variaciones en los finales de las palabras (sufijos, géneros, conjugaciones). El inglés es mucho más plano.</p>
+    <p>Mira lo que pasa con los verbos. En inglés, el verbo <em>comer</em> casi no cambia:</p>
+    <ul>
+      <li><em>I eat, you eat, we eat, they eat.</em> (Siempre es la misma palabra de 4 letras: <code>eat</code>).</li>
+    </ul>
+    <p>En español, ese mismo verbo cambia constantemente:</p>
+    <ul>
+      <li><em>Yo como, tú comes, nosotros comemos, ellos comen, vosotros comisteis.</em></li>
+    </ul>
+    <p>Para la IA es imposible guardar un token único para cada una de las miles de conjugaciones en español. ¿Qué hace entonces? Guarda la raíz <code>com</code> como un token, y luego añade tokens para los finales (<code>-os</code>, <code>-es</code>, <code>-isteis</code>). <strong>Resultado:</strong> una sola palabra en español se convierte en 2 o 3 tokens.</p>
+
+    <h3>3. Las benditas tildes y la "ñ"</h3>
+    <p>Los caracteres especiales de nuestro idioma son un dolor de cabeza para la tokenización. La IA procesa el texto usando codificación UTF-8 (un estándar informático). Las letras normales ocupan menos espacio en esa codificación que las letras con acentos o la eñe.</p>
+    <p>Cuando la IA se encuentra con una palabra como <strong>"comunicación"</strong> o <strong>"mañana"</strong>, el acento y la "ñ" suelen actuar como una "guillotina" que corta la palabra en ese punto, obligando a la IA a separar la palabra en más tokens de los necesarios.</p>
+
+    <p class="mini-title">En resumen:</p>
+    <p>El español genera más tokens porque <strong>la IA tiene que "deletrear" en trozos más pequeños nuestras palabras</strong> para poder entender su género, su tiempo verbal y sus caracteres especiales, mientras que en inglés puede procesar palabras enteras de un solo golpe.</p>
+  </div>
+</details>
+
 <h2>Ventana de contexto</h2>
 <p>La <strong>ventana de contexto</strong> es el límite de tokens que el modelo puede "ver" a la vez. Todo lo que ocurre dentro de una conversación — tu historial, documentos adjuntos, la respuesta generada — compite por ese espacio.</p>
 
