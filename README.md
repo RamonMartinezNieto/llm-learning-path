@@ -1,6 +1,6 @@
-# llm-learning-path
+# LLM Learning Path
 
-A self-directed learning path from casual AI user to production LLM engineer. 55 interactive HTML lessons across 9 phases: prompt engineering, IDE integration, API building, autonomous agents, RAG, and AI systems in production.
+Un camino de aprendizaje autodirigido desde usuario casual de IA hasta ingeniero de LLMs en producción. 55 lecciones HTML interactivas estructuradas en 9 fases: ingeniería de prompts, integración con IDEs, construcción de APIs, agentes autónomos, RAG y sistemas de IA en producción.
 
 ## 📚 Contenido del Curso
 
