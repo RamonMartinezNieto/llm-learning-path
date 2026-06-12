@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5.3 — Tool use y function calling</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+  nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  pre,code{font-family:monospace;font-size:0.83rem}
+  pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;overflow-x:auto;line-height:1.6;margin:1rem 0}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .warning{background:#fff7ed;border-left:3px solid #f97316;padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .warning strong{font-family:var(--sans);font-size:0.8rem;color:#c2410c;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+  th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}
+  .q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f5f3ff}
+  .opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}
+  .feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+  .source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">Inicio</a> › <a href="index.html">Lecciones</a> › 5.3 Tool use y function calling</nav>
+
+<h1>5.3 — Tool use y function calling</h1>
+<div class="meta">Fase 5 · Lección 31 de 55 · ~18 min · Construcción con APIs de IA</div>
+
+<p>Hasta ahora los modelos solo podían devolver texto. Con <strong>tool use</strong> (llamado <em>function calling</em> en OpenAI), el modelo puede solicitar que tu código ejecute funciones reales y usar el resultado para completar su respuesta. Es el primer paso hacia los agentes de IA.</p>
+
+<h2>¿Qué es tool use?</h2>
+<p>Tool use permite que un LLM "llame" a funciones externas durante su proceso de razonamiento. Aclaración crucial: <strong>el modelo no ejecuta nada</strong>. Lo que hace es devolver una instrucción estructurada con el nombre de la función y los argumentos. Tu código ejecuta la función real y devuelve el resultado al modelo para que continúe.</p>
+
+<div class="callout">
+  <strong>Concepto clave</strong>
+  Tool use convierte un LLM en un agente básico. La descripción de la herramienta es crucial — el modelo decide si usarla basándose solo en tu descripción.
+</div>
+
+<h2>El ciclo completo de tool use</h2>
+<p>El flujo tiene cuatro pasos que pueden repetirse en múltiples turnos:</p>
+
+<pre>1. Tu código → API: "Aquí tienes las herramientas disponibles y la pregunta del usuario"
+2. Modelo → Tu código: "Quiero llamar a get_weather con ciudad='Madrid'"  (stop_reason: "tool_use")
+3. Tu código → Modelo: "El resultado de get_weather fue: 22°C, soleado"   (role: "tool")
+4. Modelo → Tu código: "En Madrid ahora mismo hay 22°C y está soleado."   (respuesta final)</pre>
+
+<h2>Definir una herramienta en Anthropic</h2>
+<p>Las herramientas se definen con un nombre, descripción y schema de los parámetros de entrada en formato JSON Schema:</p>
+
+<pre>import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+# Definición de la herramienta
+tools = [
+    {
+        "name": "get_weather",
+        "description": "Obtiene el tiempo meteorológico actual para una ciudad. "
+                       "Úsala cuando el usuario pregunte por el clima o temperatura "
+                       "de cualquier lugar.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "description": "Nombre de la ciudad, ej: 'Madrid', 'Barcelona'"
+                },
+                "units": {
+                    "type": "string",
+                    "enum": ["celsius", "fahrenheit"],
+                    "description": "Unidad de temperatura"
+                }
+            },
+            "required": ["city"]
+        }
+    }
+]
+
+# Primera llamada: el modelo puede decidir usar la herramienta
+respuesta = client.messages.create(
+    model="claude-opus-4-5",
+    max_tokens=1024,
+    tools=tools,
+    messages=[
+        {"role": "user", "content": "¿Qué tiempo hace en Madrid ahora mismo?"}
+    ]
+)
+
+print(f"Stop reason: {respuesta.stop_reason}")
+# → "tool_use" si el modelo quiere usar una herramienta</pre>
+
+<h2>Manejar la respuesta y completar el ciclo</h2>
+<p>Cuando <code>stop_reason == "tool_use"</code>, extraes el bloque tool_use, ejecutas la función real y devuelves el resultado:</p>
+
+<pre>import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+# Función real que ejecuta tu código
+def get_weather(city: str, units: str = "celsius") -> dict:
+    # En producción: llamarías a una API meteorológica real
+    return {"city": city, "temperature": 22, "condition": "soleado", "units": units}
+
+def llamar_con_tools(mensaje_usuario: str):
+    mensajes = [{"role": "user", "content": mensaje_usuario}]
+    
+    while True:
+        respuesta = client.messages.create(
+            model="claude-opus-4-5",
+            max_tokens=1024,
+            tools=tools,  # definidos arriba
+            messages=mensajes
+        )
+        
+        if respuesta.stop_reason == "end_turn":
+            # El modelo terminó sin usar más herramientas
+            return respuesta.content[0].text
+        
+        if respuesta.stop_reason == "tool_use":
+            # Añadir respuesta del modelo al historial
+            mensajes.append({"role": "assistant", "content": respuesta.content})
+            
+            # Procesar cada tool_use en la respuesta
+            resultados_tools = []
+            for bloque in respuesta.content:
+                if bloque.type == "tool_use":
+                    # Ejecutar la función real
+                    if bloque.name == "get_weather":
+                        resultado = get_weather(**bloque.input)
+                    
+                    resultados_tools.append({
+                        "type": "tool_result",
+                        "tool_use_id": bloque.id,
+                        "content": json.dumps(resultado)
+                    })
+            
+            # Devolver resultados al modelo
+            mensajes.append({"role": "user", "content": resultados_tools})
+
+respuesta = llamar_con_tools("¿Qué tiempo hace en Madrid?")
+print(respuesta)</pre>
+
+<h2>Casos de uso habituales</h2>
+<table>
+  <thead>
+    <tr><th>Herramienta</th><th>Qué hace</th><th>Ejemplo de uso</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Búsqueda web</td><td>Consulta información actual</td><td>Noticias, precios, datos recientes</td></tr>
+    <tr><td>Base de datos</td><td>Consulta datos de tu sistema</td><td>Estado de un pedido, saldo de cuenta</td></tr>
+    <tr><td>Ejecución de código</td><td>Cálculos, transformaciones</td><td>Análisis de datos, gráficas</td></tr>
+    <tr><td>Calendario / email</td><td>Acceso a herramientas de productividad</td><td>Crear evento, enviar mensaje</td></tr>
+    <tr><td>APIs externas</td><td>Integración con servicios</td><td>Mapas, pagos, notificaciones</td></tr>
+  </tbody>
+</table>
+
+<div class="warning">
+  <strong>Seguridad importante</strong>
+  Valida siempre los argumentos que devuelve el modelo antes de ejecutar la función. El modelo podría generar argumentos inesperados o maliciosos. Nunca ejecutes código arbitrario que el modelo sugiera sin validación.
+</div>
+
+<div class="source">
+  <strong>Fuente oficial</strong>
+  <a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use" target="_blank">Anthropic Tool Use — docs.anthropic.com</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo aprendido</h3>
+
+  <div class="q">
+    <p><strong>1.</strong> ¿Quién ejecuta realmente la función cuando el modelo "llama a una herramienta"?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> El servidor de Anthropic ejecuta la función directamente en sus servidores</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Tu código ejecuta la función y devuelve el resultado al modelo — el modelo solo decide cuándo y con qué argumentos llamarla</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> El modelo ejecuta la función en un sandbox seguro incluido en la API</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Ninguno — el modelo simula el resultado sin ejecutar nada real</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Verificar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>2.</strong> ¿Cuál es el elemento más crítico en la definición de una herramienta?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> El nombre, que debe seguir una convención de nomenclatura estricta</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> El schema de parámetros, que debe ser JSON Schema válido</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> La descripción, ya que el modelo decide si usarla y con qué argumentos basándose únicamente en el texto de la descripción</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> El tipo de retorno, para que el modelo sepa qué esperar</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Verificar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0030-prompt-caching.html">← 5.2 Prompt caching</a>
+  <a href="0032-structured-outputs.html">5.4 Structured outputs →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

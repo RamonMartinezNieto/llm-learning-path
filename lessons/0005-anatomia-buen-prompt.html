@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.1 — Anatomía de un buen prompt</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .prompt-anatomy{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:1.5rem 0;font-family:monospace;font-size:0.85rem}
+  .pa-row{display:flex;border-bottom:1px solid var(--border)}
+  .pa-row:last-child{border-bottom:none}
+  .pa-label{min-width:120px;padding:0.75rem 1rem;font-family:var(--sans);font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;background:#f9fafb;color:var(--muted);display:flex;align-items:flex-start;border-right:1px solid var(--border)}
+  .pa-content{padding:0.75rem 1rem;line-height:1.5;color:var(--text)}
+  .before-after{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+  .ba-card{border-radius:8px;padding:1rem;font-family:monospace;font-size:0.82rem;line-height:1.5}
+  .ba-bad{background:#fff1f2;border:1px solid #fecaca}
+  .ba-good{background:#f0fdf4;border:1px solid #bbf7d0}
+  .ba-card strong{font-family:var(--sans);font-size:0.75rem;display:block;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em}
+  .ba-bad strong{color:#dc2626}.ba-good strong{color:#16a34a}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f5f3ff}.opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}.feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 1: Prompt Engineering</a> › Lección 1.1</nav>
+<h1>Anatomía de un buen prompt</h1>
+<p class="meta">Fase 1 · Lección 5 de 55 · ~15 min · Prompt Engineering</p>
+
+<h2>Los cuatro componentes de un prompt</h2>
+<p>Todo prompt efectivo se puede descomponer en cuatro partes. No todas son obligatorias en todas las situaciones, pero conocerlas te da un framework para diagnosticar por qué un prompt falla.</p>
+
+<div class="prompt-anatomy">
+  <div class="pa-row">
+    <div class="pa-label">Rol / Persona</div>
+    <div class="pa-content">Eres un experto en seguridad de aplicaciones web con 10 años de experiencia en auditorías de código.</div>
+  </div>
+  <div class="pa-row">
+    <div class="pa-label">Tarea / Instrucción</div>
+    <div class="pa-content">Revisa el siguiente fragmento de código Python e identifica vulnerabilidades de seguridad.</div>
+  </div>
+  <div class="pa-row">
+    <div class="pa-label">Contexto / Input</div>
+    <div class="pa-content">```python\ndef login(username, password):\n    query = f"SELECT * FROM users WHERE user='{username}' AND pass='{password}'"```</div>
+  </div>
+  <div class="pa-row">
+    <div class="pa-label">Formato de salida</div>
+    <div class="pa-content">Lista cada vulnerabilidad con: nombre, severidad (Alta/Media/Baja), y una línea de cómo solucionarla.</div>
+  </div>
+</div>
+
+<h2>Antes y después: el impacto del prompt</h2>
+<div class="before-after">
+  <div class="ba-card ba-bad">
+    <strong>❌ Prompt vago</strong>
+    Explícame el patrón Repository en Python.
+  </div>
+  <div class="ba-card ba-good">
+    <strong>✓ Prompt específico</strong>
+    Eres un desarrollador Python senior. Explica el patrón Repository en 3 pasos con un ejemplo mínimo usando SQLAlchemy. El lector ya sabe OOP pero nunca ha usado este patrón. Sin teoría extra.
+  </div>
+</div>
+
+<h2>El principio de especificidad</h2>
+<p>El modelo asigna probabilidad a los tokens. Un prompt vago abre el espacio de respuestas posibles. Un prompt específico lo cierra. La especificidad es tu palanca más directa sobre la calidad del output.</p>
+
+<div class="callout">
+  <strong>La pregunta diagnóstico</strong>
+  Antes de enviar un prompt, pregúntate: "Si 10 humanos diferentes leyeran esto, ¿responderían de forma muy similar?" Si la respuesta es no, el prompt necesita más especificidad.
+</div>
+
+<h2>System prompt vs. User prompt</h2>
+<p>La mayoría de APIs separan <strong>system prompt</strong> (instrucciones de rol y comportamiento permanente) del <strong>user prompt</strong> (la tarea concreta). El system prompt persiste como contexto en toda la conversación.</p>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+  <div class="q">
+    <p>¿Cuál de estos elementos del prompt define el tono, rol y comportamiento permanente del modelo?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> El formato de salida (especificar JSON, lista, etc.)</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> El system prompt (instrucciones de rol y comportamiento)</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> El contexto de la tarea (datos de entrada)</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> El user prompt (la pregunta concreta)</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+  <div class="q">
+    <p>¿Por qué especificar el formato de salida en el prompt mejora los resultados?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Obliga al modelo a activar un modo de respuesta especial más preciso</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Cierra el espacio de respuestas posibles, guiando al modelo hacia tokens más útiles</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Aumenta la temperatura efectiva, haciendo la respuesta más creativa</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Reduce el número de tokens generados, bajando el coste</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','b')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank">Anthropic — Prompt Engineering Overview (Docs oficiales)</a><br>
+  Guía oficial de Anthropic sobre estructura y mejores prácticas de prompts. Especialmente relevante si vas a usar la API de Claude.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregunta al agente: "Dame un ejemplo de cómo aplicar los 4 componentes del prompt a mi tarea de [X]" o "¿Cuándo debo usar system prompt y cuándo user prompt?"
+</div>
+
+<div class="lesson-nav">
+  <a href="0004-limitaciones-alucinaciones.html">← 0.4 Limitaciones y alucinaciones</a>
+  <a href="0006-tecnicas-basicas-prompting.html">1.2 Técnicas básicas →</a>
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

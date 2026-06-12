@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>6.3 Bucles de agente | MattPocockSkills</title>
+<style>
+:root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#0891b2;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+nav a{color:var(--accent);text-decoration:none}
+h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+.meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+p{margin-bottom:1rem}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.3rem}
+.callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+.callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.83rem;line-height:1.6;overflow-x:auto;margin:1rem 0}
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
+.source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+.source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+.source a{color:#0369a1}
+.teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+.teacher strong{display:block;margin-bottom:0.3rem}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+.lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 6: Código Agéntico</a> › Lección 6.3</nav>
+<h1>6.3 — Bucles de agente: planificación, ejecución, corrección</h1>
+<div class="meta">Lección 39 de 55 · ~16 min · Fase 6: Código Agéntico</div>
+
+<p>Entender el bucle de un agente no es solo entender ReAct — es entender cómo implementar ese bucle de forma robusta en producción. Un bucle bien diseñado planifica, ejecuta, corrige y sabe cuándo detenerse. Un bucle mal diseñado gasta dinero, entra en ciclos infinitos o falla silenciosamente.</p>
+
+<h2>La estructura del bucle</h2>
+
+<p>En pseudocódigo, el bucle de un agente típico es:</p>
+
+<pre>
+def agent_loop(task, max_iterations=20, budget_tokens=50000):
+    context = [system_prompt, task]
+    iterations = 0
+    total_tokens = 0
+
+    while not is_complete(context) and iterations < max_iterations:
+        response = llm.call(context)
+        total_tokens += response.tokens_used
+
+        if total_tokens > budget_tokens:
+            return error("Presupuesto de tokens agotado")
+
+        if response.type == "final_answer":
+            return response.content
+
+        if response.type == "tool_call":
+            result = execute_tool(response.tool, response.args)
+            context.append(response)   # pensamiento del agente
+            context.append(result)     # observación
+            checkpoint(context)        # guardar progreso
+
+        iterations += 1
+
+    return error("Máximo de iteraciones alcanzado")
+</pre>
+
+<h2>Stopping conditions: cuándo parar</h2>
+
+<p>Las condiciones de parada son críticas y deben definirse antes de desplegar cualquier agente:</p>
+<ul>
+  <li><strong>Tarea completada:</strong> El agente declara explícitamente que ha terminado con una respuesta final.</li>
+  <li><strong>Máximo de iteraciones:</strong> Límite duro de pasos (ej. 20 iteraciones). Previene bucles infinitos.</li>
+  <li><strong>Presupuesto de tokens:</strong> Límite de tokens totales consumidos en el ciclo.</li>
+  <li><strong>Umbral de errores:</strong> Si N herramientas seguidas fallan, escalar al usuario en vez de reintentar indefinidamente.</li>
+  <li><strong>Timeout absoluto:</strong> Tiempo máximo de ejecución en segundos/minutos.</li>
+</ul>
+
+<h2>Manejo de fallos: el agente debe decidir</h2>
+
+<p>Cuando una herramienta falla, el agente no debe simplemente parar. Debe razonar sobre el fallo:</p>
+
+<pre>
+Thought: La herramienta search_web devolvió un error de timeout.
+         Tengo tres opciones:
+         1. Reintentar con una query más simple
+         2. Usar mi conocimiento de entrenamiento si el dato no es crítico
+         3. Informar al usuario que no puedo completar esta parte
+
+Action: search_web("Kafka release date site:apache.org")  # query más específica
+</pre>
+
+<p>El contexto del fallo se incluye en el siguiente paso de razonamiento. El agente no ignora el error — lo integra en su plan.</p>
+
+<h2>Checkpointing: guardar progreso intermedio</h2>
+
+<p>Para tareas largas, guardar el estado del contexto tras cada iteración permite:</p>
+<ul>
+  <li>Reanudar si el proceso se interrumpe (crash, timeout de red)</li>
+  <li>Auditar qué hizo el agente en cada paso</li>
+  <li>Detectar bucles donde el agente repite la misma acción</li>
+</ul>
+
+<h2>Estrategias de fallback</h2>
+
+<table>
+  <tr><th>Situación</th><th>Estrategia recomendada</th></tr>
+  <tr><td>Herramienta falla 1 vez</td><td>Reintentar con parámetros ajustados</td></tr>
+  <tr><td>Herramienta falla 3 veces</td><td>Intentar herramienta alternativa</td></tr>
+  <tr><td>Sin herramienta alternativa</td><td>Responder con lo que se tiene + notificar limitación</td></tr>
+  <tr><td>Agente en bucle (repite acción)</td><td>Detectar y forzar stop; escalar al usuario</td></tr>
+  <tr><td>Presupuesto agotado</td><td>Devolver respuesta parcial con advertencia</td></tr>
+</table>
+
+<div class="callout">
+  <strong>Advertencia crítica</strong>
+  Sin stopping conditions bien definidas, un agente puede entrar en bucles infinitos o acumular costes enormes. Siempre define el presupuesto máximo de iteraciones y tokens.
+</div>
+
+<div class="source">
+  <strong>Fuente principal</strong>
+  Anthropic — Agentic patterns<br>
+  <a href="https://docs.anthropic.com/en/docs/build-with-claude/agents" target="_blank">docs.anthropic.com/en/docs/build-with-claude/agents</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo que has aprendido</h3>
+
+  <div class="q">
+    <p><strong>P1.</strong> ¿Por qué es crítico definir stopping conditions en un bucle de agente?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> a) Para que el agente pueda paralelizar múltiples acciones y responder más rápido</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> b) Para evitar bucles infinitos, controlar costes y asegurar que el agente no ejecuta acciones indefinidamente</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> c) Porque los LLMs tienen un límite de contexto que se alcanza antes de 10 iteraciones</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>P2.</strong> ¿Qué debe hacer un agente cuando una herramienta falla o devuelve un error?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> a) Detenerse inmediatamente y devolver un error al usuario sin intentar recuperarse</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> b) Ignorar el error y continuar con el siguiente paso del plan original</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> c) Incluir el error en el contexto de razonamiento y decidir si reintentar, usar una alternativa o escalar al usuario</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0038-diseno-herramientas-agentes.html">← 6.2 Diseño de herramientas</a>
+  <a href="0040-agentes-codigo.html">6.4 Agentes de código →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

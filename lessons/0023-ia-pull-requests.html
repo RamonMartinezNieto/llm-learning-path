@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.1 — IA en el análisis y revisión de Pull Requests</title>
+<style>
+  :root {
+    --accent: #dc2626;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: system-ui, -apple-system, sans-serif;
+    --bg: #fffef7;
+    --card: #fff;
+    --border: #e5e7eb;
+    --ok: #15803d;
+    --err: #dc2626;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--serif); background: var(--bg); color: #1a1a1a; line-height: 1.7; font-size: 1.05rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .page-wrap { max-width: 740px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* Breadcrumb */
+  .breadcrumb { font-family: var(--sans); font-size: 0.78rem; color: #6b7280; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
+  .breadcrumb a { color: #6b7280; }
+  .breadcrumb a:hover { color: var(--accent); }
+  .breadcrumb span { color: #9ca3af; }
+
+  /* Header */
+  .lesson-header { border-bottom: 2px solid var(--accent); padding-bottom: 1.25rem; margin-bottom: 2rem; }
+  h1 { font-family: var(--serif); font-size: 1.9rem; font-weight: 700; line-height: 1.25; color: #111; }
+  .meta { font-family: var(--sans); font-size: 0.8rem; color: #6b7280; margin-top: 0.6rem; letter-spacing: 0.03em; }
+  .meta strong { color: var(--accent); }
+
+  /* Sections */
+  h2 { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: #111; margin: 2.5rem 0 0.9rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  p { margin-bottom: 1rem; }
+  ul, ol { margin: 0.75rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.4rem; }
+  code { font-family: 'Courier New', monospace; font-size: 0.88em; background: #f3f4f6; padding: 0.1em 0.35em; border-radius: 3px; color: #374151; }
+  pre { background: #1e1e2e; color: #cdd6f4; padding: 1.25rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.6; margin: 1rem 0 1.25rem; }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  /* Callout */
+  .callout { background: #fef2f2; border-left: 4px solid var(--accent); padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .callout p { margin: 0; font-style: italic; color: #374151; }
+  .callout strong { color: var(--accent); font-style: normal; display: block; margin-bottom: 0.35rem; font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .warning { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .warning p { margin: 0; color: #374151; }
+  .warning strong { color: #b45309; font-style: normal; display: block; margin-bottom: 0.35rem; font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Quiz */
+  .quiz { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
+  .quiz h2 { border: none; margin-top: 0; padding-bottom: 0; font-size: 1.1rem; margin-bottom: 1.25rem; }
+  .quiz-q { margin-bottom: 1.5rem; }
+  .quiz-q:last-child { margin-bottom: 0; }
+  .quiz-q p { font-weight: 600; margin-bottom: 0.6rem; }
+  .quiz-q label { display: block; margin-bottom: 0.35rem; font-size: 0.95rem; cursor: pointer; padding: 0.3rem 0; }
+  .quiz-q label:hover { color: var(--accent); }
+  .quiz-q input[type=radio] { accent-color: var(--accent); margin-right: 0.45rem; }
+  .btn { font-family: var(--sans); font-size: 0.85rem; background: var(--accent); color: #fff; border: none; padding: 0.45rem 1.1rem; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; }
+  .btn:hover { background: #b91c1c; }
+  .feedback { display: none; font-family: var(--sans); font-size: 0.88rem; margin-top: 0.5rem; padding: 0.45rem 0.75rem; border-radius: 4px; font-weight: 600; }
+  .feedback.ok { background: #f0fdf4; color: var(--ok); }
+  .feedback.err { background: #fef2f2; color: var(--err); }
+
+  /* Source */
+  .source { background: #f9fafb; border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; margin: 2rem 0; font-family: var(--sans); font-size: 0.85rem; }
+  .source strong { display: block; margin-bottom: 0.3rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+
+  /* Teacher */
+  .teacher { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 2rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+  .teacher-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .teacher-body { font-size: 0.9rem; color: #374151; }
+  .teacher-body strong { display: block; font-family: var(--sans); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; margin-bottom: 0.3rem; }
+
+  /* Lesson nav */
+  .lesson-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--sans); font-size: 0.85rem; }
+  .lesson-nav a { display: flex; flex-direction: column; gap: 0.2rem; max-width: 45%; }
+  .lesson-nav a span:first-child { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
+  .lesson-nav a span:last-child { color: var(--accent); font-weight: 600; }
+  .lesson-nav .nav-next { text-align: right; margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Misión</a>
+    <span>›</span>
+    <a href="#">Fase 4: IA en el Ciclo DevOps</a>
+    <span>›</span>
+    <span>Lección 4.1</span>
+  </nav>
+
+  <header class="lesson-header">
+    <h1>4.1 — IA en el análisis y revisión de Pull Requests</h1>
+    <p class="meta"><strong>Fase 4</strong> · Lección 23 de 55 · ~13 min · IA en el Ciclo DevOps</p>
+  </header>
+
+  <h2>El rol de la IA en el code review moderno</h2>
+  <p>El code review es uno de los cuellos de botella más costosos del desarrollo de software. Los revisores humanos deben leer cientos de líneas de código, recordar el contexto del proyecto, verificar estándares de estilo y al mismo tiempo pensar en implicaciones de arquitectura. Las herramientas de IA como <strong>GitHub Copilot Code Review</strong> transforman este flujo de trabajo actuando como un primer revisor automatizado que nunca se cansa.</p>
+  <p>GitHub Copilot puede revisar automáticamente los cambios de un Pull Request y dejar comentarios sobre problemas potenciales antes de que ningún humano lo toque. Esto cambia radicalmente la dinámica: el reviewer humano recibe un PR ya "pre-filtrado", con las observaciones obvias ya resueltas.</p>
+  <p>Otras herramientas como <strong>CodeRabbit</strong>, <strong>Bito</strong> o modelos de lenguaje integrados vía API permiten análisis similares en pipelines de CI/CD, generando resúmenes automáticos del PR, identificando archivos de alto riesgo y sugiriendo tests ausentes.</p>
+
+  <h2>¿Qué detecta bien la IA en un Pull Request?</h2>
+  <p>La IA brilla especialmente en categorías de problemas que tienen patrones reconocibles en el código:</p>
+  <ul>
+    <li><strong>Problemas de estilo y convenciones:</strong> nombres inconsistentes, comentarios desactualizados, violaciones de guías de estilo del proyecto.</li>
+    <li><strong>Vulnerabilidades de seguridad comunes:</strong> SQL injection, XSS, hardcoded secrets, uso inseguro de funciones criptográficas.</li>
+    <li><strong>Tests ausentes:</strong> código nuevo sin cobertura de tests, edge cases no considerados.</li>
+    <li><strong>Breaking changes:</strong> modificaciones a interfaces públicas, cambios incompatibles en APIs o contratos de datos.</li>
+    <li><strong>Bugs lógicos evidentes:</strong> off-by-one errors, comparaciones incorrectas, variables sin inicializar.</li>
+    <li><strong>Complejidad excesiva:</strong> funciones demasiado largas, anidamiento profundo, código duplicado.</li>
+  </ul>
+  <p>Una plantilla de prompt efectiva para revisión manual con IA:</p>
+  <pre><code>Eres un senior engineer revisando el siguiente diff de Pull Request.
+Identifica: (1) bugs potenciales, (2) problemas de seguridad,
+(3) tests ausentes para los casos importantes, (4) violaciones
+de principios SOLID o clean code. Sé específico con número de línea.
+
+[PEGAR DIFF AQUÍ]</code></pre>
+
+  <h2>Limitaciones y el modelo de colaboración humano-IA</h2>
+  <p>La IA tiene límites claros en el code review que son importantes comprender para no sobrevalorarla:</p>
+  <ul>
+    <li><strong>No entiende el contexto de negocio:</strong> no sabe si un cambio tiene sentido para los usuarios o para los objetivos del producto.</li>
+    <li><strong>No conoce el historial del proyecto:</strong> puede sugerir refactors que van en contra de decisiones deliberadas del equipo.</li>
+    <li><strong>Puede generar falsos positivos:</strong> revisar sus comentarios con criterio sigue siendo necesario.</li>
+    <li><strong>No evalúa trade-offs de arquitectura:</strong> elegir entre dos soluciones correctas requiere conocimiento del sistema completo.</li>
+  </ul>
+
+  <div class="callout">
+    <strong>💡 Principio clave</strong>
+    <p>La IA en code review reduce la carga cognitiva del reviewer humano, que puede entonces focalizarse en arquitectura y contexto de negocio — lo que la IA no entiende.</p>
+  </div>
+
+  <p>El modelo óptimo es: <strong>IA como primera pasada → resolución de comentarios obvios → review humano profundo</strong>. Esto reduce el tiempo de review humano en un 30-50% según estudios internos de equipos que adoptan esta práctica.</p>
+
+  <section class="quiz">
+    <h2>🧠 Comprueba lo aprendido</h2>
+
+    <div class="quiz-q">
+      <p>1. ¿Cuál es el mejor rol de la IA en el proceso de code review?</p>
+      <label><input type="radio" name="q1" value="a"> Como reemplazo completo del reviewer humano para PRs pequeños</label>
+      <label><input type="radio" name="q1" value="b"> Como primera pasada automática que filtra problemas obvios, liberando al reviewer humano para el análisis profundo</label>
+      <label><input type="radio" name="q1" value="c"> Solo para revisar el estilo y formato del código</label>
+      <label><input type="radio" name="q1" value="d"> Para aprobar automáticamente PRs que pasen los tests</label>
+      <button class="btn" onclick="check('q1','b')">Verificar</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="quiz-q">
+      <p>2. ¿Qué tipo de problema es menos probable que detecte la IA en un PR?</p>
+      <label><input type="radio" name="q2" value="a"> Un SQL injection en una query sin parametrizar</label>
+      <label><input type="radio" name="q2" value="b"> Una función con más de 200 líneas sin tests</label>
+      <label><input type="radio" name="q2" value="c"> Un hardcoded secret en el código fuente</label>
+      <label><input type="radio" name="q2" value="d"> Si el cambio tiene sentido desde el punto de vista de negocio y los requisitos del producto</label>
+      <button class="btn" onclick="check('q2','d')">Verificar</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+  </section>
+
+  <div class="source">
+    <strong>📚 Fuente principal</strong>
+    <a href="https://docs.github.com/en/copilot/using-github-copilot/code-review/using-copilot-code-review" target="_blank" rel="noopener">GitHub Docs — Requesting a Copilot code review</a>
+    <p style="margin-top:0.4rem;color:#6b7280;font-size:0.82rem;">docs.github.com · Documentación oficial de GitHub Copilot Code Review</p>
+  </div>
+
+  <div class="teacher">
+    <div class="teacher-avatar">👨‍🏫</div>
+    <div class="teacher-body">
+      <strong>Nota del instructor</strong>
+      Antes de activar Copilot Code Review en tu repositorio, revisa las políticas de tu organización sobre datos de código enviados a servicios externos. Para proyectos con código muy sensible, considera usar modelos locales o herramientas on-premise. La transparencia con el equipo sobre qué herramientas de IA se usan en el flujo de trabajo es fundamental.
+    </div>
+  </div>
+
+  <nav class="lesson-nav">
+    <a href="0022-herramientas-cursor-copilot.html">
+      <span>← Anterior</span>
+      <span>4.0 — Herramientas: Cursor y Copilot</span>
+    </a>
+    <a href="0024-pipelines-cicd.html" class="nav-next">
+      <span>Siguiente →</span>
+      <span>4.2 — Pipelines CI/CD con IA</span>
+    </a>
+  </nav>
+
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

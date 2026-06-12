@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2.6 — Comparativa de modelos: cuándo usar Claude vs. GPT vs. Gemini</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#0891b2;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.84rem}
+  th{background:#f3f4f6;text-align:left;padding:0.65rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.65rem 0.8rem;border:1px solid var(--border)}
+  td:first-child{font-weight:600}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#ecfeff}.opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}.feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 2: Chat Mode Avanzado</a> › Lección 2.6</nav>
+<h1>Comparativa de modelos: cuándo usar Claude vs. GPT vs. Gemini</h1>
+<p class="meta">Fase 2 · Lección 16 de 55 · ~13 min · Chat Mode Avanzado</p>
+
+<h2>No hay un modelo mejor, hay modelos mejores para cada tarea</h2>
+<p>Los tres grandes (Claude, GPT-4o, Gemini) son capaces en casi cualquier tarea. Las diferencias relevantes están en: estilo de respuesta, longitud del contexto, integración con herramientas, precio y comportamiento en casos específicos.</p>
+
+<h2>Comparativa por fortalezas</h2>
+<table>
+  <tr><th>Criterio</th><th>Claude (Anthropic)</th><th>GPT-4o (OpenAI)</th><th>Gemini (Google)</th></tr>
+  <tr><td>Contexto máximo</td><td>200K tokens</td><td>128K tokens</td><td>1M tokens</td></tr>
+  <tr><td>Código</td><td>⭐⭐⭐⭐⭐ Excelente</td><td>⭐⭐⭐⭐⭐ Excelente</td><td>⭐⭐⭐⭐ Muy bueno</td></tr>
+  <tr><td>Razonamiento largo</td><td>⭐⭐⭐⭐⭐ Destaca</td><td>⭐⭐⭐⭐ Muy bueno</td><td>⭐⭐⭐⭐ Muy bueno</td></tr>
+  <tr><td>Integración Google</td><td>❌</td><td>❌</td><td>✅ Nativa (Docs, Drive)</td></tr>
+  <tr><td>Ecosistema / herramientas</td><td>Bueno</td><td>⭐⭐⭐⭐⭐ El más maduro</td><td>Bueno</td></tr>
+  <tr><td>Seguir instrucciones</td><td>⭐⭐⭐⭐⭐ Destaca</td><td>⭐⭐⭐⭐ Muy bueno</td><td>⭐⭐⭐⭐ Muy bueno</td></tr>
+  <tr><td>Precio (tier medio)</td><td>Competitivo</td><td>Competitivo</td><td>Generoso (free tier)</td></tr>
+</table>
+
+<div class="callout">
+  <strong>Regla práctica para desarrolladores</strong>
+  Para uso diario en código y razonamiento: Claude Sonnet o GPT-4o son intercambiables. Para documentos muy largos: Claude o Gemini. Para integración con workflows Google: Gemini. Para el ecosistema más maduro (plugins, fine-tuning, más SDKs): OpenAI.
+</div>
+
+<h2>Los modelos de razonamiento (o1, o3, Claude Thinking)</h2>
+<p>Una nueva categoría: modelos que "piensan antes de responder" usando chain-of-thought interno. Son significativamente mejores en matemáticas, lógica y código complejo, pero más lentos y más caros. Úsalos cuando la tarea lo justifica, no por defecto.</p>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+  <div class="q">
+    <p>¿Cuándo tiene más sentido usar Gemini sobre Claude o GPT-4o?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Cuando necesitas el razonamiento matemático más avanzado disponible</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Cuando necesitas procesar documentos muy largos o integrar con el ecosistema Google</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Cuando el código generado necesita seguir estándares de seguridad estrictos</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Siempre, porque tiene el mayor contexto disponible en todos los modelos</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+  <div class="q">
+    <p>¿Para qué tipo de tarea deberías usar un modelo de razonamiento (o1, o3) en vez del modelo estándar?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Para tareas simples y repetitivas de alto volumen</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Para problemas complejos de lógica, matemáticas o código donde la calidad justifica el coste y latencia extra</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Para cualquier tarea de escritura creativa o generación de texto</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Para tareas que requieren velocidad de respuesta máxima</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','b')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://lmarena.ai/" target="_blank">LMSYS Chatbot Arena — Rankings en tiempo real (lmarena.ai)</a><br>
+  El único ranking basado en preferencias humanas reales en evaluaciones ciegas. Filtra por categoría (código, razonamiento, escritura) para comparativas más específicas.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregunta al agente: "¿Cuál debería usar para mi caso de uso concreto: [describe tu proyecto]?" y te doy una recomendación razonada.
+</div>
+
+<div class="lesson-nav">
+  <a href="0015-ia-toma-decisiones.html">← 2.5 IA para toma de decisiones</a>
+  <a href="0017-autocompletado-generacion-inline.html">3.1 Autocompletado y generación inline →</a>
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

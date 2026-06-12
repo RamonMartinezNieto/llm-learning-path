@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3.6 — Herramientas: Cursor, GitHub Copilot, Claude Code</title>
+<style>
+  :root{--accent:#059669;--serif:Georgia,serif;--sans:system-ui,sans-serif;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:#1f2937;line-height:1.7;font-size:1rem}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem}
+  .breadcrumb{font-size:.8rem;color:#6b7280;margin-bottom:2rem}
+  .breadcrumb span{color:#9ca3af}
+  h1{font-family:var(--serif);font-size:2rem;line-height:1.2;color:#111827;margin-bottom:.5rem}
+  .meta{font-size:.85rem;color:#6b7280;margin-bottom:2.5rem;display:flex;flex-wrap:wrap;gap:.5rem .75rem;align-items:center}
+  .meta .tag{background:#ecfdf5;color:var(--accent);border-radius:999px;padding:.15rem .65rem;font-weight:600;font-size:.75rem}
+  h2{font-family:var(--serif);font-size:1.35rem;color:#111827;margin:2.5rem 0 .75rem;padding-bottom:.35rem;border-bottom:1px solid var(--border)}
+  p{margin-bottom:1rem}
+  ul,ol{margin:0 0 1rem 1.4rem}
+  li{margin-bottom:.35rem}
+  code{background:#f3f4f6;border-radius:4px;padding:.1rem .4rem;font-size:.9em;font-family:'Courier New',monospace;color:#374151}
+  pre{background:#f3f4f6;border-radius:8px;padding:1rem 1.25rem;overflow-x:auto;margin-bottom:1rem;font-size:.88rem;line-height:1.6}
+  .callout{border-left:3px solid var(--accent);background:#ecfdf5;padding:.85rem 1.1rem;border-radius:0 6px 6px 0;margin:1.5rem 0;font-style:italic;color:#065f46}
+
+  /* comparison table */
+  .table-wrap{overflow-x:auto;margin-bottom:1.5rem}
+  table{width:100%;border-collapse:collapse;font-size:.88rem}
+  th{background:#f0fdf4;color:#065f46;font-weight:700;text-align:left;padding:.6rem .85rem;border:1px solid var(--border)}
+  td{padding:.55rem .85rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#fafafa}
+  td:first-child{font-weight:600;white-space:nowrap}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem}
+  .quiz{margin:2.5rem 0}
+  .quiz h2{margin-top:0}
+  .question{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem}
+  .question p{font-weight:600;margin-bottom:.75rem}
+  .question label{display:block;margin-bottom:.45rem;cursor:pointer;font-weight:400;padding:.35rem .5rem;border-radius:5px;transition:background .15s}
+  .question label:hover{background:#f9fafb}
+  .question input[type=radio]{margin-right:.5rem;accent-color:var(--accent)}
+  .btn{display:inline-block;margin-top:.75rem;padding:.45rem 1.1rem;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.9rem;font-family:var(--sans);font-weight:600;transition:opacity .15s}
+  .btn:hover{opacity:.88}
+  .feedback{display:none;margin-top:.65rem;padding:.45rem .75rem;border-radius:5px;font-size:.9rem;font-weight:600}
+  .feedback.ok{background:#dcfce7;color:var(--ok)}
+  .feedback.err{background:#fee2e2;color:var(--err)}
+  .source{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.4rem;margin:2rem 0}
+  .source strong{display:block;margin-bottom:.3rem;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
+  .teacher{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:1.1rem 1.4rem;margin:1.5rem 0}
+  .teacher strong{display:block;margin-bottom:.35rem;color:#92400e;font-size:.9rem}
+  .teacher p{color:#78350f;font-size:.9rem;margin:0}
+  .lesson-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.75rem}
+  .lesson-nav a{font-size:.9rem;font-weight:600;color:var(--accent)}
+  .lesson-nav .prev::before{content:'← '}
+  .lesson-nav .next::after{content:' →'}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="breadcrumb">
+    <a href="../MISSION.md">Misión</a>
+    <span> › </span>Fase 3: IA en el Entorno de Desarrollo
+    <span> › </span>Lección 3.6
+  </nav>
+
+  <h1>3.6 — Herramientas: Cursor, GitHub Copilot, Claude Code</h1>
+  <div class="meta">
+    <span class="tag">Fase 3</span>
+    <span>Lección 22 de 55</span>
+    <span>·</span>
+    <span>⏱ ~14 min</span>
+    <span>·</span>
+    <span>IA en el Entorno de Desarrollo</span>
+  </div>
+
+  <!-- SECCIÓN 1 -->
+  <h2>Comparativa de las tres herramientas principales</h2>
+  <p>El ecosistema de asistentes de codificación con IA evoluciona rápidamente, pero en 2024–2025 tres herramientas dominan el mercado profesional. Cada una tiene un modelo de uso óptimo diferente:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Herramienta</th>
+          <th>Tipo</th>
+          <th>Contexto</th>
+          <th>Precio</th>
+          <th>Mejor para</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GitHub Copilot</td>
+          <td>Plugin IDE (VS Code, JetBrains, Neovim…)</td>
+          <td>Fichero activo + pestañas abiertas</td>
+          <td>$10/mes individual</td>
+          <td>Autocompletado inline del día a día</td>
+        </tr>
+        <tr>
+          <td>Cursor</td>
+          <td>IDE completo (fork de VS Code)</td>
+          <td>Codebase completo indexado</td>
+          <td>$20/mes Pro</td>
+          <td>Refactorizaciones multi-fichero y modo agente</td>
+        </tr>
+        <tr>
+          <td>Claude Code</td>
+          <td>CLI agentic (terminal)</td>
+          <td>Repositorio completo leído en contexto</td>
+          <td>Pay-per-use vía API</td>
+          <td>Tareas autónomas complejas: issue → implementación</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECCIÓN 2 -->
+  <h2>Cuándo usar cada herramienta</h2>
+  <p>No son herramientas competidoras, sino complementarias con casos de uso distintos. La elección depende de la complejidad y el alcance de la tarea:</p>
+  <div class="card">
+    <ul style="margin-top:.25rem">
+      <li><strong>GitHub Copilot</strong>: tarea de codificación normal dentro de un fichero. Autocompletado de funciones, snippets, imports. Mínima fricción, integrado en tu flujo habitual.</li>
+      <li><strong>Cursor</strong>: cuando necesitas editar varios ficheros de forma coordinada, refactorizar un módulo completo, o usar el modo agente para encadenar múltiples pasos de transformación del código.</li>
+      <li><strong>Claude Code</strong>: tareas que requieren autonomía prolongada — leer la issue en GitHub, entender la codebase, implementar, escribir tests y proponer la PR. Ideal para tareas bien especificadas que pueden delegarse.</li>
+    </ul>
+  </div>
+
+  <!-- SECCIÓN 3 -->
+  <h2>El concepto clave: contexto de codebase completo</h2>
+  <p>La diferencia fundamental entre GitHub Copilot (tradicional) y Cursor/Claude Code está en la <strong>amplitud del contexto</strong> que el modelo recibe:</p>
+  <ul>
+    <li><strong>Contexto de fichero</strong>: el modelo solo ve el fichero activo y los abiertos. Las sugerencias son localmente relevantes pero ignoran convenciones del proyecto.</li>
+    <li><strong>Contexto de codebase</strong>: el modelo ha indexado o leído todo el repositorio. Puede respetar patrones existentes, usar las abstracciones correctas, y evitar duplicar código que ya existe en otro módulo.</li>
+  </ul>
+  <p>Con contexto completo, una sugerencia de un componente React sabrá que el proyecto usa <code>shadcn/ui</code>, no que hay un <code>Button</code> genérico. Esto cambia cualitativamente la relevancia de las respuestas.</p>
+
+  <div class="callout">
+    ⚠️ "Cursor y Claude Code leen tu codebase completo. Esto mejora drásticamente la relevancia de las sugerencias, pero implica enviar tu código a servidores externos — verifica la política de tu empresa."
+  </div>
+
+  <!-- QUIZ -->
+  <section class="quiz">
+    <h2>Comprueba lo aprendido</h2>
+
+    <div class="question">
+      <p>Q1 — ¿Qué herramienta es más adecuada para una tarea que requiere editar múltiples archivos de forma coordinada?</p>
+      <label><input type="radio" name="q1" value="a"> a) GitHub Copilot, porque su integración con VS Code permite abrir varios ficheros a la vez</label>
+      <label><input type="radio" name="q1" value="b"> b) Cursor o Claude Code, que tienen contexto del codebase completo y modo agente</label>
+      <label><input type="radio" name="q1" value="c"> c) Cualquier herramienta sirve igual; la diferencia es solo de precio y preferencia personal</label>
+      <label><input type="radio" name="q1" value="d"> d) Ninguna IA es fiable para ediciones coordinadas entre varios ficheros del proyecto</label>
+      <button class="btn" onclick="check('q1','b')">Comprobar</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="question">
+      <p>Q2 — ¿Cuál es la ventaja principal de herramientas con contexto de codebase completo vs. autocompletado tradicional?</p>
+      <label><input type="radio" name="q2" value="a"> a) Son más rápidas en generar respuestas porque usan modelos más pequeños y especializados</label>
+      <label><input type="radio" name="q2" value="b"> b) Permiten usar el modelo sin conexión a internet gracias al índice local del repositorio</label>
+      <label><input type="radio" name="q2" value="c"> c) Generan sugerencias coherentes con el estilo, patrones y estructuras específicas de tu proyecto</label>
+      <label><input type="radio" name="q2" value="d"> d) Tienen menor coste por token al procesar solo los ficheros más relevantes del proyecto</label>
+      <button class="btn" onclick="check('q2','c')">Comprobar</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+  </section>
+
+  <!-- SOURCE -->
+  <div class="source">
+    <strong>📖 Recursos primarios recomendados</strong>
+    <a href="https://docs.cursor.com/" target="_blank" rel="noopener">Cursor Documentation — docs.cursor.com</a>
+    <span style="color:#9ca3af;margin:0 .4rem">·</span>
+    <a href="https://docs.github.com/en/copilot" target="_blank" rel="noopener">GitHub Copilot Docs — docs.github.com/en/copilot</a>
+    <p style="margin:.3rem 0 0;font-size:.85rem;color:#6b7280">Documentación oficial de ambas herramientas, incluyendo guías de configuración del contexto de codebase, modo agente y políticas de privacidad de datos.</p>
+  </div>
+
+  <!-- TEACHER -->
+  <div class="teacher">
+    <strong>🤖 Pregunta al agente para profundizar</strong>
+    <p>Describe tu stack actual al agente y pregunta: <em>"Dado que trabajo con [tu stack], ¿qué herramienta entre GitHub Copilot, Cursor y Claude Code me daría más valor para mi tipo de trabajo habitual? ¿Qué casos de uso específicos debería probar primero?"</em></p>
+  </div>
+
+  <!-- NAV -->
+  <nav class="lesson-nav">
+    <a class="prev" href="0021-documentacion-automatica.html">3.5 Documentación automática</a>
+    <a class="next" href="0023-ia-pull-requests.html">3.7 IA en pull requests</a>
+  </nav>
+
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

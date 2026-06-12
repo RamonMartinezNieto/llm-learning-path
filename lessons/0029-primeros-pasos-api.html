@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5.1 — Primeros pasos con la API de Anthropic / OpenAI</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+  nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  pre,code{font-family:monospace;font-size:0.83rem}
+  pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;overflow-x:auto;line-height:1.6;margin:1rem 0}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .warning{background:#fff7ed;border-left:3px solid #f97316;padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .warning strong{font-family:var(--sans);font-size:0.8rem;color:#c2410c;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+  th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}
+  .q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f5f3ff}
+  .opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}
+  .feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+  .source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">Inicio</a> › <a href="index.html">Lecciones</a> › 5.1 Primeros pasos con la API</nav>
+
+<h1>5.1 — Primeros pasos con la API de Anthropic / OpenAI</h1>
+<div class="meta">Fase 5 · Lección 29 de 55 · ~18 min · Construcción con APIs de IA</div>
+
+<p>Las APIs de los grandes modelos de lenguaje te permiten integrar inteligencia artificial en cualquier aplicación. En esta lección aprendemos lo esencial para hacer tu primera llamada real desde Python.</p>
+
+<h2>Autenticación y API keys</h2>
+<p>Para usar las APIs de Anthropic u OpenAI necesitas una clave de API (<em>API key</em>). Esta clave identifica tu cuenta y se usa para facturar el uso. Hay una regla de oro:</p>
+
+<div class="callout">
+  <strong>Seguridad crítica</strong>
+  Las API keys son credenciales de acceso con coste. Guárdalas en variables de entorno (<code>.env</code>) nunca en el código ni en el repositorio. Una key expuesta en GitHub puede generar miles de euros en cargos en pocas horas.
+</div>
+
+<p>La forma correcta es usar un archivo <code>.env</code> en la raíz de tu proyecto (añadido al <code>.gitignore</code>) y cargarlo con la librería <code>python-dotenv</code>:</p>
+
+<pre># archivo .env (NUNCA subir a git)
+ANTHROPIC_API_KEY=sk-ant-api03-...
+OPENAI_API_KEY=sk-proj-...</pre>
+
+<pre># Python: cargar la key desde .env
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+api_key = os.environ.get("ANTHROPIC_API_KEY")
+# Las librerías la leen automáticamente del entorno</pre>
+
+<h2>La estructura de mensajes: roles del sistema</h2>
+<p>Tanto Anthropic como OpenAI usan el mismo concepto: un <strong>array de mensajes</strong> donde cada mensaje tiene un <code>role</code> y un <code>content</code>. Los roles posibles son:</p>
+
+<table>
+  <thead>
+    <tr><th>Role</th><th>Descripción</th><th>Cuándo se usa</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>system</code></td><td>Instrucciones base del asistente</td><td>Al inicio, define comportamiento y personalidad</td></tr>
+    <tr><td><code>user</code></td><td>Mensajes del usuario humano</td><td>Cada turno del usuario en la conversación</td></tr>
+    <tr><td><code>assistant</code></td><td>Respuestas anteriores del modelo</td><td>Para mantener historial de conversación</td></tr>
+  </tbody>
+</table>
+
+<h2>Llamada básica con la API de Anthropic</h2>
+<p>Instala la librería con <code>pip install anthropic</code> y realiza tu primera llamada:</p>
+
+<pre>import anthropic
+
+client = anthropic.Anthropic()
+# La key se lee de ANTHROPIC_API_KEY en el entorno
+
+message = client.messages.create(
+    model="claude-opus-4-5",
+    max_tokens=1024,
+    system="Eres un asistente útil y conciso.",  # opcional
+    messages=[
+        {"role": "user", "content": "Hola, ¿cómo estás?"}
+    ]
+)
+
+# Acceder al texto de la respuesta
+print(message.content[0].text)
+
+# Información útil en la respuesta
+print(f"Tokens de entrada: {message.usage.input_tokens}")
+print(f"Tokens de salida: {message.usage.output_tokens}")</pre>
+
+<h2>Llamada básica con la API de OpenAI</h2>
+<p>Instala con <code>pip install openai</code>. La estructura es muy similar:</p>
+
+<pre>from openai import OpenAI
+
+client = OpenAI()
+# La key se lee de OPENAI_API_KEY en el entorno
+
+completion = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "Eres un asistente útil y conciso."},
+        {"role": "user", "content": "Hola, ¿cómo estás?"}
+    ]
+)
+
+# Acceder al texto de la respuesta
+print(completion.choices[0].message.content)
+
+# Información de uso
+print(f"Tokens totales: {completion.usage.total_tokens}")</pre>
+
+<h2>Campos clave de la respuesta</h2>
+<p>Las dos APIs tienen estructuras de respuesta ligeramente diferentes. Es importante conocer dónde está el texto:</p>
+
+<table>
+  <thead>
+    <tr><th>API</th><th>Cómo acceder al texto</th><th>Tokens de uso</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Anthropic</td><td><code>message.content[0].text</code></td><td><code>message.usage.input_tokens</code></td></tr>
+    <tr><td>OpenAI</td><td><code>completion.choices[0].message.content</code></td><td><code>completion.usage.total_tokens</code></td></tr>
+  </tbody>
+</table>
+
+<p>Nota que Anthropic devuelve <code>content</code> como un array (puede haber múltiples bloques, por ejemplo texto + tool use), mientras que OpenAI devuelve <code>choices</code> como array (para cuando se usan múltiples completions con <code>n>1</code>).</p>
+
+<h2>Conversación multi-turno</h2>
+<p>Para mantener una conversación, simplemente acumulas los mensajes en el array:</p>
+
+<pre>import anthropic
+
+client = anthropic.Anthropic()
+historial = []
+
+def chatear(mensaje_usuario):
+    historial.append({"role": "user", "content": mensaje_usuario})
+    
+    respuesta = client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=1024,
+        messages=historial
+    )
+    
+    texto = respuesta.content[0].text
+    historial.append({"role": "assistant", "content": texto})
+    return texto
+
+print(chatear("Me llamo Ana."))
+print(chatear("¿Cómo me llamo?"))  # El modelo sabrá que te llamas Ana</pre>
+
+<div class="source">
+  <strong>Fuente oficial</strong>
+  <a href="https://docs.anthropic.com/en/api/getting-started" target="_blank">Anthropic API Quickstart — docs.anthropic.com</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo aprendido</h3>
+
+  <div class="q">
+    <p><strong>1.</strong> ¿Dónde debes almacenar tu API key?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Directamente en el código Python como una constante</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> En variables de entorno, nunca en el código fuente ni en el repositorio git</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> En un archivo JSON de configuración versionado en el repositorio</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> No importa mientras el repositorio sea privado</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Verificar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>2.</strong> ¿Qué estructura de datos usa la API de Anthropic/OpenAI para el historial de conversación?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Una cadena de texto con el historial completo separado por saltos de línea</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Un diccionario con claves "system", "user" y "assistant"</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Un array de objetos con campos "role" (system/user/assistant) y "content" (el texto)</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Un objeto con los campos "prompt" y "context" separados</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Verificar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0028-ia-gestion-proyectos.html">← 4.8 IA en gestión de proyectos</a>
+  <a href="0030-prompt-caching.html">5.2 Prompt caching →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

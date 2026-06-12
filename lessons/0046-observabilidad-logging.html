@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>7.3 Observabilidad y logging | MattPocockSkills</title>
+<style>
+:root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#dc2626;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+nav a{color:var(--accent);text-decoration:none}
+h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+.meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+p{margin-bottom:1rem}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.3rem}
+.callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+.callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.83rem;line-height:1.6;overflow-x:auto;margin:1rem 0}
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
+.source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+.source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+.source a{color:#0369a1}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+.lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 7: IA en Producción</a> › Lección 7.3</nav>
+<h1>7.3 — Observabilidad, logging y monitoreo de aplicaciones IA</h1>
+<div class="meta">Lección 46 de 55 · ~14 min · Fase 7: Sistemas de IA en Producción</div>
+
+<p>Una aplicación LLM en producción sin observabilidad es una caja negra. Cuando algo falla — y fallará — sin logs adecuados es imposible entender por qué. La observabilidad de aplicaciones IA tiene sus propias peculiaridades respecto a aplicaciones tradicionales: los "errores" no siempre son excepciones, a veces son respuestas incorrectas silenciosas.</p>
+
+<h2>Qué loguear en cada llamada al LLM</h2>
+
+<table>
+  <tr><th>Campo</th><th>Por qué es importante</th></tr>
+  <tr><td>Input prompt (system + user)</td><td>Reproducir el comportamiento exacto para depuración</td></tr>
+  <tr><td>Output completo</td><td>Detectar respuestas incorrectas o fuera de formato</td></tr>
+  <tr><td>Modelo usado</td><td>Comparar comportamiento entre versiones de modelo</td></tr>
+  <tr><td>Tokens de entrada / salida</td><td>Monitorizar coste y detectar prompts que crecen</td></tr>
+  <tr><td>Latencia (ms)</td><td>Detectar degradación de rendimiento del proveedor</td></tr>
+  <tr><td>Coste ($)</td><td>Monitorizar gasto por feature/usuario</td></tr>
+  <tr><td>User ID / Session ID</td><td>Correlacionar problemas con usuarios específicos</td></tr>
+  <tr><td>Timestamp</td><td>Detectar patrones temporales de fallos</td></tr>
+</table>
+
+<h2>Métricas clave a monitorear</h2>
+
+<ul>
+  <li><strong>Error rate:</strong> % de llamadas que devuelven error (timeout, rate limit, malformed output).</li>
+  <li><strong>Coste por tarea:</strong> Tokens totales usados para completar una tarea de negocio end-to-end.</li>
+  <li><strong>Latencia p50/p99:</strong> La mediana y el percentil 99 de tiempo de respuesta.</li>
+  <li><strong>Tasa de reintentos:</strong> Cuántas veces el sistema necesita reintentar antes de éxito.</li>
+  <li><strong>Hallucination rate:</strong> Medido mediante evals periódicas sobre muestras de producción.</li>
+</ul>
+
+<h2>Herramientas de observabilidad LLM</h2>
+
+<p><strong>Langfuse:</strong> Open source, auto-hosteable. Registra trazas, métricas de tokens, anotaciones y evals. Muy recomendado para equipos que necesitan control total sobre sus datos.</p>
+
+<p><strong>Helicone:</strong> Proxy transparente entre tu aplicación y la API del LLM. Sin cambios de código, captura todas las llamadas automáticamente.</p>
+
+<p><strong>Datadog LLM Observability:</strong> Para equipos que ya usan Datadog — integra métricas LLM con el resto del stack de infraestructura.</p>
+
+<h2>Alertas: cuándo notificar</h2>
+
+<p>Configura alertas para:</p>
+<ul>
+  <li>Error rate > 5% en ventana de 5 minutos</li>
+  <li>Latencia p99 > umbral definido por SLA</li>
+  <li>Gasto diario de tokens supera el presupuesto</li>
+  <li>Tasa de respuestas con formato incorrecto (detectable con evals de regex)</li>
+</ul>
+
+<h2>Privacidad: el elefante en la habitación</h2>
+
+<p>Los prompts de usuario pueden contener datos personales sensibles — nombres, emails, información de salud, datos financieros. Antes de loguear prompts completos:</p>
+<ul>
+  <li>¿Tu política de privacidad permite almacenar estas interacciones?</li>
+  <li>¿Cumples con GDPR/LOPD respecto al derecho de supresión?</li>
+  <li>¿Tienes acceso control sobre quién puede ver los logs de prompts?</li>
+  <li>¿Aplicas anonimización/pseudonimización antes de almacenar?</li>
+</ul>
+
+<div class="callout">
+  <strong>Equilibrio crítico</strong>
+  Loguea suficiente para depurar cualquier fallo, pero no más. Los prompts de usuarios pueden contener PII — asegúrate de cumplir con GDPR/LOPD antes de almacenarlos.
+</div>
+
+<div class="source">
+  <strong>Fuente principal</strong>
+  Langfuse documentation<br>
+  <a href="https://langfuse.com/docs" target="_blank">langfuse.com/docs</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo que has aprendido</h3>
+
+  <div class="q">
+    <p><strong>P1.</strong> ¿Cuál es la métrica de negocio más importante a monitorear en una aplicación LLM en producción?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> a) El número de tokens de entrada por llamada, para asegurarse de que los prompts son concisos</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> b) El coste por tarea completada y la tasa de error o necesidad de reintentos, que determinan la viabilidad económica</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> c) La latencia media de respuesta, ya que es la métrica que más impacta la satisfacción del usuario</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>P2.</strong> ¿Qué consideración de privacidad es crítica al implementar logging de prompts?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> a) Que los logs se encripten con AES-256 para protegerlos de accesos no autorizados al servidor</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> b) Que los logs se almacenen durante al menos 90 días para facilitar auditorías de seguridad</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> c) Los prompts de usuarios pueden contener datos personales (PII) que requieren tratamiento especial según GDPR/LOPD</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0045-evaluacion-sistematica-modelos.html">← 7.2 Evaluación sistemática</a>
+  <a href="0047-seguridad-llm-prompt-injection.html">7.4 Seguridad y prompt injection →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.3 — IA para seguridad: detección de vulnerabilidades</title>
+<style>
+  :root {
+    --accent: #dc2626;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: system-ui, -apple-system, sans-serif;
+    --bg: #fffef7;
+    --card: #fff;
+    --border: #e5e7eb;
+    --ok: #15803d;
+    --err: #dc2626;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--serif); background: var(--bg); color: #1a1a1a; line-height: 1.7; font-size: 1.05rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .page-wrap { max-width: 740px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .breadcrumb { font-family: var(--sans); font-size: 0.78rem; color: #6b7280; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
+  .breadcrumb a { color: #6b7280; }
+  .breadcrumb a:hover { color: var(--accent); }
+  .breadcrumb span { color: #9ca3af; }
+
+  .lesson-header { border-bottom: 2px solid var(--accent); padding-bottom: 1.25rem; margin-bottom: 2rem; }
+  h1 { font-family: var(--serif); font-size: 1.9rem; font-weight: 700; line-height: 1.25; color: #111; }
+  .meta { font-family: var(--sans); font-size: 0.8rem; color: #6b7280; margin-top: 0.6rem; letter-spacing: 0.03em; }
+  .meta strong { color: var(--accent); }
+
+  h2 { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: #111; margin: 2.5rem 0 0.9rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  p { margin-bottom: 1rem; }
+  ul, ol { margin: 0.75rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.4rem; }
+  code { font-family: 'Courier New', monospace; font-size: 0.88em; background: #f3f4f6; padding: 0.1em 0.35em; border-radius: 3px; color: #374151; }
+  pre { background: #1e1e2e; color: #cdd6f4; padding: 1.25rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.6; margin: 1rem 0 1.25rem; }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  .callout { background: #fef2f2; border-left: 4px solid var(--accent); padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .callout p { margin: 0; font-style: italic; color: #374151; }
+  .callout strong { color: var(--accent); font-style: normal; display: block; margin-bottom: 0.35rem; font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .warning { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .warning p { margin: 0; color: #374151; }
+  .warning strong { color: #b45309; font-style: normal; display: block; margin-bottom: 0.35rem; font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .quiz { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
+  .quiz h2 { border: none; margin-top: 0; padding-bottom: 0; font-size: 1.1rem; margin-bottom: 1.25rem; }
+  .quiz-q { margin-bottom: 1.5rem; }
+  .quiz-q:last-child { margin-bottom: 0; }
+  .quiz-q p { font-weight: 600; margin-bottom: 0.6rem; }
+  .quiz-q label { display: block; margin-bottom: 0.35rem; font-size: 0.95rem; cursor: pointer; padding: 0.3rem 0; }
+  .quiz-q label:hover { color: var(--accent); }
+  .quiz-q input[type=radio] { accent-color: var(--accent); margin-right: 0.45rem; }
+  .btn { font-family: var(--sans); font-size: 0.85rem; background: var(--accent); color: #fff; border: none; padding: 0.45rem 1.1rem; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; }
+  .btn:hover { background: #b91c1c; }
+  .feedback { display: none; font-family: var(--sans); font-size: 0.88rem; margin-top: 0.5rem; padding: 0.45rem 0.75rem; border-radius: 4px; font-weight: 600; }
+  .feedback.ok { background: #f0fdf4; color: var(--ok); }
+  .feedback.err { background: #fef2f2; color: var(--err); }
+
+  .source { background: #f9fafb; border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; margin: 2rem 0; font-family: var(--sans); font-size: 0.85rem; }
+  .source strong { display: block; margin-bottom: 0.3rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+
+  .teacher { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 2rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+  .teacher-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .teacher-body { font-size: 0.9rem; color: #374151; }
+  .teacher-body strong { display: block; font-family: var(--sans); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; margin-bottom: 0.3rem; }
+
+  .lesson-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--sans); font-size: 0.85rem; }
+  .lesson-nav a { display: flex; flex-direction: column; gap: 0.2rem; max-width: 45%; }
+  .lesson-nav a span:first-child { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
+  .lesson-nav a span:last-child { color: var(--accent); font-weight: 600; }
+  .lesson-nav .nav-next { text-align: right; margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Misión</a>
+    <span>›</span>
+    <a href="#">Fase 4: IA en el Ciclo DevOps</a>
+    <span>›</span>
+    <span>Lección 4.3</span>
+  </nav>
+
+  <header class="lesson-header">
+    <h1>4.3 — IA para seguridad: detección de vulnerabilidades</h1>
+    <p class="meta"><strong>Fase 4</strong> · Lección 25 de 55 · ~14 min · IA en el Ciclo DevOps</p>
+  </header>
+
+  <h2>Qué detecta bien la IA en un análisis de seguridad</h2>
+  <p>La seguridad del software es un dominio donde la IA aporta valor real porque muchas vulnerabilidades tienen patrones reconocibles que la IA ha visto miles de veces en su entrenamiento. No es magia: es reconocimiento de patrones a gran escala.</p>
+  <p>Vulnerabilidades donde la IA destaca especialmente:</p>
+  <ul>
+    <li><strong>SQL Injection:</strong> queries construidas con concatenación de strings en lugar de parámetros preparados.</li>
+    <li><strong>Cross-Site Scripting (XSS):</strong> datos de usuario insertados en el DOM sin sanitizar.</li>
+    <li><strong>Hardcoded secrets:</strong> API keys, contraseñas y tokens escritos directamente en el código fuente.</li>
+    <li><strong>Dependencias inseguras:</strong> identificar paquetes con CVEs conocidos o versiones muy desactualizadas.</li>
+    <li><strong>Insecure Direct Object References (IDOR):</strong> endpoints que no verifican autorización antes de acceder a recursos.</li>
+    <li><strong>Uso inseguro de criptografía:</strong> MD5 para passwords, IV fijo en cifrado, etc.</li>
+    <li><strong>Path traversal:</strong> uso de input de usuario en operaciones de sistema de archivos sin sanitizar.</li>
+  </ul>
+  <p>Plantilla de prompt para revisión de seguridad:</p>
+  <pre><code>Analiza este código en busca de vulnerabilidades de seguridad.
+Prioriza según el OWASP Top 10. Para cada vulnerabilidad encontrada:
+1. Nombra la categoría OWASP
+2. Señala la línea exacta
+3. Explica por qué es peligrosa
+4. Proporciona el código corregido
+
+Contexto: [framework, si maneja autenticación, si procesa
+datos de pago, si es público en internet, etc.]
+
+[CÓDIGO AQUÍ]</code></pre>
+
+  <h2>Herramientas: IA + SAST en la práctica</h2>
+  <p>La IA no opera en aislamiento — se integra con herramientas de análisis estático (SAST) para crear pipelines de seguridad potentes:</p>
+  <ul>
+    <li><strong>GitHub Advanced Security:</strong> incluye CodeQL para análisis semántico del código y Secret Scanning automático. Copilot puede explicar los hallazgos y sugerir fixes.</li>
+    <li><strong>Semgrep:</strong> motor de análisis estático muy configurable. Con IA puedes describir un patrón inseguro en lenguaje natural y Semgrep lo convierte en una regla.</li>
+    <li><strong>Snyk:</strong> especializado en dependencias y containers, con sugerencias de remediación generadas por IA.</li>
+    <li><strong>Copilot Autofix:</strong> cuando CodeQL detecta una vulnerabilidad, Copilot puede generar automáticamente el PR con el fix.</li>
+  </ul>
+
+  <div class="warning">
+    <strong>⚠️ Limitación importante</strong>
+    <p>La IA no reemplaza un pentest ni un SAST configurado específicamente para tu stack. Es una capa adicional, no la definitiva. Las vulnerabilidades de lógica de negocio y las pruebas dinámicas requieren herramientas y expertos especializados.</p>
+  </div>
+
+  <h2>Limitaciones críticas del análisis de seguridad con IA</h2>
+  <p>Para usar la IA en seguridad de forma responsable, es clave entender dónde falla:</p>
+  <ul>
+    <li><strong>Vulnerabilidades de lógica de negocio:</strong> si el sistema permite comprar productos a precio negativo porque la lógica de descuentos es incorrecta, la IA no lo detectará — no conoce las reglas de negocio.</li>
+    <li><strong>Vulnerabilidades de runtime:</strong> race conditions, problemas de concurrencia y vulnerabilidades que solo aparecen con datos o tráfico real.</li>
+    <li><strong>Ataques de cadena de suministro:</strong> un paquete malicioso que tiene código aparentemente legítimo.</li>
+    <li><strong>Falsos negativos por contexto:</strong> el código puede parecer seguro en aislamiento pero ser vulnerable en el contexto del sistema completo.</li>
+  </ul>
+
+  <div class="callout">
+    <strong>💡 Estrategia óptima</strong>
+    <p>Para máximo impacto: ejecuta un SAST automático en cada PR y usa IA para revisar código nuevo de autenticación, autorización y manejo de datos sensibles. Combina ambas capas.</p>
+  </div>
+
+  <section class="quiz">
+    <h2>🧠 Comprueba lo aprendido</h2>
+
+    <div class="quiz-q">
+      <p>1. ¿Qué tipo de vulnerabilidad detecta mejor la IA en un code review?</p>
+      <label><input type="radio" name="q1" value="a"> Vulnerabilidades de lógica de negocio específicas del dominio</label>
+      <label><input type="radio" name="q1" value="b"> Patrones comunes como SQL injection, XSS y hardcoded secrets que tienen forma reconocible en el código</label>
+      <label><input type="radio" name="q1" value="c"> Race conditions y problemas de concurrencia en sistemas distribuidos</label>
+      <label><input type="radio" name="q1" value="d"> Ataques de ingeniería social contra los usuarios del sistema</label>
+      <button class="btn" onclick="check('q1','b')">Verificar</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="quiz-q">
+      <p>2. ¿Por qué la IA no es suficiente como única medida de seguridad en producción?</p>
+      <label><input type="radio" name="q2" value="a"> Porque es demasiado lenta para analizar código en tiempo real</label>
+      <label><input type="radio" name="q2" value="b"> Porque solo funciona con lenguajes de programación populares</label>
+      <label><input type="radio" name="q2" value="c"> Porque no puede detectar vulnerabilidades de lógica de negocio ni hacer pruebas dinámicas del sistema en ejecución</label>
+      <label><input type="radio" name="q2" value="d"> Porque genera demasiados falsos positivos que saturan al equipo</label>
+      <button class="btn" onclick="check('q2','c')">Verificar</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+  </section>
+
+  <div class="source">
+    <strong>📚 Fuente principal</strong>
+    <a href="https://owasp.org/www-project-top-10/" target="_blank" rel="noopener">OWASP Top 10 — Open Worldwide Application Security Project</a>
+    <p style="margin-top:0.4rem;color:#6b7280;font-size:0.82rem;">owasp.org · El estándar de referencia para las vulnerabilidades de seguridad web más críticas</p>
+  </div>
+
+  <div class="teacher">
+    <div class="teacher-avatar">👨‍🏫</div>
+    <div class="teacher-body">
+      <strong>Nota del instructor</strong>
+      Una práctica que combina bien con IA: crea un "security checklist" personalizado para tu proyecto con los 10 puntos de seguridad más relevantes para tu stack y dominio. Usa ese checklist como parte del prompt cuando pidas una revisión de seguridad. La IA analizará el código contra criterios específicos de tu contexto, no solo patrones genéricos.
+    </div>
+  </div>
+
+  <nav class="lesson-nav">
+    <a href="0024-pipelines-cicd.html">
+      <span>← Anterior</span>
+      <span>4.2 — Pipelines CI/CD con IA</span>
+    </a>
+    <a href="0026-documentacion-tecnica-proyectos.html" class="nav-next">
+      <span>Siguiente →</span>
+      <span>4.4 — Documentación técnica</span>
+    </a>
+  </nav>
+
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

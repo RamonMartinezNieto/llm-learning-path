@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>8.5 IA para análisis de datos | MattPocockSkills</title>
+<style>
+:root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#16a34a;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+nav a{color:var(--accent);text-decoration:none}
+h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+.meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+p{margin-bottom:1rem}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.3rem}
+.callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+.callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.83rem;line-height:1.6;overflow-x:auto;margin:1rem 0}
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
+.source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+.source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+.source a{color:#0369a1}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+.lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 8: IA Aplicada</a> › Lección 8.5</nav>
+<h1>8.5 — IA para análisis de datos y visualización</h1>
+<div class="meta">Lección 54 de 55 · ~14 min · Fase 8: IA Aplicada a Otras Áreas</div>
+
+<p>Antes, para analizar un CSV necesitabas saber pandas, matplotlib o al menos Excel avanzado. Con el <strong>code interpreter</strong> de ChatGPT y las capacidades de análisis de datos de Claude, cualquier persona puede convertir una pregunta en lenguaje natural en código Python ejecutable con visualizaciones en cuestión de segundos. Este es uno de los casos de uso de mayor ROI inmediato de la IA.</p>
+
+<h2>Code Interpreter: el analista bajo demanda</h2>
+
+<p>El code interpreter (disponible en ChatGPT Advanced Data Analysis y Claude) funciona así:</p>
+<ol>
+  <li>Subes un archivo CSV, Excel o similar</li>
+  <li>Describes en lenguaje natural qué quieres ver o analizar</li>
+  <li>El LLM genera y ejecuta código Python (pandas, matplotlib, seaborn) en un sandbox</li>
+  <li>Ves el resultado y la gráfica directamente en el chat</li>
+  <li>Iteras con más preguntas o refinamientos</li>
+</ol>
+
+<h2>Ejemplo de workflow</h2>
+
+<pre>
+# Tú: [subes ventas_2024.csv]
+"Muéstrame las ventas por mes en un gráfico de barras.
+Resalta los meses con crecimiento mayor al 20% respecto
+al mes anterior."
+
+# El LLM genera y ejecuta:
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('ventas_2024.csv')
+df['crecimiento'] = df['ventas'].pct_change() * 100
+# ... genera el gráfico con highlighting condicional
+</pre>
+
+<h2>Tipos de análisis que funciona especialmente bien</h2>
+
+<table>
+  <tr><th>Tipo de análisis</th><th>Ejemplo de prompt</th></tr>
+  <tr><td>Exploratorio (EDA)</td><td>"Dame un resumen estadístico y detecta valores atípicos"</td></tr>
+  <tr><td>Tendencias temporales</td><td>"Muestra la evolución mensual con línea de tendencia"</td></tr>
+  <tr><td>Comparativa</td><td>"Compara el rendimiento por región en un heatmap"</td></tr>
+  <tr><td>Correlación</td><td>"¿Qué variables tienen más correlación con las ventas?"</td></tr>
+  <tr><td>Segmentación</td><td>"Agrupa los clientes por comportamiento de compra"</td></tr>
+</table>
+
+<h2>Cuándo usar IA vs. herramientas BI dedicadas</h2>
+
+<p><strong>Usa IA (code interpreter) cuando:</strong> análisis ad hoc, exploración de un dataset nuevo, presentaciones rápidas, no tienes acceso a BI tools, o el análisis es complejo y requiere lógica custom.</p>
+
+<p><strong>Usa herramientas BI (Tableau, Power BI, Metabase) cuando:</strong> dashboards recurrentes que se actualizan automáticamente, análisis en tiempo real sobre bases de datos en producción, o múltiples usuarios necesitan acceso centralizado a los mismos reportes.</p>
+
+<h2>Limitaciones importantes</h2>
+
+<ul>
+  <li><strong>Privacidad de datos:</strong> Los datos que subes al code interpreter van a los servidores del proveedor (OpenAI, Anthropic). Nunca subas datos confidenciales, PII, o información sujeta a NDA.</li>
+  <li><strong>El modelo puede hacer suposiciones:</strong> Si el CSV tiene campos ambiguos, el modelo puede interpretarlos de forma incorrecta. Siempre revisa el código generado antes de confiar en el resultado.</li>
+  <li><strong>Sesgo de confirmación:</strong> Si pides "demuestra que X está relacionado con Y", el modelo puede diseñar análisis que confirmen esa hipótesis. Formula preguntas abiertas.</li>
+</ul>
+
+<div class="callout">
+  <strong>Alto ROI inmediato</strong>
+  El code interpreter de ChatGPT/Claude es uno de los casos de uso de mayor ROI inmediato: convierte "analiza este CSV" en código Python ejecutable y gráficas en segundos.
+</div>
+
+<div class="source">
+  <strong>Fuente principal</strong>
+  ChatGPT Data Analysis feature<br>
+  <a href="https://openai.com/chatgpt/features/data-analysis/" target="_blank">openai.com/chatgpt/features/data-analysis</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo que has aprendido</h3>
+
+  <div class="q">
+    <p><strong>P1.</strong> ¿Cuál es la ventaja principal del code interpreter para análisis de datos?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> a) Puede conectarse directamente a bases de datos en producción sin necesidad de exportar los datos</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> b) Convierte descripciones en lenguaje natural en código Python ejecutable con visualizaciones, sin necesidad de recordar sintaxis de pandas o matplotlib</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> c) Genera análisis estadísticos más precisos que los científicos de datos humanos en todos los casos</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>P2.</strong> ¿Qué precaución de privacidad debes tomar antes de subir datos al code interpreter?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> a) Convertir todos los archivos a formato CSV antes de subirlos para evitar vulnerabilidades de seguridad</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> b) Limitar el tamaño del archivo a menos de 10MB para cumplir con las políticas de uso de la plataforma</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> c) Verificar que los datos no contienen PII (datos personales identificables) o información confidencial de la empresa antes de enviarlos a la API del proveedor</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0053-ia-productividad-personal.html">← 8.4 Productividad personal</a>
+  <a href="0055-automatizacion-zapier-make-n8n.html">8.6 Automatización con IA →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

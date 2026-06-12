@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5.6 — Gestión de conversaciones y memoria en aplicaciones</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+  nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  pre,code{font-family:monospace;font-size:0.83rem}
+  pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;overflow-x:auto;line-height:1.6;margin:1rem 0}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .warning{background:#fff7ed;border-left:3px solid #f97316;padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .warning strong{font-family:var(--sans);font-size:0.8rem;color:#c2410c;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+  th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}
+  .q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f5f3ff}
+  .opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}
+  .feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+  .source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">Inicio</a> › <a href="index.html">Lecciones</a> › 5.6 Gestión de conversaciones y memoria</nav>
+
+<h1>5.6 — Gestión de conversaciones y memoria en aplicaciones</h1>
+<div class="meta">Fase 5 · Lección 34 de 55 · ~15 min · Construcción con APIs de IA</div>
+
+<p>Los LLMs son <strong>stateless</strong>: cada llamada a la API es completamente independiente. No hay "sesión" en el servidor, no hay memoria entre llamadas. Cuando un chatbot parece recordar lo que dijiste antes, es porque tu código se lo está recordando explícitamente.</p>
+
+<div class="callout">
+  <strong>Principio fundamental</strong>
+  La "memoria" de un chatbot no la gestiona el modelo — la gestiona TU CÓDIGO. Eres responsable de qué historial incluyes en cada llamada a la API.
+</div>
+
+<h2>Patrón 1: Historial completo en contexto</h2>
+<p>El más simple: acumulas todos los mensajes y los envías en cada llamada. Funciona perfectamente para conversaciones cortas.</p>
+
+<pre>import anthropic
+
+client = anthropic.Anthropic()
+
+class ChatSimple:
+    def __init__(self):
+        self.historial = []
+    
+    def enviar(self, mensaje_usuario: str) -> str:
+        # Añadir mensaje del usuario al historial
+        self.historial.append({
+            "role": "user",
+            "content": mensaje_usuario
+        })
+        
+        # Llamar con TODO el historial
+        respuesta = client.messages.create(
+            model="claude-opus-4-5",
+            max_tokens=1024,
+            messages=self.historial
+        )
+        
+        texto = respuesta.content[0].text
+        
+        # Guardar respuesta del asistente en el historial
+        self.historial.append({
+            "role": "assistant",
+            "content": texto
+        })
+        
+        return texto
+
+chat = ChatSimple()
+print(chat.enviar("Me llamo Carlos y trabajo como médico."))
+print(chat.enviar("¿Qué hago profesionalmente?"))  # Recordará que eres médico</pre>
+
+<p><strong>Problema:</strong> para conversaciones largas, el historial crece indefinidamente, aumentando el coste y eventualmente superando el límite de la ventana de contexto del modelo.</p>
+
+<h2>Patrón 2: Ventana deslizante (sliding window)</h2>
+<p>Mantén solo los últimos N mensajes. Simple y predecible, pero puede "olvidar" información importante de antes:</p>
+
+<pre>import anthropic
+from collections import deque
+
+client = anthropic.Anthropic()
+
+class ChatVentanaDeslizante:
+    def __init__(self, max_mensajes: int = 20):
+        # deque con tamaño máximo — descarta automáticamente los más antiguos
+        self.historial = deque(maxlen=max_mensajes)
+        self.system = "Eres un asistente útil."
+    
+    def enviar(self, mensaje_usuario: str) -> str:
+        self.historial.append({"role": "user", "content": mensaje_usuario})
+        
+        respuesta = client.messages.create(
+            model="claude-opus-4-5",
+            max_tokens=1024,
+            system=self.system,
+            messages=list(self.historial)  # Convierte deque a lista
+        )
+        
+        texto = respuesta.content[0].text
+        self.historial.append({"role": "assistant", "content": texto})
+        return texto
+
+chat = ChatVentanaDeslizante(max_mensajes=10)  # Solo últimos 10 mensajes</pre>
+
+<h2>Patrón 3: Memoria por resumen (summarization)</h2>
+<p>Cuando el historial supera un umbral, pides al modelo que lo comprima en un resumen. El resumen reemplaza los mensajes antiguos, preservando la información esencial:</p>
+
+<pre>import anthropic
+
+client = anthropic.Anthropic()
+
+class ChatConResumen:
+    def __init__(self, umbral_tokens: int = 2000):
+        self.historial = []
+        self.resumen = ""  # Resumen de la conversación pasada
+        self.umbral_tokens = umbral_tokens
+    
+    def _contar_tokens_aprox(self) -> int:
+        # Aproximación: 1 token ≈ 4 caracteres en español
+        texto_total = " ".join(m["content"] for m in self.historial)
+        return len(texto_total) // 4
+    
+    def _resumir_historial(self):
+        """Comprime el historial antiguo en un resumen."""
+        historial_texto = "\n".join(
+            f"{m['role'].upper()}: {m['content']}" 
+            for m in self.historial[:-4]  # Mantén los últimos 4 mensajes intactos
+        )
+        
+        respuesta_resumen = client.messages.create(
+            model="claude-opus-4-5",
+            max_tokens=512,
+            messages=[{
+                "role": "user",
+                "content": f"Resume esta conversación en 3-5 frases, preservando hechos clave:\n\n{historial_texto}"
+            }]
+        )
+        
+        nuevo_resumen = respuesta_resumen.content[0].text
+        self.resumen = nuevo_resumen
+        self.historial = self.historial[-4:]  # Mantén solo los últimos 4 mensajes
+    
+    def enviar(self, mensaje_usuario: str) -> str:
+        if self._contar_tokens_aprox() > self.umbral_tokens:
+            self._resumir_historial()
+        
+        self.historial.append({"role": "user", "content": mensaje_usuario})
+        
+        # Incluir el resumen como contexto en el system prompt
+        system = "Eres un asistente útil."
+        if self.resumen:
+            system += f"\n\nResumen de la conversación anterior:\n{self.resumen}"
+        
+        respuesta = client.messages.create(
+            model="claude-opus-4-5",
+            max_tokens=1024,
+            system=system,
+            messages=self.historial
+        )
+        
+        texto = respuesta.content[0].text
+        self.historial.append({"role": "assistant", "content": texto})
+        return texto</pre>
+
+<h2>Patrón 4: Memoria externa (vector DB)</h2>
+<p>Para conversaciones muy largas o cuando necesitas recuperar información específica, puedes almacenar los mensajes en una base de datos vectorial y recuperar solo los fragmentos relevantes para cada nueva pregunta. Este es el patrón RAG aplicado a la memoria conversacional.</p>
+
+<pre># Pseudocódigo del patrón de memoria semántica
+# (Se desarrolla en detalle en las lecciones 5.7 y 5.8)
+
+class ChatMemoriaSemantica:
+    def __init__(self):
+        self.db_vectorial = ChromaDB()  # o Pinecone, pgvector...
+        self.historial_reciente = []    # Últimos N mensajes
+    
+    def enviar(self, mensaje_usuario: str) -> str:
+        # 1. Buscar memorias relevantes para este mensaje
+        memorias = self.db_vectorial.buscar_similares(
+            query=mensaje_usuario, 
+            n_resultados=5
+        )
+        
+        # 2. Construir contexto con memorias + historial reciente
+        contexto_memoria = "\n".join(memorias)
+        
+        # 3. Llamar al modelo con contexto enriquecido
+        respuesta = llamar_api(
+            system=f"Contexto relevante de conversaciones pasadas:\n{contexto_memoria}",
+            mensajes=self.historial_reciente + [{"role": "user", "content": mensaje_usuario}]
+        )
+        
+        # 4. Guardar nuevo intercambio en la DB vectorial
+        self.db_vectorial.guardar(f"Usuario: {mensaje_usuario}\nAsistente: {respuesta}")
+        
+        return respuesta</pre>
+
+<h2>Comparativa de patrones</h2>
+<table>
+  <thead>
+    <tr><th>Patrón</th><th>Coste</th><th>Memoria</th><th>Complejidad</th><th>Ideal para</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Historial completo</td><td>Alto (crece)</td><td>Perfecta</td><td>Baja</td><td>Conversaciones cortas (&lt;20 turnos)</td></tr>
+    <tr><td>Ventana deslizante</td><td>Controlado</td><td>Solo lo reciente</td><td>Baja</td><td>Chatbots generales</td></tr>
+    <tr><td>Resumen</td><td>Medio</td><td>Comprimida</td><td>Media</td><td>Asistentes de larga duración</td></tr>
+    <tr><td>Vector DB</td><td>Bajo/llamada</td><td>Semántica</td><td>Alta</td><td>Asistentes personales, CRM</td></tr>
+  </tbody>
+</table>
+
+<div class="source">
+  <strong>Fuente oficial</strong>
+  <a href="https://docs.anthropic.com/en/docs/build-with-claude/conversation-history" target="_blank">Building conversational apps — docs.anthropic.com</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo aprendido</h3>
+
+  <div class="q">
+    <p><strong>1.</strong> ¿Por qué un chatbot recuerda lo que dijiste antes?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Porque el modelo mantiene una sesión en el servidor con el historial de la conversación</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Porque tu código incluye el historial de mensajes anteriores en cada nueva llamada a la API</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Porque el modelo tiene memoria a largo plazo entrenada específicamente para tu aplicación</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Porque la API guarda automáticamente el historial por ID de usuario</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Verificar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>2.</strong> ¿Cuál es el problema del patrón de historial completo en conversaciones largas?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> El modelo se confunde con demasiada información y da peores respuestas</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> La API no permite enviar más de 10 mensajes en una sola llamada</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Los tokens del historial acumulado aumentan el coste y eventualmente superan la ventana de contexto del modelo</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> El modelo prioriza los mensajes antiguos sobre los recientes</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Verificar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0033-streaming.html">← 5.5 Streaming de respuestas</a>
+  <a href="0035-rag.html">5.7 RAG →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

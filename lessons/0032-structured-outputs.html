@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5.4 — Structured outputs y parsing de respuestas</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+  nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  pre,code{font-family:monospace;font-size:0.83rem}
+  pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;overflow-x:auto;line-height:1.6;margin:1rem 0}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .warning{background:#fff7ed;border-left:3px solid #f97316;padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .warning strong{font-family:var(--sans);font-size:0.8rem;color:#c2410c;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+  th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}
+  .q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f5f3ff}
+  .opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}
+  .feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+  .source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">Inicio</a> › <a href="index.html">Lecciones</a> › 5.4 Structured outputs</nav>
+
+<h1>5.4 — Structured outputs y parsing de respuestas</h1>
+<div class="meta">Fase 5 · Lección 32 de 55 · ~14 min · Construcción con APIs de IA</div>
+
+<p>Cuando el output del LLM va a ser procesado por código —almacenado en una base de datos, pasado a otro sistema, mostrado en una UI estructurada— necesitas que la respuesta tenga un formato predecible. Los <strong>structured outputs</strong> te dan exactamente eso.</p>
+
+<h2>¿Por qué importan los structured outputs?</h2>
+<p>Sin structured outputs, dependes de que el modelo respete voluntariamente un formato. Puede que funcione el 95% del tiempo, pero ese 5% de fallos rompe tu pipeline. Los enfoques de structured output garantizan la estructura de la respuesta, eliminando la necesidad de regex frágiles o parsing manual.</p>
+
+<table>
+  <thead>
+    <tr><th>Enfoque</th><th>Fiabilidad</th><th>Flexibilidad</th><th>Cuándo usar</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Prompt: "responde en JSON"</td><td>~90%</td><td>Alta</td><td>Prototipos, uso informal</td></tr>
+    <tr><td>OpenAI <code>json_schema</code></td><td>~99.9%</td><td>Media</td><td>Producción con OpenAI</td></tr>
+    <tr><td>Anthropic + Pydantic</td><td>~95%+</td><td>Alta</td><td>Producción con Anthropic</td></tr>
+    <tr><td>Tool use como extractor</td><td>~99%</td><td>Alta</td><td>Cualquier modelo con tools</td></tr>
+  </tbody>
+</table>
+
+<h2>Método 1: Instrucción en el prompt</h2>
+<p>El más sencillo: pedirle explícitamente al modelo que responda en JSON con un schema específico. Funciona bien para casos de uso sencillos:</p>
+
+<pre>import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+texto_a_analizar = "El producto llegó roto y el servicio de atención fue horrible."
+
+respuesta = client.messages.create(
+    model="claude-opus-4-5",
+    max_tokens=512,
+    system="""Eres un analizador de sentimientos. 
+Responde SIEMPRE en JSON válido con exactamente este schema:
+{
+  "sentimiento": "positivo" | "neutro" | "negativo",
+  "puntuacion": número entre -1.0 y 1.0,
+  "aspectos": [lista de aspectos mencionados],
+  "resumen": "frase breve"
+}
+No incluyas ningún texto fuera del JSON.""",
+    messages=[{"role": "user", "content": texto_a_analizar}]
+)
+
+# Parsear el JSON
+datos = json.loads(respuesta.content[0].text)
+print(datos["sentimiento"])   # → "negativo"
+print(datos["puntuacion"])    # → -0.85</pre>
+
+<h2>Método 2: OpenAI con <code>response_format</code></h2>
+<p>OpenAI ofrece un modo de structured output nativo que garantiza conformidad con el schema JSON:</p>
+
+<pre>from openai import OpenAI
+import json
+
+client = OpenAI()
+
+respuesta = client.chat.completions.create(
+    model="gpt-4o",
+    response_format={"type": "json_schema", "json_schema": {
+        "name": "analisis_sentimiento",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "sentimiento": {"type": "string", "enum": ["positivo", "neutro", "negativo"]},
+                "puntuacion": {"type": "number"},
+                "resumen": {"type": "string"}
+            },
+            "required": ["sentimiento", "puntuacion", "resumen"],
+            "additionalProperties": False
+        }
+    }},
+    messages=[
+        {"role": "system", "content": "Analiza el sentimiento del texto."},
+        {"role": "user", "content": "El producto llegó roto y el servicio fue horrible."}
+    ]
+)
+
+datos = json.loads(respuesta.choices[0].message.content)
+print(datos)  # Garantizado que sigue el schema exacto</pre>
+
+<h2>Método 3: Anthropic con validación Pydantic</h2>
+<p>Con Anthropic puedes combinar instrucciones de prompt con validación Pydantic para tener tipado fuerte en Python:</p>
+
+<pre>import anthropic
+import json
+from pydantic import BaseModel, ValidationError
+from typing import Literal, List
+
+client = anthropic.Anthropic()
+
+# Definir el schema con Pydantic
+class AnalisisSentimiento(BaseModel):
+    sentimiento: Literal["positivo", "neutro", "negativo"]
+    puntuacion: float  # Entre -1.0 y 1.0
+    aspectos: List[str]
+    resumen: str
+
+def analizar_sentimiento(texto: str) -> AnalisisSentimiento:
+    respuesta = client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=512,
+        system=f"""Analiza el sentimiento. Responde SOLO en JSON con este schema:
+{AnalisisSentimiento.model_json_schema()}
+Sin texto adicional fuera del JSON.""",
+        messages=[{"role": "user", "content": texto}]
+    )
+    
+    json_texto = respuesta.content[0].text
+    
+    try:
+        datos = json.loads(json_texto)
+        resultado = AnalisisSentimiento(**datos)  # Valida el schema
+        return resultado
+    except (json.JSONDecodeError, ValidationError) as e:
+        raise ValueError(f"El modelo devolvió un formato inválido: {e}")
+
+resultado = analizar_sentimiento("El producto llegó roto.")
+print(resultado.sentimiento)   # Tipado, con autocompletado en el IDE
+print(resultado.puntuacion)    # Float garantizado</pre>
+
+<div class="callout">
+  <strong>Advertencia importante</strong>
+  Un modelo puede devolver JSON válido con campos correctos pero valores alucinados. El schema garantiza la estructura, no la veracidad del contenido. Valida los valores de negocio por separado.
+</div>
+
+<h2>Casos de uso donde es imprescindible</h2>
+<ul style="margin:0 0 1rem 1.5rem;line-height:2">
+  <li><strong>Extracción de datos:</strong> entidades, fechas, precios desde texto no estructurado</li>
+  <li><strong>Pipelines de clasificación:</strong> categorizar tickets, emails, documentos</li>
+  <li><strong>Relleno de formularios:</strong> convertir texto libre en campos estructurados</li>
+  <li><strong>APIs que devuelven datos al frontend:</strong> necesitas JSON predecible</li>
+  <li><strong>ETL con LLM:</strong> transformar y cargar datos en bases de datos</li>
+</ul>
+
+<div class="warning">
+  <strong>No confundas estructura con veracidad</strong>
+  Si extraes la fecha de nacimiento de un CV y el modelo inventa una fecha en formato correcto, el structured output no te protege de eso. Añade validaciones de dominio (rangos, listas permitidas, verificación cruzada) para detectar valores alucinados.
+</div>
+
+<div class="source">
+  <strong>Fuente oficial</strong>
+  <a href="https://platform.openai.com/docs/guides/structured-outputs" target="_blank">OpenAI Structured Outputs — platform.openai.com</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo aprendido</h3>
+
+  <div class="q">
+    <p><strong>1.</strong> ¿Qué garantiza el modo de structured output en la API?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Que los valores del JSON son correctos y verificados</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Que la respuesta tenga el formato y esquema JSON especificado, no que los valores sean correctos o verídicos</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Que el modelo no alucine información falsa</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Que la respuesta sea más rápida que el texto libre</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Verificar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>2.</strong> ¿Para qué tipo de aplicación es imprescindible usar structured outputs?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Para chatbots conversacionales donde el usuario lee las respuestas directamente</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Para obtener respuestas más largas y detalladas del modelo</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Cuando el output del LLM se procesa programáticamente (se parsea, se almacena en BD, se pasa a otro sistema)</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Para reducir el coste de las llamadas a la API</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Verificar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0031-tool-use-function-calling.html">← 5.3 Tool use y function calling</a>
+  <a href="0033-streaming.html">5.5 Streaming de respuestas →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

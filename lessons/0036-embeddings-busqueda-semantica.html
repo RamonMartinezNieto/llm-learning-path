@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5.8 — Embeddings y búsqueda semántica</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+  nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  pre,code{font-family:monospace;font-size:0.83rem}
+  pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;overflow-x:auto;line-height:1.6;margin:1rem 0}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .warning{background:#fff7ed;border-left:3px solid #f97316;padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .warning strong{font-family:var(--sans);font-size:0.8rem;color:#c2410c;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+  th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}
+  .q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f5f3ff}
+  .opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}
+  .feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+  .source a{color:#0369a1}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">Inicio</a> › <a href="index.html">Lecciones</a> › 5.8 Embeddings y búsqueda semántica</nav>
+
+<h1>5.8 — Embeddings y búsqueda semántica</h1>
+<div class="meta">Fase 5 · Lección 36 de 55 · ~16 min · Construcción con APIs de IA</div>
+
+<p>Los embeddings son la tecnología que hace posible el RAG, la búsqueda semántica y muchos otros patrones de IA. Entender qué son y cómo usarlos te abre un abanico de capacidades que van mucho más allá de los chatbots.</p>
+
+<h2>¿Qué es un embedding?</h2>
+<p>Un embedding es una representación numérica densa de un texto como un vector de cientos o miles de dimensiones. La clave es que textos con <strong>significado similar tienen vectores cercanos</strong> en ese espacio multidimensional, independientemente de las palabras exactas usadas.</p>
+
+<p>Ejemplo intuitivo: "perro", "can", "animal doméstico de cuatro patas" y "dog" (en inglés) producen embeddings muy cercanos entre sí, porque un buen modelo de embeddings captura el significado, no las palabras.</p>
+
+<div class="callout">
+  <strong>Concepto clave</strong>
+  Los embeddings son el puente entre el lenguaje natural y las matemáticas. Permiten hacer búsquedas por significado, no por palabras clave. "¿Cuánto cuesta?" y "precio del producto" serán vecinos en el espacio de embeddings.
+</div>
+
+<h2>Cómo generar embeddings</h2>
+<p>Usas un modelo de embeddings dedicado (diferente al modelo de chat) para convertir texto en vectores:</p>
+
+<pre>from openai import OpenAI
+import numpy as np
+
+client = OpenAI()
+
+def generar_embedding(texto: str) -> list[float]:
+    """Convierte texto en un vector de 1536 dimensiones."""
+    respuesta = client.embeddings.create(
+        model="text-embedding-3-small",  # 1536 dimensiones, muy eficiente
+        input=texto
+    )
+    return respuesta.data[0].embedding
+
+# Generar embeddings
+emb_perro = generar_embedding("perro")
+emb_gato = generar_embedding("gato")
+emb_can = generar_embedding("can")      # Sinónimo de perro
+emb_avion = generar_embedding("avión")
+
+print(f"Dimensiones del vector: {len(emb_perro)}")  # → 1536</pre>
+
+<h2>Similitud coseno: la métrica de distancia</h2>
+<p>Para medir qué tan similares son dos embeddings, usamos la <strong>similitud coseno</strong>: mide el ángulo entre dos vectores. Valor 1.0 = idénticos, 0.0 = sin relación, -1.0 = opuestos.</p>
+
+<pre>import numpy as np
+from openai import OpenAI
+
+client = OpenAI()
+
+def similitud_coseno(vec1: list, vec2: list) -> float:
+    """Calcula similitud coseno entre dos vectores. Rango: -1 a 1."""
+    a = np.array(vec1)
+    b = np.array(vec2)
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+def comparar_textos(texto1: str, texto2: str) -> float:
+    emb1 = client.embeddings.create(model="text-embedding-3-small", input=texto1).data[0].embedding
+    emb2 = client.embeddings.create(model="text-embedding-3-small", input=texto2).data[0].embedding
+    return similitud_coseno(emb1, emb2)
+
+# Comparaciones
+print(f"perro vs can:     {comparar_textos('perro', 'can'):.3f}")        # → ~0.85 (muy similares)
+print(f"perro vs gato:    {comparar_textos('perro', 'gato'):.3f}")       # → ~0.70 (relacionados)
+print(f"perro vs avión:   {comparar_textos('perro', 'avión'):.3f}")      # → ~0.25 (no relacionados)
+print(f"precio vs coste:  {comparar_textos('precio', 'coste'):.3f}")     # → ~0.88 (muy similares)</pre>
+
+<h2>Modelos de embeddings disponibles</h2>
+<table>
+  <thead>
+    <tr><th>Modelo</th><th>Proveedor</th><th>Dimensiones</th><th>Notas</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>text-embedding-3-small</code></td><td>OpenAI</td><td>1536</td><td>Mejor relación calidad/coste. Recomendado para empezar.</td></tr>
+    <tr><td><code>text-embedding-3-large</code></td><td>OpenAI</td><td>3072</td><td>Mayor precisión, más costoso.</td></tr>
+    <tr><td><code>voyage-3</code></td><td>Anthropic/Voyage</td><td>1024</td><td>Excelente para código y documentación técnica.</td></tr>
+    <tr><td><code>all-MiniLM-L6-v2</code></td><td>Open source (HuggingFace)</td><td>384</td><td>Gratis, rápido, bueno para producción básica.</td></tr>
+    <tr><td><code>nomic-embed-text</code></td><td>Open source (Ollama)</td><td>768</td><td>Ejecutable localmente, sin coste por llamada.</td></tr>
+  </tbody>
+</table>
+
+<h2>Bases de datos vectoriales</h2>
+<table>
+  <thead>
+    <tr><th>Base de datos</th><th>Tipo</th><th>Ideal para</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Chroma</td><td>Local / embebida</td><td>Desarrollo, prototipado, proyectos pequeños</td></tr>
+    <tr><td>Pinecone</td><td>Cloud gestionada</td><td>Producción, escala, sin gestionar infraestructura</td></tr>
+    <tr><td>pgvector</td><td>Extensión PostgreSQL</td><td>Ya tienes PostgreSQL y no quieres otra base de datos</td></tr>
+    <tr><td>Weaviate</td><td>Open source / cloud</td><td>Búsqueda híbrida (vectorial + keywords)</td></tr>
+    <tr><td>Qdrant</td><td>Open source / cloud</td><td>Alta performance, filtrado avanzado</td></tr>
+  </tbody>
+</table>
+
+<h2>Ejemplo completo: generar, almacenar y consultar</h2>
+
+<pre>from openai import OpenAI
+import chromadb
+import numpy as np
+
+openai_client = OpenAI()
+chroma_client = chromadb.Client()
+coleccion = chroma_client.create_collection(
+    name="productos",
+    metadata={"hnsw:space": "cosine"}  # Usar similitud coseno
+)
+
+# Catálogo de productos
+productos = [
+    {"id": "p1", "texto": "Zapatos de running ligeros para asfalto, talla 42"},
+    {"id": "p2", "texto": "Zapatillas de trail running para montaña con suela grip"},
+    {"id": "p3", "texto": "Camiseta técnica de secado rápido para ciclismo"},
+    {"id": "p4", "texto": "Bicicleta de carretera con cambios Shimano 105"},
+    {"id": "p5", "texto": "Mochila de hidratación 10L para trail running"},
+]
+
+# INDEXAR: Generar embeddings y almacenar
+print("Indexando productos...")
+embeddings = []
+for producto in productos:
+    emb = openai_client.embeddings.create(
+        model="text-embedding-3-small",
+        input=producto["texto"]
+    ).data[0].embedding
+    embeddings.append(emb)
+
+coleccion.add(
+    ids=[p["id"] for p in productos],
+    documents=[p["texto"] for p in productos],
+    embeddings=embeddings
+)
+print(f"✓ {len(productos)} productos indexados")
+
+# BUSCAR: Consulta semántica
+def buscar_productos(consulta: str, n: int = 3):
+    # Generar embedding de la consulta
+    emb_consulta = openai_client.embeddings.create(
+        model="text-embedding-3-small",
+        input=consulta
+    ).data[0].embedding
+    
+    # Buscar en Chroma
+    resultados = coleccion.query(
+        query_embeddings=[emb_consulta],
+        n_results=n,
+        include=["documents", "distances"]
+    )
+    
+    print(f"\nConsulta: '{consulta}'")
+    print("Resultados más relevantes:")
+    for doc, dist in zip(resultados["documents"][0], resultados["distances"][0]):
+        similitud = 1 - dist  # Chroma devuelve distancia, convertir a similitud
+        print(f"  [{similitud:.2f}] {doc}")
+
+buscar_productos("calzado para correr en ciudad")
+# → Encontrará zapatos de running aunque no use las palabras exactas
+
+buscar_productos("bolsa de agua para deporte en montaña")
+# → Encontrará la mochila de hidratación</pre>
+
+<h2>Casos de uso más allá de RAG</h2>
+<ul style="margin:0 0 1rem 1.5rem;line-height:2.2">
+  <li><strong>Sistemas de recomendación:</strong> "Usuarios que compraron X también les gustó Y" basado en similitud de embeddings de productos/contenidos</li>
+  <li><strong>Detección de duplicados:</strong> encontrar tickets de soporte, preguntas FAQ o documentos con el mismo significado</li>
+  <li><strong>Clustering semántico:</strong> agrupar automáticamente feedback de clientes por tema sin categorías predefinidas</li>
+  <li><strong>Clasificación zero-shot:</strong> clasificar texto en categorías nuevas sin ejemplos de entrenamiento</li>
+  <li><strong>Búsqueda de código:</strong> encontrar funciones similares en un repositorio grande por lo que hacen, no por su nombre</li>
+</ul>
+
+<div class="warning">
+  <strong>El modelo de embeddings debe ser consistente</strong>
+  Siempre usa el mismo modelo para indexar y para hacer las consultas. Si cambias el modelo, todos los embeddings almacenados quedan invalidados y debes reindexar. Dos modelos distintos producen espacios vectoriales incompatibles.
+</div>
+
+<div class="source">
+  <strong>Fuente oficial</strong>
+  <a href="https://platform.openai.com/docs/guides/embeddings" target="_blank">OpenAI Embeddings Guide — platform.openai.com</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo aprendido</h3>
+
+  <div class="q">
+    <p><strong>1.</strong> ¿Cómo se mide la similitud entre dos embeddings para búsqueda semántica?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Contando las palabras en común entre los dos textos originales</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Con similitud coseno (cosine similarity), que mide el ángulo entre los dos vectores en el espacio de embeddings</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Comparando las dimensiones del vector una a una con diferencia absoluta</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Con la distancia euclidiana entre los dos puntos en el espacio vectorial</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Verificar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>2.</strong> ¿Cuál es la diferencia entre búsqueda semántica y búsqueda por palabras clave?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> La búsqueda semántica es más lenta pero siempre más precisa que la búsqueda por palabras clave</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> La búsqueda semántica solo funciona en inglés; la de palabras clave funciona en cualquier idioma</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> La búsqueda semántica encuentra textos con significado similar aunque no compartan palabras exactas, la de palabras clave requiere coincidencia textual</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> No hay diferencia práctica; ambas devuelven los mismos resultados en la mayoría de casos</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Verificar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0035-rag.html">← 5.7 RAG</a>
+  <a href="0037-arquitectura-react.html">5.9 Arquitectura ReAct →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

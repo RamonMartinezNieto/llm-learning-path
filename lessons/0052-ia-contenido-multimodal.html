@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>8.3 IA para contenido multimodal | MattPocockSkills</title>
+<style>
+:root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#16a34a;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+nav a{color:var(--accent);text-decoration:none}
+h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+.meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+p{margin-bottom:1rem}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.3rem}
+.callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+.callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.83rem;line-height:1.6;overflow-x:auto;margin:1rem 0}
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
+.source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+.source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+.source a{color:#0369a1}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+.lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 8: IA Aplicada</a> › Lección 8.3</nav>
+<h1>8.3 — IA para creación de contenido multimodal</h1>
+<div class="meta">Lección 52 de 55 · ~13 min · Fase 8: IA Aplicada a Otras Áreas</div>
+
+<p>El panorama de la IA generativa va mucho más allá del texto. En los últimos años han emergido modelos capaces de generar imágenes, audio, video y voz con calidad suficiente para uso profesional. Entender qué herramienta usar para cada tipo de contenido — y las consideraciones éticas y legales asociadas — es esencial para cualquier creador de contenido moderno.</p>
+
+<h2>El ecosistema multimodal</h2>
+
+<table>
+  <tr><th>Tipo</th><th>Modelos principales</th><th>Fortalezas</th></tr>
+  <tr><td>Texto → Imagen</td><td>DALL-E 3 (OpenAI), Midjourney, Stable Diffusion</td><td>Ilustración, concept art, mockups, marketing</td></tr>
+  <tr><td>Texto → Audio/Voz</td><td>ElevenLabs, OpenAI TTS, Google Text-to-Speech</td><td>Narración, podcasts, accesibilidad</td></tr>
+  <tr><td>Texto → Vídeo</td><td>Sora (OpenAI), Runway Gen-3, Pika</td><td>Vídeos cortos, animaciones, prototipos visuales</td></tr>
+  <tr><td>Imagen → Texto</td><td>GPT-4o Vision, Claude 3, Gemini Pro Vision</td><td>Descripción, extracción de datos, análisis visual</td></tr>
+  <tr><td>Audio → Texto</td><td>Whisper (OpenAI), AssemblyAI</td><td>Transcripción, subtitulación, notas de reuniones</td></tr>
+</table>
+
+<h2>Prompting para generación de imágenes</h2>
+
+<p>La calidad de las imágenes generadas depende directamente de la calidad del prompt. Elementos clave:</p>
+<ul>
+  <li><strong>Sujeto:</strong> Qué aparece en la imagen (persona, objeto, escena)</li>
+  <li><strong>Estilo:</strong> Fotografía realista, ilustración, acuarela, pixel art, 3D render</li>
+  <li><strong>Composición:</strong> Plano general/detalle, ángulo de cámara, iluminación</li>
+  <li><strong>Calidad/técnica:</strong> "4K", "photorealistic", "studio lighting", "bokeh"</li>
+  <li><strong>Negative prompts</strong> (Stable Diffusion): qué no quieres que aparezca</li>
+</ul>
+
+<pre>
+# Ejemplo de prompt efectivo para imagen corporativa
+"Professional headshot photo of a person smiling, neutral background,
+studio lighting, shallow depth of field, corporate attire,
+high resolution, 4K"
+
+# Negative prompt (Stable Diffusion)
+"blurry, distorted, low quality, watermark, text"
+</pre>
+
+<h2>Workflows prácticos</h2>
+
+<p><strong>Creación de contenido para redes sociales:</strong> Texto del post con Claude → Imagen con DALL-E → Publicar con Zapier. Un workflow que automatiza la creación de contenido visual a partir de ideas en texto.</p>
+
+<p><strong>Narración de artículos:</strong> Artículo en texto → ElevenLabs TTS → Audio para podcast o accesibilidad. Convierte contenido escrito en audio de alta calidad en minutos.</p>
+
+<h2>Consideraciones éticas y legales</h2>
+
+<p><strong>Derechos de autor:</strong> Las imágenes generadas por IA tienen un estatus legal en evolución. En muchas jurisdicciones, el contenido generado por IA no tiene derechos de autor atribuibles al creador. Consulta las políticas del servicio que usas y la legislación aplicable en tu país.</p>
+
+<p><strong>Deepfakes:</strong> La generación de imágenes o vídeos realistas de personas reales sin su consentimiento es ilegal en muchas jurisdicciones y éticamente problemática. Nunca uses estas tecnologías para crear contenido engañoso sobre personas reales.</p>
+
+<p><strong>Transparencia:</strong> Declarar que el contenido es generado por IA es buena práctica ética. En contextos periodísticos, publicitarios y educativos, la transparencia sobre el origen del contenido es a veces un requisito legal.</p>
+
+<div class="callout">
+  <strong>Práctica ética</strong>
+  El contenido generado por IA debe declararse cuando sea relevante para la audiencia. La transparencia es buena práctica ética y en algunos contextos ya es requisito legal.
+</div>
+
+<div class="source">
+  <strong>Fuente principal</strong>
+  OpenAI DALL-E documentation<br>
+  <a href="https://platform.openai.com/docs/guides/images" target="_blank">platform.openai.com/docs/guides/images</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo que has aprendido</h3>
+
+  <div class="q">
+    <p><strong>P1.</strong> ¿Qué modelos se usan para generar imágenes a partir de texto?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> a) Whisper, ElevenLabs y AssemblyAI, que son los líderes en generación visual</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> b) DALL-E (OpenAI), Midjourney y Stable Diffusion, que son los principales modelos de generación imagen a partir de texto (text-to-image)</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> c) GPT-4o, Claude 3 y Gemini, que son los mejores modelos de lenguaje para describir imágenes</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>P2.</strong> ¿Cuál es la consideración ética más importante al publicar contenido generado por IA?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> a) Verificar que el contenido no contiene errores gramaticales o factológicos antes de publicarlo</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> b) Pagar las tarifas de licencia correspondientes al proveedor del modelo de IA utilizado</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> c) Declarar que el contenido es generado por IA cuando sea relevante, especialmente en contextos donde la audiencia asumiría que es creación humana</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0051-ia-automatizacion-flujos-negocio.html">← 8.2 Automatización de flujos</a>
+  <a href="0053-ia-productividad-personal.html">8.4 Productividad personal →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

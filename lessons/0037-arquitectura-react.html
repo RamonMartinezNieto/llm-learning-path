@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>6.1 Arquitectura ReAct | MattPocockSkills</title>
+<style>
+:root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#0891b2;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+nav a{color:var(--accent);text-decoration:none}
+h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+.meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+p{margin-bottom:1rem}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.3rem}
+.callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+.callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.83rem;line-height:1.6;overflow-x:auto;margin:1rem 0}
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
+.source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+.source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+.source a{color:#0369a1}
+.teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+.teacher strong{display:block;margin-bottom:0.3rem}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+.lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 6: Código Agéntico</a> › Lección 6.1</nav>
+<h1>6.1 — Arquitectura ReAct: Reasoning + Acting</h1>
+<div class="meta">Lección 37 de 55 · ~16 min · Fase 6: Código Agéntico</div>
+
+<p>El patrón <strong>ReAct</strong> (Reasoning + Acting), propuesto por Yao et al. en 2022, es el fundamento de casi todos los agentes de IA modernos. La idea central es sencilla pero poderosa: en lugar de que el modelo solo razone (como en Chain-of-Thought) o solo ejecute acciones, el agente <em>alterna</em> de forma cíclica entre razonamiento explícito y ejecución de acciones, observando el resultado de cada acción antes de decidir el siguiente paso.</p>
+
+<h2>El bucle Thought → Action → Observation</h2>
+
+<p>El bucle ReAct se compone de tres tipos de pasos que se repiten hasta completar la tarea:</p>
+<ul>
+  <li><strong>Thought (Razonamiento):</strong> El modelo reflexiona sobre el estado actual, lo que sabe y lo que necesita hacer a continuación.</li>
+  <li><strong>Action (Acción):</strong> El modelo invoca una herramienta concreta — buscar en la web, ejecutar código, leer un archivo, llamar a una API.</li>
+  <li><strong>Observation (Observación):</strong> El resultado de la acción se devuelve al modelo como nueva información que alimenta el siguiente ciclo de razonamiento.</li>
+</ul>
+<p>Este ciclo permite que el agente integre información externa real en su razonamiento, corrigiendo su plan a medida que obtiene nuevos datos del mundo.</p>
+
+<h2>Ejemplo de traza ReAct</h2>
+<p>Pregunta: <em>"¿Cuántos días lleva activo el proyecto Apache Kafka desde su primera release pública?"</em></p>
+
+<pre>
+Thought: Necesito saber la fecha de la primera release pública de Apache Kafka.
+Action: search_web("Apache Kafka first public release date")
+Observation: Apache Kafka fue liberado como open source en enero de 2011.
+
+Thought: Ahora calculo cuántos días han pasado desde enero de 2011 hasta hoy.
+Action: calculate_days("2011-01-01", "2025-01-15")
+Observation: Han pasado aproximadamente 5,128 días.
+
+Thought: Tengo todos los datos necesarios para responder.
+Final Answer: Apache Kafka ha estado activo durante aproximadamente 5,128 días
+desde su primera release pública en enero de 2011.
+</pre>
+
+<p>Sin ReAct, el modelo intentaría responder solo con su conocimiento de entrenamiento — posiblemente desactualizado. Con ReAct, puede obtener datos reales y realizar cálculos precisos en tiempo de inferencia.</p>
+
+<h2>ReAct vs. Chain-of-Thought puro</h2>
+
+<table>
+  <tr><th>Característica</th><th>Chain-of-Thought (CoT)</th><th>ReAct</th></tr>
+  <tr><td>Acceso a información externa</td><td>No</td><td>Sí, mediante herramientas</td></tr>
+  <tr><td>Corrección en tiempo real</td><td>No</td><td>Sí, tras cada observación</td></tr>
+  <tr><td>Transparencia</td><td>Pasos de pensamiento visibles</td><td>Pensamiento + acciones visibles</td></tr>
+  <tr><td>Casos de uso ideales</td><td>Razonamiento con conocimiento del modelo</td><td>Tareas que requieren datos externos o actuales</td></tr>
+</table>
+
+<p>Los experimentos del paper original mostraron que ReAct supera significativamente a CoT puro en tareas de búsqueda de información y resolución de problemas de múltiples pasos, precisamente porque puede verificar y actualizar su razonamiento con datos reales en cada paso.</p>
+
+<h2>Diferencia con el uso básico de herramientas</h2>
+
+<p>El <em>function calling</em> básico permite que un modelo llame a una función cuando lo necesita, pero sin un bucle de razonamiento explícito ni la capacidad de iterar basándose en observaciones. ReAct va más allá: el modelo escribe su razonamiento antes de cada acción, haciendo el proceso transparente, depurable y más efectivo para tareas de múltiples pasos. Es la diferencia entre "el modelo llama a una función" y "el modelo piensa, actúa, observa y actualiza su plan".</p>
+
+<div class="callout">
+  <strong>Concepto clave</strong>
+  El patrón ReAct es la base de casi todos los agentes modernos. Comprender este bucle te permite diseñar y depurar sistemas agénticos.
+</div>
+
+<div class="source">
+  <strong>Fuente principal</strong>
+  ReAct: Synergizing Reasoning and Acting in Language Models — Yao et al. (2022)<br>
+  <a href="https://arxiv.org/abs/2210.03629" target="_blank">arxiv.org/abs/2210.03629</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo que has aprendido</h3>
+
+  <div class="q">
+    <p><strong>P1.</strong> ¿Qué alterna el patrón ReAct en su bucle?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> a) Pasos de prompting con pasos de fine-tuning del modelo</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> b) Pasos de razonamiento (Thought) con pasos de acción (Action) y observación del resultado (Observation)</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> c) Llamadas síncronas con llamadas asíncronas a herramientas externas</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>P2.</strong> ¿Por qué ReAct supera a CoT puro en tareas complejas?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> a) Porque usa modelos más grandes con más parámetros en cada paso</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> b) Porque reduce el número de tokens necesarios para cada respuesta</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> c) Porque puede obtener información externa real mediante acciones, no solo razonar con el conocimiento del modelo</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0036-embeddings-busqueda-semantica.html">← 6.0 Embeddings y búsqueda semántica</a>
+  <a href="0038-diseno-herramientas-agentes.html">6.2 Diseño de herramientas →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

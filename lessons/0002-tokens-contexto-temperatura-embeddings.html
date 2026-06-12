@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0.2 — Tokens, contexto, temperatura y embeddings</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#1d4ed8;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+  nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.88rem}
+  th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+  .token-demo{display:flex;flex-wrap:wrap;gap:0.4rem;margin:1rem 0}
+  .tok{background:#dbeafe;color:#1e40af;padding:0.25rem 0.5rem;border-radius:4px;font-family:monospace;font-size:0.9rem;border:1px solid #93c5fd}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}
+  .q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f0f4ff}
+  .opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}.feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+  .source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 0: Fundamentos</a> › Lección 0.2</nav>
+
+<h1>Tokens, contexto, temperatura y embeddings</h1>
+<p class="meta">Fase 0 · Lección 2 de 55 · ~15 min · Fundamentos Conceptuales</p>
+
+<h2>Tokens: la unidad de moneda de los LLMs</h2>
+<p>Los LLMs no procesan palabras ni caracteres: procesan <strong>tokens</strong>. Un token es un fragmento de texto de longitud variable — puede ser una palabra completa, una sílaba o un signo de puntuación.</p>
+
+<p>La frase "Hola mundo" se tokeniza aproximadamente así:</p>
+<div class="token-demo">
+  <span class="tok">Hola</span>
+  <span class="tok"> mundo</span>
+</div>
+
+<p>Pero "transformadores" podría ser:</p>
+<div class="token-demo">
+  <span class="tok">trans</span><span class="tok">form</span><span class="tok">adores</span>
+</div>
+
+<div class="callout">
+  <strong>Regla práctica</strong>
+  ~1 token ≈ 0.75 palabras en inglés; ~0.6 palabras en español. 1000 tokens ≈ 750 palabras. Los costes de la API se miden en tokens.
+</div>
+
+<h2>Ventana de contexto</h2>
+<p>La <strong>ventana de contexto</strong> es el límite de tokens que el modelo puede "ver" a la vez. Todo lo que ocurre dentro de una conversación — tu historial, documentos adjuntos, la respuesta generada — compite por ese espacio.</p>
+
+<table>
+  <tr><th>Modelo</th><th>Contexto aprox.</th><th>Equivalente en páginas A4</th></tr>
+  <tr><td>GPT-4o</td><td>128K tokens</td><td>~96 páginas</td></tr>
+  <tr><td>Claude 3.5 Sonnet</td><td>200K tokens</td><td>~150 páginas</td></tr>
+  <tr><td>Gemini 1.5 Pro</td><td>1M tokens</td><td>~750 páginas</td></tr>
+</table>
+
+<h2>Temperatura</h2>
+<p>La temperatura controla cuánta aleatoriedad introduce el modelo al elegir el siguiente token. Técnicamente, escala la distribución de probabilidades antes del muestreo.</p>
+
+<table>
+  <tr><th>Temperatura</th><th>Comportamiento</th><th>Cuándo usarla</th></tr>
+  <tr><td>0.0</td><td>Determinista, siempre elige el token más probable</td><td>Extracción de datos, código, facts</td></tr>
+  <tr><td>0.5–0.7</td><td>Balance entre coherencia y variedad</td><td>Respuestas generales, análisis</td></tr>
+  <tr><td>1.0+</td><td>Alta variedad, más "creativa" y menos predecible</td><td>Brainstorming, escritura creativa</td></tr>
+</table>
+
+<h2>Embeddings</h2>
+<p>Un <strong>embedding</strong> es una representación numérica de texto como un vector en un espacio de alta dimensión (ej. 1536 dimensiones en OpenAI). La magia: textos con significado similar están próximos en ese espacio.</p>
+
+<div class="callout">
+  <strong>Ejemplo mental</strong>
+  "perro" y "gato" estarán cerca en el espacio de embeddings. "perro" y "coche" estarán lejos. Esto permite <em>búsqueda semántica</em>: encontrar documentos relevantes sin que compartan palabras exactas.
+</div>
+
+<p>Los embeddings son la base de RAG (Retrieval-Augmented Generation), que verás en la Fase 5.</p>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+
+  <div class="q">
+    <p>Un texto de 1000 palabras en español equivale aproximadamente a…</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> 400 tokens</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> 750 tokens</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> 1000 tokens</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> 1600 tokens</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','d')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+
+  <div class="q">
+    <p>¿Para qué tarea deberías usar temperatura 0.0?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Generar nombres creativos para una startup</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Escribir un poema en estilo libre</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Extraer campos de un JSON a partir de texto no estructurado</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Hacer brainstorming de ideas de negocio</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+
+  <div class="q">
+    <p>¿Qué propiedad fundamental tienen los embeddings de textos con significado similar?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q3" value="a"> Tienen el mismo número de tokens que el texto original</label>
+      <label class="opt"><input type="radio" name="q3" value="b"> Son vectores numéricamente cercanos en el espacio de embeddings</label>
+      <label class="opt"><input type="radio" name="q3" value="c"> Comparten exactamente las mismas palabras clave</label>
+      <label class="opt"><input type="radio" name="q3" value="d"> Se generan en menos tiempo que los embeddings de textos distintos</label>
+    </div>
+    <button class="check-btn" onclick="check('q3','b')">Comprobar</button>
+    <p class="feedback" id="fb-q3"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://platform.openai.com/tokenizer" target="_blank">OpenAI Tokenizer (herramienta interactiva)</a><br>
+  Pega cualquier texto y observa cómo se divide en tokens. Juega con texto en español, código y emojis para desarrollar intuición real sobre la tokenización.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregúntale a tu agente: "¿Por qué el número de tokens en español es mayor que en inglés?" o "¿Cómo afecta la ventana de contexto al coste de la API?"
+</div>
+
+<div class="lesson-nav">
+  <a href="0001-como-funcionan-los-llms.html">← 0.1 Cómo funcionan los LLMs</a>
+  <a href="0003-ecosistema-modelos-proveedores.html">0.3 El ecosistema actual →</a>
+</div>
+
+<script>
+function check(qid, correct) {
+  const sel = document.querySelector(`input[name="${qid}"]:checked`);
+  const fb = document.getElementById(`fb-${qid}`);
+  if (!sel) { fb.textContent='Selecciona una opción.'; fb.className='feedback err'; fb.style.display='block'; return; }
+  fb.textContent = sel.value===correct ? '✓ Correcto.' : '✗ Incorrecto. Revisa la sección correspondiente.';
+  fb.className = sel.value===correct ? 'feedback ok' : 'feedback err';
+  fb.style.display='block';
+}
+</script>
+</body>
+</html>

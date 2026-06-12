@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0.1 — Cómo funcionan los LLMs</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#1d4ed8;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+  nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  figure{margin:2rem 0;text-align:center}
+  figure figcaption{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-top:0.5rem}
+  .diagram{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;font-family:monospace;font-size:0.85rem;line-height:2;overflow-x:auto}
+  /* Quiz */
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}
+  .q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f0f4ff}
+  .opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .check-btn:hover{background:#1e40af}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}
+  .feedback.err{color:var(--err)}
+  /* Source */
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+  .source a{color:#0369a1}
+  /* Teacher */
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  /* Nav */
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 0: Fundamentos</a> › Lección 0.1</nav>
+
+<h1>Cómo funcionan los LLMs</h1>
+<p class="meta">Fase 0 · Lección 1 de 55 · ~12 min · Fundamentos Conceptuales</p>
+
+<h2>¿Qué es un LLM?</h2>
+<p>Un <strong>Large Language Model</strong> es una red neuronal entrenada sobre enormes volúmenes de texto (libros, webs, código) con un objetivo engañosamente simple: <em>predecir el siguiente token</em>. De esa tarea elemental emerge la capacidad de razonar, traducir, programar y conversar.</p>
+
+<div class="callout">
+  <strong>Analogía</strong>
+  Imagina que has leído miles de millones de frases y entrenas tu intuición para completarlas. "El cielo es de color…" → "azul". Con suficiente escala, esa intuición se convierte en algo que parece comprensión.
+</div>
+
+<h2>El proceso de entrenamiento en tres pasos</h2>
+
+<div class="diagram">
+1. Pre-entrenamiento ──→ El modelo ve todo el texto de internet
+                          y aprende patrones del lenguaje.
+                          (Meses. Miles de GPUs. Enorme corpus.)
+
+2. Fine-tuning / RLHF ──→ Se afina para seguir instrucciones
+                           y responder de forma útil y segura.
+
+3. Inferencia ──────────→ Tú envías un prompt. El modelo genera
+                           tokens uno a uno hasta completar la respuesta.
+</div>
+
+<h2>Predicción token a token</h2>
+<p>Cada token generado se añade al contexto y se convierte en entrada para el siguiente. El modelo no "piensa" de forma holística — genera <strong>de izquierda a derecha</strong>, token a token, sin poder borrar lo que ya escribió. Esto explica por qué los LLMs cometen errores que parecen "tontos" en operaciones aritméticas simples.</p>
+
+<div class="callout">
+  <strong>Implicación práctica</strong>
+  Cuanto más claro y específico sea tu prompt, más probable es que el modelo genere el siguiente token "correcto" en cada paso. Esa es la base del prompt engineering.
+</div>
+
+<h2>¿Por qué son tan capaces?</h2>
+<p>La escala importa. Con suficientes parámetros y datos, los modelos desarrollan <strong>capacidades emergentes</strong> que no fueron programadas explícitamente: razonamiento, traducción multilingüe, escritura de código. Nadie sabe exactamente por qué sucede — es uno de los misterios activos de la investigación en IA.</p>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+
+  <div class="q" id="q1">
+    <p>¿Cuál es el objetivo básico con el que se entrena un LLM?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Clasificar imágenes en categorías predefinidas</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Predecir el siguiente token en una secuencia de texto</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Responder preguntas de verdadero o falso sobre hechos</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Traducir texto entre pares de idiomas específicos</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+
+  <div class="q" id="q2">
+    <p>Cuando un LLM genera una respuesta, ¿cómo lo hace?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Busca la respuesta correcta en una base de datos interna</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Razona el texto completo de una vez y luego lo escribe</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Genera tokens uno a uno, añadiendo cada uno al contexto</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Copia fragmentos textuales de sus datos de entrenamiento</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+
+  <div class="q" id="q3">
+    <p>¿Qué es el fine-tuning con RLHF en el pipeline de un LLM?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q3" value="a"> El entrenamiento inicial sobre grandes volúmenes de texto</label>
+      <label class="opt"><input type="radio" name="q3" value="b"> El ajuste posterior para que el modelo siga instrucciones y sea seguro</label>
+      <label class="opt"><input type="radio" name="q3" value="c"> El proceso de comprimir el modelo para que ocupe menos memoria</label>
+      <label class="opt"><input type="radio" name="q3" value="d"> La fase en que el modelo aprende a generar imágenes y audio</label>
+    </div>
+    <button class="check-btn" onclick="check('q3','b')">Comprobar</button>
+    <p class="feedback" id="fb-q3"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://www.youtube.com/watch?v=zjkBMFhNj_g" target="_blank">Andrej Karpathy — "Intro to Large Language Models" (YouTube, 1h)</a><br>
+  La introducción más honesta y técnicamente sólida sobre qué son y qué no son los LLMs. Obligatoria para tener un modelo mental correcto.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Algo no quedó claro?</strong>
+  Pregúntale a tu agente: "Explícame por qué los LLMs alucinan si solo predicen el siguiente token" o cualquier otro concepto de esta lección. Estoy aquí para profundizar.
+</div>
+
+<div class="lesson-nav">
+  <span></span>
+  <a href="0002-tokens-contexto-temperatura-embeddings.html">Siguiente: Tokens, contexto y temperatura →</a>
+</div>
+
+<script>
+function check(qid, correct) {
+  const sel = document.querySelector(`input[name="${qid}"]:checked`);
+  const fb = document.getElementById(`fb-${qid}`);
+  if (!sel) { fb.textContent = 'Selecciona una opción primero.'; fb.className='feedback err'; fb.style.display='block'; return; }
+  if (sel.value === correct) {
+    fb.textContent = '✓ Correcto.';
+    fb.className = 'feedback ok';
+  } else {
+    fb.textContent = '✗ Incorrecto. Vuelve a leer la sección y reintenta.';
+    fb.className = 'feedback err';
+  }
+  fb.style.display = 'block';
+}
+</script>
+</body>
+</html>

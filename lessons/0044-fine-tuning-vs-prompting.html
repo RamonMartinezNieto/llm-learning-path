@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>7.1 Fine-tuning vs. prompting | MattPocockSkills</title>
+<style>
+:root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#dc2626;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+nav a{color:var(--accent);text-decoration:none}
+h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+.meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+p{margin-bottom:1rem}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.3rem}
+.callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+.callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.83rem;line-height:1.6;overflow-x:auto;margin:1rem 0}
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
+.source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+.source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+.source a{color:#0369a1}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+.lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 7: IA en Producción</a> › Lección 7.1</nav>
+<h1>7.1 — Fine-tuning vs. prompting: cuándo usar cada enfoque</h1>
+<div class="meta">Lección 44 de 55 · ~15 min · Fase 7: Sistemas de IA en Producción</div>
+
+<p>Una de las preguntas más frecuentes en equipos que llevan aplicaciones de IA a producción: <em>"¿Cuándo debería hacer fine-tuning en lugar de seguir mejorando los prompts?"</em> La respuesta honesta es que la mayoría de las veces, no necesitas fine-tuning. Pero cuando sí lo necesitas, marca una diferencia real.</p>
+
+<h2>El framework de decisión</h2>
+
+<p>Sigue este orden estrictamente:</p>
+<ol>
+  <li><strong>Prompting primero:</strong> Itera el system prompt, añade few-shot examples, prueba diferentes framing. El 70% de los problemas se resuelven aquí.</li>
+  <li><strong>RAG si el problema es conocimiento:</strong> Si el modelo no sabe algo porque no está en su entrenamiento, RAG es la solución, no fine-tuning.</li>
+  <li><strong>Fine-tuning solo si:</strong> Tienes >1000 ejemplos de alta calidad, necesitas estilo/formato ultra-consistente, y la latencia/coste a escala lo justifica.</li>
+</ol>
+
+<h2>Qué puede (y no puede) hacer el fine-tuning</h2>
+
+<table>
+  <tr><th>Fine-tuning SÍ puede</th><th>Fine-tuning NO puede</th></tr>
+  <tr><td>Consistencia de formato/estilo</td><td>Añadir conocimiento factual nuevo</td></tr>
+  <tr><td>Seguir instrucciones específicas más fielmente</td><td>Actualizar información desactualizada</td></tr>
+  <tr><td>Reducir prompts largos (el comportamiento queda "horneado")</td><td>Eliminar alucinaciones sobre hechos</td></tr>
+  <tr><td>Ajustar tono y vocabulario de forma consistente</td><td>Razonar mejor sobre dominios nuevos sin datos</td></tr>
+</table>
+
+<p>La <strong>regla de oro</strong>: haz fine-tuning sobre <em>comportamientos</em> (cómo responde), no sobre <em>conocimiento</em> (qué sabe). Para conocimiento, usa RAG o context injection.</p>
+
+<h2>Comparativa de costes</h2>
+
+<table>
+  <tr><th>Aspecto</th><th>Prompting</th><th>Fine-tuning</th></tr>
+  <tr><td>Coste inicial</td><td>Bajo (solo iteración)</td><td>Alto (preparación de datos + entrenamiento)</td></tr>
+  <tr><td>Coste por llamada</td><td>Normal + tokens del prompt</td><td>Puede ser menor (menos tokens de sistema)</td></tr>
+  <tr><td>Tiempo hasta producción</td><td>Días</td><td>Semanas (preparar datos, entrenar, evaluar)</td></tr>
+  <tr><td>Mantenimiento</td><td>Editar el prompt</td><td>Re-entrenar con nuevos datos si el comportamiento cambia</td></tr>
+  <tr><td>Ejemplos mínimos útiles</td><td>5-20 (few-shot)</td><td>500-1000+ (entrenamiento)</td></tr>
+</table>
+
+<h2>Cuándo el fine-tuning sí tiene sentido</h2>
+
+<ul>
+  <li>Necesitas que el modelo responda siempre en un formato JSON muy específico con campos anidados complejos</li>
+  <li>Tienes una jerga de dominio muy específica (legal, médico, código propietario) y >1000 ejemplos etiquetados</li>
+  <li>El prompt de sistema es tan largo que impacta significativamente el coste a escala</li>
+  <li>Latencia extremadamente crítica y cada token cuenta</li>
+</ul>
+
+<div class="callout">
+  <strong>Regla del 90%</strong>
+  El 90% de los casos de uso no necesitan fine-tuning. Antes de plantearlo, asegúrate de haber agotado las técnicas de prompting y RAG.
+</div>
+
+<div class="source">
+  <strong>Fuente principal</strong>
+  OpenAI Fine-tuning guide<br>
+  <a href="https://platform.openai.com/docs/guides/fine-tuning" target="_blank">platform.openai.com/docs/guides/fine-tuning</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo que has aprendido</h3>
+
+  <div class="q">
+    <p><strong>P1.</strong> ¿Cuándo tiene sentido hacer fine-tuning en lugar de seguir mejorando los prompts?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> a) Siempre que el modelo no responda exactamente como quieres en el primer intento</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> b) Cuando tienes cientos de ejemplos de alta calidad y necesitas un estilo o comportamiento muy consistente que los prompts no pueden lograr de forma fiable</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> c) Cuando quieres que el modelo tenga acceso a datos de tu empresa que son confidenciales</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>P2.</strong> ¿Qué NO puede hacer el fine-tuning que a veces se asume incorrectamente que puede?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> a) Hacer que el modelo responda siempre en un formato de salida específico y estructurado</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> b) Hacer que el modelo ignore ciertos tipos de solicitudes no deseadas</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> c) Enseñar al modelo conocimiento nuevo y factual que no tenía en el pre-entrenamiento, eso es tarea de RAG</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0043-frameworks-langchain-crewai.html">← 6.7 Frameworks de agentes</a>
+  <a href="0045-evaluacion-sistematica-modelos.html">7.2 Evaluación sistemática →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

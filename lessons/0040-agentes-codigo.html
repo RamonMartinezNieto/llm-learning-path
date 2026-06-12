@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>6.4 Agentes de código | MattPocockSkills</title>
+<style>
+:root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#0891b2;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+nav a{color:var(--accent);text-decoration:none}
+h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+.meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+p{margin-bottom:1rem}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.3rem}
+.callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+.callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.83rem;line-height:1.6;overflow-x:auto;margin:1rem 0}
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
+.source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+.source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+.source a{color:#0369a1}
+.teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+.teacher strong{display:block;margin-bottom:0.3rem}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+.lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 6: Código Agéntico</a> › Lección 6.4</nav>
+<h1>6.4 — Agentes de código: desde issue a PR de forma autónoma</h1>
+<div class="meta">Lección 40 de 55 · ~16 min · Fase 6: Código Agéntico</div>
+
+<p>Los <strong>coding agents</strong> representan uno de los avances más prácticos de la IA agéntica. A diferencia de un asistente de código que sugiere fragmentos, un coding agent puede leer un repositorio real, entender su contexto, planificar cambios, escribir el código, ejecutar los tests y crear una Pull Request — todo de forma autónoma o con supervisión mínima.</p>
+
+<h2>Arquitectura de un coding agent</h2>
+
+<p>El ciclo de un coding agent típico tiene estas etapas:</p>
+<ol>
+  <li><strong>Comprensión del codebase:</strong> Lee archivos relevantes, entiende la estructura del proyecto, localiza el código relacionado con la tarea.</li>
+  <li><strong>Planificación:</strong> Define qué archivos modificar, en qué orden, y qué tests escribir o actualizar.</li>
+  <li><strong>Implementación:</strong> Escribe o modifica código archivo por archivo, manteniendo coherencia entre ellos.</li>
+  <li><strong>Verificación:</strong> Ejecuta los tests, corrige errores, hace linting. Itera hasta que pasan.</li>
+  <li><strong>Entrega:</strong> Crea la PR con descripción de los cambios, qué se testó y por qué se tomaron ciertas decisiones.</li>
+</ol>
+
+<h2>Herramientas necesarias</h2>
+
+<table>
+  <tr><th>Herramienta</th><th>Propósito</th></tr>
+  <tr><td><code>read_file(path)</code></td><td>Leer el contenido de archivos del repositorio</td></tr>
+  <tr><td><code>write_file(path, content)</code></td><td>Crear o modificar archivos</td></tr>
+  <tr><td><code>search_code(query)</code></td><td>Encontrar referencias, definiciones, usos</td></tr>
+  <tr><td><code>run_bash(cmd)</code></td><td>Ejecutar tests, linters, compiladores</td></tr>
+  <tr><td><code>list_files(path)</code></td><td>Explorar la estructura del proyecto</td></tr>
+  <tr><td><code>create_pr(title, body)</code></td><td>Abrir la Pull Request con el resultado</td></tr>
+</table>
+
+<h2>Ejemplos en producción: Claude Code y GitHub Copilot Agent</h2>
+
+<p><strong>Claude Code</strong> (Anthropic) es un agente de terminal que opera sobre el directorio local. Lee el codebase completo, razona sobre los cambios necesarios y los implementa. Especialmente efectivo para: corregir bugs con stack traces, implementar funciones con specs claras, refactorizar código con tests existentes.</p>
+
+<p><strong>GitHub Copilot Agent Mode</strong> integra el agente directamente en VS Code, con acceso al workspace del editor. Puede leer errores de la consola y el estado del linter en tiempo real para corregir iterativamente.</p>
+
+<h2>El desafío de la coherencia entre archivos</h2>
+
+<p>El mayor reto de los coding agents no es escribir código correcto en un archivo — es mantener coherencia cuando hay que modificar múltiples archivos interdependientes. Un cambio en una interfaz de TypeScript debe propagarse a todos los archivos que la implementan. Si el agente no tiene un plan global del alcance del cambio, puede "arreglar" un archivo y "romper" otro.</p>
+
+<p>La solución es la <strong>planificación explícita</strong>: antes de escribir código, el agente debe generar un plan con todos los archivos afectados y el orden de modificación.</p>
+
+<h2>Human-in-the-loop: cuándo pedir confirmación</h2>
+
+<p>Los buenos coding agents incluyen checkpoints donde piden confirmación antes de acciones de alto impacto:</p>
+<ul>
+  <li>Antes de modificar más de N archivos</li>
+  <li>Antes de ejecutar comandos destructivos (<code>rm</code>, migraciones de base de datos)</li>
+  <li>Cuando los tests fallan repetidamente y el agente no encuentra la causa</li>
+  <li>Cuando el scope de la tarea es mayor de lo esperado</li>
+</ul>
+
+<div class="callout">
+  <strong>Recomendación práctica</strong>
+  Los coding agents actuales son más útiles para tareas bien definidas (fix this bug, implement this function) que para arquitectura abierta. Define el scope claramente.
+</div>
+
+<div class="source">
+  <strong>Fuente principal</strong>
+  Claude Code documentation — Anthropic<br>
+  <a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank">docs.anthropic.com/en/docs/claude-code</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo que has aprendido</h3>
+
+  <div class="q">
+    <p><strong>P1.</strong> ¿Qué diferencia a un coding agent de un simple generador de código?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> a) El coding agent usa un modelo más grande con más parámetros entrenados en código</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> b) El agente lee el codebase real, ejecuta los cambios, corre los tests y puede iterar hasta que el resultado es correcto</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> c) El coding agent solo genera código en lenguajes de bajo nivel como C o Rust</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>P2.</strong> ¿Para qué tipo de tarea es más efectivo un coding agent actualmente?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> a) Diseñar la arquitectura completa de un sistema nuevo desde cero sin especificaciones</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> b) Reescribir proyectos legacy de millones de líneas de código de forma autónoma</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> c) Tareas bien definidas y acotadas como corregir un bug específico o implementar una función con tests claros</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0039-bucles-agente.html">← 6.3 Bucles de agente</a>
+  <a href="0041-multi-agent-systems.html">6.5 Multi-agent systems →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

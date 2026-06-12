@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.5 — Gestión del contexto y ventana de contexto</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .warning{background:#fff7ed;border-left:3px solid #f97316;padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .warning strong{font-family:var(--sans);font-size:0.8rem;color:#c2410c;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .strategy-list{display:flex;flex-direction:column;gap:0.75rem;margin:1.5rem 0}
+  .strat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem}
+  .strat h3{font-family:var(--sans);font-size:0.9rem;font-weight:700;margin-bottom:0.3rem}
+  .strat p{font-size:0.88rem;color:var(--muted);margin:0}
+  .diagram{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.25rem;font-family:monospace;font-size:0.82rem;line-height:1.8;overflow-x:auto;margin:1.5rem 0}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f5f3ff}.opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}.feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 1: Prompt Engineering</a> › Lección 1.5</nav>
+<h1>Gestión del contexto y ventana de contexto</h1>
+<p class="meta">Fase 1 · Lección 9 de 55 · ~14 min · Prompt Engineering</p>
+
+<h2>Qué está compitiendo por tu ventana de contexto</h2>
+<div class="diagram">
+┌─────────────────────────── VENTANA DE CONTEXTO ────────────────────────────┐
+│  System prompt    │  Historial de conversación  │  Documentos  │  Respuesta│
+│  (instrucciones)  │  (mensajes anteriores)      │  (adjuntos)  │  (output) │
+└─────────────────────────────────────────────────────────────────────────────┘
+                     ↑ Todo compite por el mismo espacio
+</div>
+
+<p>Cuando el contexto se llena, algo tiene que salir. Los modelos más antiguos simplemente recortaban el inicio. Los modernos intentan priorizar, pero el efecto "lost in the middle" sigue presente.</p>
+
+<div class="warning">
+  <strong>El fenómeno "Lost in the Middle"</strong>
+  Los LLMs prestan más atención al principio y al final del contexto. Información crítica colocada en el centro de un contexto largo tiene más probabilidad de ser ignorada. Coloca lo más importante al principio o al final.
+</div>
+
+<h2>Estrategias de gestión de contexto</h2>
+<div class="strategy-list">
+  <div class="strat">
+    <h3>🗜️ Compresión del historial</h3>
+    <p>Cuando una conversación se alarga, pide al modelo que resuma los puntos clave antes de continuar. El resumen ocupa menos tokens que el historial completo.</p>
+  </div>
+  <div class="strat">
+    <h3>✂️ Truncado inteligente</h3>
+    <p>En aplicaciones de chat, mantén siempre el system prompt + N mensajes recientes + resumen del resto. Nunca trunces desde el inicio sin más.</p>
+  </div>
+  <div class="strat">
+    <h3>📌 Posicionamiento estratégico</h3>
+    <p>Las instrucciones críticas van al principio (system prompt). Los documentos de referencia, también al principio o en posición destacada.</p>
+  </div>
+  <div class="strat">
+    <h3>🔍 RAG en vez de contexto masivo</h3>
+    <p>En vez de meter toda la documentación en el contexto, usa RAG para recuperar solo los fragmentos relevantes (lo verás en Fase 5.7).</p>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>Regla práctica de coste</strong>
+  El coste de la API se calcula por token de entrada + token de salida. Un contexto de 100K tokens en cada llamada puede costar 50× más que uno de 2K tokens. La gestión de contexto es también optimización de costes.
+</div>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+  <div class="q">
+    <p>¿Dónde debe colocarse la información más crítica en un contexto largo según el fenómeno "lost in the middle"?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> En el centro del contexto, rodeada de texto relevante</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Al principio o al final del contexto</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Distribuida uniformemente a lo largo del contexto</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Al final, justo antes del user prompt</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+  <div class="q">
+    <p>¿Cuál es la alternativa a meter toda la documentación de un proyecto en el contexto de cada llamada?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Usar fine-tuning para que el modelo aprenda la documentación</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Aumentar la temperatura para que el modelo "recuerde" más</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Usar RAG para recuperar solo los fragmentos relevantes en cada llamada</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Dividir la documentación entre múltiples system prompts</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://arxiv.org/abs/2307.03172" target="_blank">Liu et al. (2023) — "Lost in the Middle: How LLMs Use Long Contexts" (Paper)</a><br>
+  El paper que documentó el fenómeno de pérdida de información en contextos largos. Sección 3 tiene los gráficos más reveladores.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregunta al agente: "¿Cómo gestiono el historial de conversación en una aplicación de chat con Node.js?" o "¿Cuánto me costaría en tokens meter 50 páginas de PDF en el contexto?"
+</div>
+
+<div class="lesson-nav">
+  <a href="0008-prompts-codigo-vs-texto.html">← 1.4 Prompts para código vs. texto</a>
+  <a href="0010-evaluacion-refinamiento-prompts.html">1.6 Evaluación y refinamiento →</a>
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

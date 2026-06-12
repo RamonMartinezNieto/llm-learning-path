@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3.3 — Generación de tests unitarios e integración con IA</title>
+<style>
+  :root{--accent:#059669;--serif:Georgia,serif;--sans:system-ui,sans-serif;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:#1f2937;line-height:1.7;font-size:1rem}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem}
+  .breadcrumb{font-size:.8rem;color:#6b7280;margin-bottom:2rem}
+  .breadcrumb span{color:#9ca3af}
+  h1{font-family:var(--serif);font-size:2rem;line-height:1.2;color:#111827;margin-bottom:.5rem}
+  .meta{font-size:.85rem;color:#6b7280;margin-bottom:2.5rem;display:flex;flex-wrap:wrap;gap:.5rem .75rem;align-items:center}
+  .meta .tag{background:#ecfdf5;color:var(--accent);border-radius:999px;padding:.15rem .65rem;font-weight:600;font-size:.75rem}
+  h2{font-family:var(--serif);font-size:1.35rem;color:#111827;margin:2.5rem 0 .75rem;padding-bottom:.35rem;border-bottom:1px solid var(--border)}
+  p{margin-bottom:1rem}
+  ul,ol{margin:0 0 1rem 1.4rem}
+  li{margin-bottom:.35rem}
+  code{background:#f3f4f6;border-radius:4px;padding:.1rem .4rem;font-size:.9em;font-family:'Courier New',monospace;color:#374151}
+  pre{background:#f3f4f6;border-radius:8px;padding:1rem 1.25rem;overflow-x:auto;margin-bottom:1rem;font-size:.88rem;line-height:1.6}
+  .callout{border-left:3px solid var(--accent);background:#ecfdf5;padding:.85rem 1.1rem;border-radius:0 6px 6px 0;margin:1.5rem 0;font-style:italic;color:#065f46}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem}
+  .quiz{margin:2.5rem 0}
+  .quiz h2{margin-top:0}
+  .question{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem}
+  .question p{font-weight:600;margin-bottom:.75rem}
+  .question label{display:block;margin-bottom:.45rem;cursor:pointer;font-weight:400;padding:.35rem .5rem;border-radius:5px;transition:background .15s}
+  .question label:hover{background:#f9fafb}
+  .question input[type=radio]{margin-right:.5rem;accent-color:var(--accent)}
+  .btn{display:inline-block;margin-top:.75rem;padding:.45rem 1.1rem;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.9rem;font-family:var(--sans);font-weight:600;transition:opacity .15s}
+  .btn:hover{opacity:.88}
+  .feedback{display:none;margin-top:.65rem;padding:.45rem .75rem;border-radius:5px;font-size:.9rem;font-weight:600}
+  .feedback.ok{background:#dcfce7;color:var(--ok)}
+  .feedback.err{background:#fee2e2;color:var(--err)}
+  .source{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.4rem;margin:2rem 0}
+  .source strong{display:block;margin-bottom:.3rem;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
+  .teacher{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:1.1rem 1.4rem;margin:1.5rem 0}
+  .teacher strong{display:block;margin-bottom:.35rem;color:#92400e;font-size:.9rem}
+  .teacher p{color:#78350f;font-size:.9rem;margin:0}
+  .lesson-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.75rem}
+  .lesson-nav a{font-size:.9rem;font-weight:600;color:var(--accent)}
+  .lesson-nav .prev::before{content:'← '}
+  .lesson-nav .next::after{content:' →'}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="breadcrumb">
+    <a href="../MISSION.md">Misión</a>
+    <span> › </span>Fase 3: IA en el Entorno de Desarrollo
+    <span> › </span>Lección 3.3
+  </nav>
+
+  <h1>3.3 — Generación de tests unitarios e integración con IA</h1>
+  <div class="meta">
+    <span class="tag">Fase 3</span>
+    <span>Lección 19 de 55</span>
+    <span>·</span>
+    <span>⏱ ~15 min</span>
+    <span>·</span>
+    <span>IA en el Entorno de Desarrollo</span>
+  </div>
+
+  <!-- SECCIÓN 1 -->
+  <h2>Por qué la IA destaca en la generación de tests</h2>
+  <p>Los tests unitarios son uno de los casos de uso donde la IA aporta más valor de forma consistente. La razón: escribir tests es una tarea <strong>altamente estructurada y repetitiva</strong> que sigue patrones predecibles (Arrange–Act–Assert), algo en lo que los modelos de lenguaje son especialmente buenos.</p>
+  <p>Ventajas concretas de generar tests con IA:</p>
+  <ul>
+    <li>Cubre rápidamente el <em>happy path</em> y los casos de error más comunes.</li>
+    <li>Genera variantes con diferentes valores de entrada sin esfuerzo manual.</li>
+    <li>Produce el boilerplate del test (imports, describe blocks, mocks básicos) en segundos.</li>
+    <li>Sugiere edge cases que el desarrollador podría no haber considerado.</li>
+  </ul>
+
+  <!-- SECCIÓN 2 -->
+  <h2>Plantilla de prompt para tests de calidad</h2>
+  <p>El contexto que le das al modelo determina la calidad de los tests generados. Un prompt efectivo debe incluir tres elementos obligatorios:</p>
+  <pre>Genera tests unitarios con [Jest/Vitest/pytest/etc.] para la siguiente función.
+Cubre: 1) el caso de éxito principal, 2) valores límite y edge cases,
+3) casos de error y excepciones.
+
+[Pegar la función completa aquí]
+
+Edge cases específicos que quiero cubrir: [lista]</pre>
+
+  <p>Los tres tipos de tests que la IA genera bien:</p>
+  <div class="card">
+    <ol style="margin-top:.25rem">
+      <li><strong>Happy path</strong>: la función recibe inputs válidos y produce el output esperado.</li>
+      <li><strong>Edge cases</strong>: valores límite (0, -1, cadena vacía, array vacío, null, undefined, Infinity).</li>
+      <li><strong>Error cases</strong>: la función lanza la excepción correcta o devuelve el error apropiado ante inputs inválidos.</li>
+    </ol>
+  </div>
+
+  <!-- SECCIÓN 3 -->
+  <h2>El riesgo crítico: tests que encodenan bugs</h2>
+  <p>La IA genera tests <em>observando el comportamiento actual del código</em>. Si la función tiene un bug, el modelo puede escribir un test que <strong>espera el comportamiento incorrecto</strong> — pasando el test aunque el código esté mal.</p>
+  <p>Esto es especialmente peligroso porque:</p>
+  <ul>
+    <li>Los tests parecen correctos y pasan en CI/CD.</li>
+    <li>Dan una falsa sensación de seguridad.</li>
+    <li>Si alguien arregla el bug más tarde, el test "falla" aunque el código sea ahora correcto.</li>
+  </ul>
+  <p>La solución: <strong>revisa siempre las aserciones</strong>. Para cada <code>expect(result).toBe(X)</code>, pregúntate: "¿Es X realmente el valor correcto según la especificación, o simplemente es lo que el código actual devuelve?"</p>
+
+  <div class="callout">
+    💡 "Los tests generados por IA son un punto de partida, no el producto final. Añade tests para los casos de negocio que el modelo no conoce."
+  </div>
+
+  <!-- QUIZ -->
+  <section class="quiz">
+    <h2>Comprueba lo aprendido</h2>
+
+    <div class="question">
+      <p>Q1 — ¿Cuál es el riesgo principal de tests unitarios generados por IA sin revisión?</p>
+      <label><input type="radio" name="q1" value="a"> a) Que usen un estilo de código diferente al del resto del proyecto</label>
+      <label><input type="radio" name="q1" value="b"> b) Pueden encodear los bugs del código original en lugar de detectarlos como fallos</label>
+      <label><input type="radio" name="q1" value="c"> c) Que sean demasiado lentos y aumenten el tiempo de ejecución del pipeline</label>
+      <label><input type="radio" name="q1" value="d"> d) Que no sean compatibles con el framework de tests del proyecto</label>
+      <button class="btn" onclick="check('q1','b')">Comprobar</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="question">
+      <p>Q2 — ¿Qué información debes dar al modelo para que genere tests de calidad?</p>
+      <label><input type="radio" name="q2" value="a"> a) Solo el nombre de la función y una descripción breve de lo que hace</label>
+      <label><input type="radio" name="q2" value="b"> b) El nombre del fichero y la ruta en el repositorio para que el modelo lo busque</label>
+      <label><input type="radio" name="q2" value="c"> c) La función completa, el framework de tests a usar y los edge cases específicos que quieres cubrir</label>
+      <label><input type="radio" name="q2" value="d"> d) Únicamente los tests existentes para que el modelo complete los que faltan</label>
+      <button class="btn" onclick="check('q2','c')">Comprobar</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+  </section>
+
+  <!-- SOURCE -->
+  <div class="source">
+    <strong>📖 Recurso primario recomendado</strong>
+    <a href="https://learn.deeplearning.ai/" target="_blank" rel="noopener">
+      "Test-Driven Development with LLMs" — DeepLearning.AI
+    </a>
+    <p style="margin:.3rem 0 0;font-size:.85rem;color:#6b7280">Curso práctico de Andrew Ng sobre estrategias de testing con LLMs, incluyendo cómo validar aserciones generadas automáticamente.</p>
+  </div>
+
+  <!-- TEACHER -->
+  <div class="teacher">
+    <strong>🤖 Pregunta al agente para profundizar</strong>
+    <p>Pega una función propia en el chat y pide: <em>"Genera tests unitarios con [tu framework] para esta función. Cubre el happy path, tres edge cases y dos casos de error. Después explícame qué aserciones podrían ser incorrectas si la función tuviera un bug."</em></p>
+  </div>
+
+  <!-- NAV -->
+  <nav class="lesson-nav">
+    <a class="prev" href="0018-refactorizacion-code-review.html">3.2 Refactorización y code review</a>
+    <a class="next" href="0020-debugging-con-ia.html">3.4 Debugging con IA</a>
+  </nav>
+
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

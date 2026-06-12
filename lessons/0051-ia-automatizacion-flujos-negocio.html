@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>8.2 IA para automatización de flujos de negocio | MattPocockSkills</title>
+<style>
+:root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#16a34a;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+nav a{color:var(--accent);text-decoration:none}
+h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+.meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+p{margin-bottom:1rem}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.3rem}
+.callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+.callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.83rem;line-height:1.6;overflow-x:auto;margin:1rem 0}
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
+.source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+.source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+.source a{color:#0369a1}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+.lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 8: IA Aplicada</a> › Lección 8.2</nav>
+<h1>8.2 — IA para automatización de flujos de negocio (no-code/low-code)</h1>
+<div class="meta">Lección 51 de 55 · ~13 min · Fase 8: IA Aplicada a Otras Áreas</div>
+
+<p>No toda automatización con IA requiere escribir código Python y desplegar en servidores. Las plataformas de automatización no-code y low-code han integrado capacidades de IA que permiten a equipos de negocio construir flujos automatizados sofisticados sin ingeniería personalizada. Conocer estas opciones — y sus límites — es esencial para elegir la herramienta adecuada.</p>
+
+<h2>Principales plataformas</h2>
+
+<table>
+  <tr><th>Plataforma</th><th>Modelo</th><th>Fortaleza IA</th><th>Limitación</th></tr>
+  <tr><td>Zapier</td><td>SaaS, por tarea</td><td>Integraciones nativas con 6000+ apps, AI actions fáciles</td><td>Caro a escala, poco control sobre el modelo</td></tr>
+  <tr><td>Make.com</td><td>SaaS, por operación</td><td>Flujos complejos visuales, OpenAI/Claude integrado</td><td>Curva de aprendizaje visual, pricing por operación</td></tr>
+  <tr><td>n8n</td><td>Open source / cloud</td><td>AI nodes completos, auto-hosteable, sin límites artificiales</td><td>Requiere más configuración inicial</td></tr>
+</table>
+
+<h2>Casos de uso de alto impacto</h2>
+
+<p><strong>Triage de emails:</strong> Nuevo email → Clasificar urgencia/categoría con LLM → Enrutar a carpeta correcta / asignar en CRM / notificar en Slack según tipo.</p>
+
+<p><strong>Enriquecimiento de CRM:</strong> Nuevo lead entra → Buscar empresa en web → Extraer información relevante con LLM → Enriquecer el registro en CRM automáticamente.</p>
+
+<p><strong>Moderación de contenido:</strong> Post generado por usuario → Clasificar con LLM (apropiado/requiere revisión/rechazar) → Rutear para acción correspondiente.</p>
+
+<p><strong>Procesamiento de documentos:</strong> Factura/contrato/formulario recibido → Extraer campos clave con LLM → Registrar en sistema de gestión.</p>
+
+<h2>IA como paso en el pipeline</h2>
+
+<p>La IA en estas plataformas actúa como un nodo de procesamiento en el flujo. Los tres tipos de nodo IA más útiles:</p>
+<ul>
+  <li><strong>Clasificación:</strong> Input → categoría (urgente/no urgente, positivo/negativo, spam/legítimo)</li>
+  <li><strong>Extracción:</strong> Texto no estructurado → campos estructurados (nombre, fecha, importe, entidad)</li>
+  <li><strong>Generación:</strong> Datos → texto generado (borrador de respuesta, resumen, informe)</li>
+</ul>
+
+<h2>No-code vs. pipeline propio: cuándo elegir cada uno</h2>
+
+<p><strong>Usa no-code cuando:</strong> el caso de uso es estándar, el equipo no tiene ingeniería de ML, el ROI justifica el coste de la plataforma, y no necesitas control fino sobre el modelo o los datos.</p>
+
+<p><strong>Construye propio cuando:</strong> tienes requisitos de privacidad estrictos (datos no pueden salir de tu infraestructura), necesitas un modelo específico o fine-tuned, el volumen hace inviable el coste de la plataforma, o el flujo tiene lógica de negocio compleja no soportada.</p>
+
+<div class="callout">
+  <strong>Criterio de decisión</strong>
+  Las plataformas no-code de IA son perfectas para automatizaciones de negocio donde el ROI es alto y no necesitas control total. Para casos críticos o personalizados, construye tu propio pipeline.
+</div>
+
+<div class="source">
+  <strong>Fuente principal</strong>
+  n8n documentation and AI nodes<br>
+  <a href="https://docs.n8n.io/" target="_blank">docs.n8n.io</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo que has aprendido</h3>
+
+  <div class="q">
+    <p><strong>P1.</strong> ¿Cuándo tiene sentido usar plataformas no-code (Zapier, Make) frente a construir un pipeline de IA propio?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> a) Siempre, porque las plataformas no-code son siempre más rápidas de implementar y más económicas</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> b) Cuando el caso de uso es estándar, el ROI justifica el coste de la plataforma y no necesitas control total sobre el modelo o los datos</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> c) Solo para empresas sin equipo de ingeniería que no pueden contratar desarrolladores</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>P2.</strong> ¿En qué tipo de automatización de negocio destaca especialmente la IA?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> a) Cálculos matemáticos complejos que los sistemas tradicionales no pueden procesar</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> b) Automatizaciones que involucran bases de datos relacionales con esquemas complejos</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> c) Tareas que involucran texto no estructurado (emails, documentos, tickets) que antes requerían revisión humana manual</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0050-ia-investigacion-mercado.html">← 8.1 IA para investigación</a>
+  <a href="0052-ia-contenido-multimodal.html">8.3 Contenido multimodal →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

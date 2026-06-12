@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.6 — Evaluación y refinamiento iterativo de prompts</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .loop{display:flex;flex-direction:column;gap:0;margin:1.5rem 0}
+  .loop-step{background:var(--card);border:1px solid var(--border);padding:0.85rem 1rem;display:flex;align-items:flex-start;gap:0.75rem}
+  .loop-step:first-child{border-radius:8px 8px 0 0}
+  .loop-step:last-child{border-radius:0 0 8px 8px}
+  .loop-step:not(:last-child){border-bottom:none}
+  .loop-num{background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:0.1rem}
+  .loop-content h3{font-family:var(--sans);font-size:0.88rem;font-weight:700;margin-bottom:0.2rem}
+  .loop-content p{font-size:0.85rem;color:var(--muted);margin:0}
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin:1.5rem 0}
+  .metric{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.85rem}
+  .metric h3{font-family:var(--sans);font-size:0.82rem;font-weight:700;margin-bottom:0.3rem}
+  .metric p{font-size:0.82rem;color:var(--muted);margin:0}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f5f3ff}.opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}.feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 1: Prompt Engineering</a> › Lección 1.6</nav>
+<h1>Evaluación y refinamiento iterativo de prompts</h1>
+<p class="meta">Fase 1 · Lección 10 de 55 · ~14 min · Prompt Engineering</p>
+
+<h2>El bucle de refinamiento</h2>
+<p>Un prompt rara vez funciona a la primera para producción. El refinamiento iterativo es el proceso real de prompt engineering — no es arte, es ingeniería con feedback.</p>
+
+<div class="loop">
+  <div class="loop-step">
+    <div class="loop-num">1</div>
+    <div class="loop-content"><h3>Definir criterio de éxito</h3><p>¿Qué hace que una respuesta sea buena? Define esto antes de escribir el prompt, no después. Ej: "contiene los 3 puntos clave, en menos de 150 palabras, sin jerga técnica".</p></div>
+  </div>
+  <div class="loop-step">
+    <div class="loop-num">2</div>
+    <div class="loop-content"><h3>Crear un conjunto de evaluación</h3><p>5–20 inputs representativos que cubran casos normales y edge cases. El prompt debe funcionar en todos ellos, no solo en el ejemplo que usaste para diseñarlo.</p></div>
+  </div>
+  <div class="loop-step">
+    <div class="loop-num">3</div>
+    <div class="loop-content"><h3>Ejecutar y evaluar</h3><p>Corre el prompt en todos los inputs. Anota en qué falla y de qué forma falla (formato incorrecto, contenido incorrecto, demasiado largo, etc.).</p></div>
+  </div>
+  <div class="loop-step">
+    <div class="loop-num">4</div>
+    <div class="loop-content"><h3>Hacer un único cambio</h3><p>Cambia una sola variable a la vez. Si cambias varias cosas simultáneamente, no sabrás qué funcionó. Documenta cada versión.</p></div>
+  </div>
+  <div class="loop-step">
+    <div class="loop-num">5</div>
+    <div class="loop-content"><h3>Repetir hasta cumplir el criterio</h3><p>Itera hasta que el prompt pase el conjunto de evaluación. En producción, esto se automatiza con evals (Fase 7.2).</p></div>
+  </div>
+</div>
+
+<h2>Qué medir</h2>
+<div class="metrics">
+  <div class="metric"><h3>✅ Correctitud</h3><p>¿La respuesta es factualmente correcta? ¿Hace lo que pediste?</p></div>
+  <div class="metric"><h3>📐 Formato</h3><p>¿Respeta el formato pedido (JSON, lista, longitud máxima)?</p></div>
+  <div class="metric"><h3>🔄 Consistencia</h3><p>¿Con diferentes inputs similares, el comportamiento es estable?</p></div>
+  <div class="metric"><h3>💰 Eficiencia</h3><p>¿Produce el output correcto con el mínimo de tokens posible?</p></div>
+</div>
+
+<div class="callout">
+  <strong>Herramienta: Prompt Playground</strong>
+  Anthropic Console, OpenAI Playground y LangSmith te permiten hacer A/B testing de prompts con el mismo conjunto de inputs. Úsalos para no perder versiones anteriores.
+</div>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+  <div class="q">
+    <p>Al refinar un prompt que no funciona bien, ¿cuántas variables debes cambiar a la vez?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Todas las que parezcan problemáticas simultáneamente para ahorrar tiempo</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Solo una a la vez para saber qué cambio tuvo efecto</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Al menos tres para que el cambio sea estadísticamente significativo</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Depende del número de tokens del prompt original</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+  <div class="q">
+    <p>¿Cuándo se debe definir el criterio de éxito de un prompt?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Después de ver las primeras respuestas del modelo para tener expectativas realistas</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Antes de escribir el prompt, para tener una métrica objetiva de evaluación</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Solo en producción, cuando hay usuarios reales que dan feedback</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> No es necesario definirlo, la calidad es subjetiva</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','b')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://docs.anthropic.com/en/docs/test-and-evaluate/eval-overview" target="_blank">Anthropic — Evaluating Prompts (Docs oficiales)</a><br>
+  Guía práctica de cómo construir pipelines de evaluación para prompts. Incluye métricas concretas y ejemplos de código.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregunta al agente: "¿Cómo creo un eval sencillo en Python para probar mi prompt automáticamente?" o "¿Qué herramientas existen para hacer A/B testing de prompts?"
+</div>
+
+<div class="lesson-nav">
+  <a href="0009-gestion-contexto.html">← 1.5 Gestión del contexto</a>
+  <a href="0011-ia-investigacion-sintesis.html">2.1 IA como motor de investigación →</a>
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

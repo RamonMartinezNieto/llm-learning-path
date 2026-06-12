@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>8.6 Automatización con IA: Zapier, Make y n8n | MattPocockSkills</title>
+<style>
+:root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#16a34a;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+nav a{color:var(--accent);text-decoration:none}
+h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+.meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+p{margin-bottom:1rem}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.3rem}
+.callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+.callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.83rem;line-height:1.6;overflow-x:auto;margin:1rem 0}
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
+.source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+.source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+.source a{color:#0369a1}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+.lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 8: IA Aplicada</a> › Lección 8.6</nav>
+<h1>8.6 — Automatización con IA: Zapier, Make y n8n</h1>
+<div class="meta">Lección 55 de 55 · ~13 min · Fase 8: IA Aplicada a Otras Áreas · ¡Última lección!</div>
+
+<p>En esta lección final exploramos en profundidad las tres plataformas de automatización más relevantes para workflows de IA, y reflexionamos sobre los próximos pasos después de completar este plan de aprendizaje. La automatización con IA no es el final del camino — es el punto de partida para construir sistemas que trabajen por ti.</p>
+
+<h2>Comparativa práctica: Zapier vs. Make vs. n8n</h2>
+
+<table>
+  <tr><th>Criterio</th><th>Zapier</th><th>Make.com</th><th>n8n</th></tr>
+  <tr><td>Modelo</td><td>SaaS, por tarea</td><td>SaaS, por operación</td><td>Open source / cloud</td></tr>
+  <tr><td>Hosting</td><td>Solo cloud</td><td>Solo cloud</td><td>Cloud o self-hosted</td></tr>
+  <tr><td>Integraciones</td><td>6000+ apps</td><td>1500+ apps</td><td>400+ nodos</td></tr>
+  <tr><td>Nodos de IA</td><td>OpenAI, básico</td><td>OpenAI, Claude</td><td>LangChain, OpenAI, Anthropic, modelos locales</td></tr>
+  <tr><td>Control de datos</td><td>Bajo</td><td>Bajo</td><td>Total (self-hosted)</td></tr>
+  <tr><td>Precio a escala</td><td>Caro</td><td>Medio</td><td>Fijo (self-hosted)</td></tr>
+  <tr><td>Complejidad inicial</td><td>Mínima</td><td>Media</td><td>Media-alta</td></tr>
+</table>
+
+<h2>Ejemplo de workflow: clasificación automática de emails</h2>
+
+<p>Un workflow real que puedes construir en cualquiera de las tres plataformas:</p>
+
+<pre>
+Trigger: Nuevo email en Gmail
+
+→ Nodo IA: Clasificar email con LLM
+  Prompt: "Clasifica este email en una categoría:
+  URGENTE, CLIENTE, NEWSLETTER, SPAM, INTERNO.
+  Solo responde con la categoría.
+  Email: {email_body}"
+
+→ Router: Según categoría
+  - URGENTE → Slack #alertas + Gmail etiqueta "URGENTE"
+  - CLIENTE  → HubSpot crear tarea + Gmail carpeta "Clientes"
+  - NEWSLETTER → Gmail carpeta "Para leer después"
+  - SPAM     → Gmail mover a spam
+  - INTERNO  → Gmail etiqueta "Interno"
+</pre>
+
+<h2>Cuándo elegir n8n sobre Zapier/Make</h2>
+
+<p>n8n brilla especialmente cuando:</p>
+<ul>
+  <li>Los datos no pueden salir de tu infraestructura (GDPR, datos médicos, secretos empresariales)</li>
+  <li>Volumen de ejecuciones alto que haría prohibitivo el precio de Zapier/Make</li>
+  <li>Necesitas integrar modelos de lenguaje locales (Ollama, modelos self-hosted)</li>
+  <li>Quieres lógica de negocio compleja con código JavaScript personalizado</li>
+  <li>El flujo tiene ramas condicionales complejas que las otras plataformas no soportan bien</li>
+</ul>
+
+<h2>Próximos pasos tras completar el plan</h2>
+
+<p><strong>Construye algo real:</strong> El mejor aprendizaje viene de enfrentarse a problemas reales con deadline real. Elige un proyecto pequeño pero completo: un chatbot para tu empresa, un pipeline de análisis de datos, un agente que automatice una tarea repetitiva tuya.</p>
+
+<p><strong>Comunidad:</strong> Únete a comunidades de practitioners: Latent Space (podcast + Discord), Towards Data Science, LangChain Discord, Hugging Face forums. El campo evoluciona cada semana — la comunidad es tu fuente más rápida de actualización.</p>
+
+<p><strong>Contribución open source:</strong> Contribuir a proyectos de IA open source (LangChain, n8n, Langfuse, llama.cpp) es la forma más efectiva de aprender en profundidad y construir reputación en el campo.</p>
+
+<div class="callout">
+  <strong>¡Lo has conseguido!</strong>
+  Has completado el plan de aprendizaje. El siguiente paso es construir algo real con lo que has aprendido. El mejor aprendizaje viene de la práctica con proyectos propios.
+</div>
+
+<div class="source">
+  <strong>Fuente principal</strong>
+  n8n AI automation templates<br>
+  <a href="https://n8n.io/ai/" target="_blank">n8n.io/ai</a>
+</div>
+
+<div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:1.5rem;margin:2rem 0;text-align:center;font-family:system-ui">
+  <div style="font-size:2rem;margin-bottom:0.5rem">🎓</div>
+  <strong style="font-size:1.1rem;color:#15803d">¡Felicidades! Has completado el plan de aprendizaje.</strong>
+  <p style="margin:0.75rem 0 0;color:#166534;font-size:0.9rem">55 lecciones · 9 fases · De usuario a experto en IA</p>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo que has aprendido</h3>
+
+  <div class="q">
+    <p><strong>P1.</strong> ¿Cuál es la principal ventaja de n8n frente a Zapier o Make para automatizaciones con IA?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> a) n8n tiene más integraciones nativas con aplicaciones SaaS que Zapier y Make combinados</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> b) n8n es open source y puede auto-hospedarse, dando control total sobre los datos y sin límites de ejecuciones por precio fijo</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> c) n8n usa modelos de IA más avanzados que los disponibles en Zapier o Make</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>P2.</strong> Después de completar este plan de aprendizaje, ¿cuál es el mejor siguiente paso?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> a) Empezar inmediatamente otro plan de aprendizaje más avanzado antes de aplicar lo aprendido</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> b) Obtener todas las certificaciones disponibles de los principales proveedores de IA (OpenAI, Anthropic, Google)</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> c) Construir un proyecto real (pequeño pero completo) que resuelva un problema concreto tuyo, aplicando lo aprendido en múltiples fases del plan</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0054-ia-analisis-datos.html">← 8.5 IA para análisis de datos</a>
+  <span>🎉 ¡Has completado el plan de aprendizaje! Vuelve al <a href="../MISSION.md">inicio</a>.</span>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2.2 — IA para análisis de documentos y datos</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#0891b2;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .warning{background:#fff7ed;border-left:3px solid #f97316;padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .warning strong{font-family:var(--sans);font-size:0.8rem;color:#c2410c;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .template{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:1rem 0;font-family:monospace;font-size:0.83rem;line-height:1.6}
+  .template .label{font-family:var(--sans);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:0.4rem;display:block}
+  .tasks{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0}
+  .task-item{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:0.75rem 1rem;font-family:var(--sans);font-size:0.87rem}
+  .task-item strong{color:var(--accent)}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#ecfeff}.opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}.feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 2: Chat Mode Avanzado</a> › Lección 2.2</nav>
+<h1>IA para análisis de documentos y datos</h1>
+<p class="meta">Fase 2 · Lección 12 de 55 · ~13 min · Chat Mode Avanzado</p>
+
+<h2>Qué puedes hacer con un documento en el contexto</h2>
+<p>Pegando o adjuntando un documento al contexto de un LLM puedes realizar tareas que antes requerían horas de lectura y análisis manual. La clave es saber qué pedir.</p>
+
+<div class="tasks">
+  <div class="task-item"><strong>Extracción:</strong> "Lista todas las fechas y compromisos mencionados en este contrato."</div>
+  <div class="task-item"><strong>Resumen ejecutivo:</strong> "Resume este informe en 5 bullets para una audiencia no técnica."</div>
+  <div class="task-item"><strong>Comparación:</strong> "Compara estos dos documentos e identifica las diferencias clave en los términos de pago."</div>
+  <div class="task-item"><strong>Q&amp;A:</strong> "Basándote solo en este documento, ¿qué dice sobre los plazos de devolución?"</div>
+  <div class="task-item"><strong>Detección de problemas:</strong> "¿Hay inconsistencias o cláusulas ambiguas en este documento que deberían revisarse?"</div>
+</div>
+
+<div class="warning">
+  <strong>Limitación crítica: grounding</strong>
+  El modelo puede generar información que <em>parece</em> estar en el documento pero no está. Para análisis críticos (contratos, documentos legales, médicos), siempre verifica manualmente los puntos clave. Pide siempre que el modelo cite el párrafo exacto del que extrae la información.
+</div>
+
+<h2>Plantilla para análisis de documento</h2>
+<div class="template">
+  <span class="label">Prompt de análisis con grounding</span>
+  Analiza el siguiente documento. Para cada punto que identifiques:<br>
+  - Cita textualmente el fragmento del que lo extraes (entre comillas)<br>
+  - Indica la sección/página si está disponible<br>
+  - Si no encuentras información sobre X en el documento, dilo explícitamente<br><br>
+  Tarea: [Tu análisis específico]<br><br>
+  [DOCUMENTO]<br>
+  {pega el documento aquí}
+</div>
+
+<div class="callout">
+  <strong>Para datos estructurados (CSV, tablas)</strong>
+  Los LLMs con code interpreter (ChatGPT, Claude con artefactos) pueden ejecutar código Python para analizar CSVs con pandas. Esto da análisis cuantitativo verificable, no solo interpretación textual.
+</div>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+  <div class="q">
+    <p>¿Por qué es importante pedir al modelo que cite textualmente al analizar documentos críticos?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Para reducir el número de tokens de la respuesta</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Para poder verificar que la información extraída realmente está en el documento y no es una alucinación</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Porque sin citas el modelo genera respuestas más cortas de lo esperado</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Para que el análisis sea más fácil de leer</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://docs.anthropic.com/en/docs/build-with-claude/pdf-support" target="_blank">Anthropic Docs — Working with PDFs and Documents</a><br>
+  Guía oficial sobre cómo pasar documentos a Claude para análisis, incluyendo formatos soportados y mejores prácticas.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregunta al agente: "¿Cómo analizo un PDF de 100 páginas si no cabe en el contexto?" o "¿Qué diferencia hay entre analizar un documento con ChatGPT vs. Claude?"
+</div>
+
+<div class="lesson-nav">
+  <a href="0011-ia-investigacion-sintesis.html">← 2.1 IA como motor de investigación</a>
+  <a href="0013-ia-aprendizaje-acelerado.html">2.3 IA para aprendizaje acelerado →</a>
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

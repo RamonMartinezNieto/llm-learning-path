@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5.7 — RAG: Retrieval-Augmented Generation</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+  nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  pre,code{font-family:monospace;font-size:0.83rem}
+  pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;overflow-x:auto;line-height:1.6;margin:1rem 0}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .warning{background:#fff7ed;border-left:3px solid #f97316;padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .warning strong{font-family:var(--sans);font-size:0.8rem;color:#c2410c;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+  th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}
+  .q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f5f3ff}
+  .opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}
+  .feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+  .source a{color:#0369a1}
+  .pipeline{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+  .pipeline-step{display:flex;align-items:flex-start;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid var(--border)}
+  .pipeline-step:last-child{border-bottom:none}
+  .step-num{background:var(--accent);color:#fff;border-radius:50%;width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:0.1rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">Inicio</a> › <a href="index.html">Lecciones</a> › 5.7 RAG</nav>
+
+<h1>5.7 — RAG: Retrieval-Augmented Generation</h1>
+<div class="meta">Fase 5 · Lección 35 de 55 · ~18 min · Construcción con APIs de IA</div>
+
+<p>Los LLMs solo conocen lo que estaba en sus datos de entrenamiento. No conocen los documentos internos de tu empresa, la base de conocimiento de tu producto, ni nada publicado después de su fecha de corte. <strong>RAG</strong> es el patrón que resuelve exactamente este problema.</p>
+
+<h2>El problema que resuelve RAG</h2>
+<p>Supón que quieres un chatbot que responda preguntas sobre el manual interno de tu empresa. Opciones sin RAG:</p>
+<ul style="margin:0 0 1rem 1.5rem;line-height:2">
+  <li><strong>Incluir todo el manual en el prompt:</strong> prohibitivo en coste si el manual tiene miles de páginas</li>
+  <li><strong>Fine-tuning:</strong> costoso, lento, y el modelo "memoriza" el conocimiento en lugar de citarlo</li>
+  <li><strong>Confiar en el modelo base:</strong> no conoce tu manual, simplemente alucinará</li>
+</ul>
+<p>RAG ofrece una cuarta opción: en tiempo de consulta, recuperar solo los fragmentos del manual relevantes para la pregunta y pasarlos en el prompt. Eficiente, actualizable y con trazabilidad.</p>
+
+<div class="callout">
+  <strong>Estadística del sector</strong>
+  RAG es el patrón más importante para conectar LLMs con datos privados de empresas. El 80% de los casos de uso empresarial de IA generativa son RAG o variantes de RAG.
+</div>
+
+<h2>El pipeline RAG: paso a paso</h2>
+
+<div class="pipeline">
+  <div class="pipeline-step">
+    <div class="step-num">1</div>
+    <div><strong>Ingesta de documentos:</strong> Cargas tus documentos (PDFs, páginas web, bases de datos, Notion, etc.) en el sistema.</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">2</div>
+    <div><strong>Chunking:</strong> Divides cada documento en fragmentos (<em>chunks</em>) de tamaño manejable. La estrategia importa: chunks demasiado pequeños pierden contexto; demasiado grandes diluyen la relevancia.</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">3</div>
+    <div><strong>Embedding:</strong> Conviertes cada chunk en un vector numérico usando un modelo de embeddings. Chunks con significado similar tendrán vectores similares.</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">4</div>
+    <div><strong>Almacenamiento:</strong> Guardas los vectores en una base de datos vectorial (Chroma, Pinecone, pgvector...).</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">5</div>
+    <div><strong>Consulta (en runtime):</strong> Cuando llega una pregunta del usuario, la conviertes también en un vector con el mismo modelo de embeddings.</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">6</div>
+    <div><strong>Recuperación:</strong> Buscas en la DB vectorial los chunks más similares a la pregunta (por similitud coseno).</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">7</div>
+    <div><strong>Inyección en prompt:</strong> Incluyes los chunks recuperados en el prompt como contexto para el LLM.</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">8</div>
+    <div><strong>Generación:</strong> El LLM responde la pregunta basándose en el contexto recuperado.</div>
+  </div>
+</div>
+
+<h2>Implementación básica con Chroma y Anthropic</h2>
+
+<pre>import anthropic
+from openai import OpenAI
+import chromadb
+
+# Clientes
+anthropic_client = anthropic.Anthropic()
+openai_client = OpenAI()
+chroma_client = chromadb.Client()
+coleccion = chroma_client.create_collection("documentos_empresa")
+
+# FASE 1: INDEXACIÓN (se hace una vez, o cuando cambian los docs)
+documentos = [
+    "La política de vacaciones permite 22 días laborables al año.",
+    "Las solicitudes de vacaciones se hacen con 15 días de antelación mínima.",
+    "El horario de trabajo es flexible entre las 8:00 y las 18:00.",
+    "El teletrabajo está permitido hasta 3 días por semana.",
+    "Las bajas por enfermedad requieren justificante médico a partir del 3er día.",
+]
+
+# Generar embeddings para cada documento
+embeddings = []
+for doc in documentos:
+    respuesta = openai_client.embeddings.create(
+        model="text-embedding-3-small",
+        input=doc
+    )
+    embeddings.append(respuesta.data[0].embedding)
+
+# Almacenar en Chroma
+coleccion.add(
+    documents=documentos,
+    embeddings=embeddings,
+    ids=[f"doc_{i}" for i in range(len(documentos))]
+)
+
+# FASE 2: CONSULTA (se hace en cada pregunta del usuario)
+def preguntar(pregunta: str) -> str:
+    # 1. Convertir pregunta a embedding
+    embedding_pregunta = openai_client.embeddings.create(
+        model="text-embedding-3-small",
+        input=pregunta
+    ).data[0].embedding
+    
+    # 2. Recuperar chunks más relevantes
+    resultados = coleccion.query(
+        query_embeddings=[embedding_pregunta],
+        n_results=3
+    )
+    
+    chunks_relevantes = resultados["documents"][0]
+    contexto = "\n".join(f"- {chunk}" for chunk in chunks_relevantes)
+    
+    # 3. Llamar al LLM con el contexto
+    respuesta = anthropic_client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=512,
+        system=f"""Eres un asistente de RRHH. Responde basándote SOLO en el siguiente 
+contexto. Si la respuesta no está en el contexto, dilo explícitamente.
+
+Contexto relevante:
+{contexto}""",
+        messages=[{"role": "user", "content": pregunta}]
+    )
+    
+    return respuesta.content[0].text
+
+# Probar
+print(preguntar("¿Cuántos días de vacaciones tengo?"))
+print(preguntar("¿Puedo trabajar desde casa todos los días?"))</pre>
+
+<h2>Estrategias de chunking</h2>
+<table>
+  <thead>
+    <tr><th>Estrategia</th><th>Cómo funciona</th><th>Mejor para</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Tamaño fijo</td><td>Cada N caracteres o tokens</td><td>Documentos sin estructura clara</td></tr>
+    <tr><td>Por párrafos</td><td>Dividir por saltos de línea dobles</td><td>Artículos, manuales</td></tr>
+    <tr><td>Por secciones</td><td>Dividir por headings (H1, H2...)</td><td>Documentación técnica</td></tr>
+    <tr><td>Semántico</td><td>Detectar cambios de tema</td><td>Documentos heterogéneos</td></tr>
+    <tr><td>Con solapamiento</td><td>Chunks con overlap del 10-20%</td><td>Cuando el contexto entre chunks importa</td></tr>
+  </tbody>
+</table>
+
+<h2>RAG vs. Fine-tuning: ¿cuándo usar cada uno?</h2>
+<table>
+  <thead>
+    <tr><th></th><th>RAG</th><th>Fine-tuning</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Datos que cambian</strong></td><td>✅ Ideal</td><td>❌ Requiere reentrenar</td></tr>
+    <tr><td><strong>Datos muy extensos</strong></td><td>✅ Escala bien</td><td>⚠️ Limitado por tamaño</td></tr>
+    <tr><td><strong>Citación de fuentes</strong></td><td>✅ Fácil</td><td>❌ Difícil</td></tr>
+    <tr><td><strong>Estilo/tono específico</strong></td><td>⚠️ Vía prompt</td><td>✅ Aprende el estilo</td></tr>
+    <tr><td><strong>Tarea muy específica</strong></td><td>⚠️ Depende</td><td>✅ Puede superar RAG</td></tr>
+  </tbody>
+</table>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://learn.deeplearning.ai/" target="_blank">DeepLearning.AI — Building Systems with the ChatGPT API</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo aprendido</h3>
+
+  <div class="q">
+    <p><strong>1.</strong> ¿Qué problema resuelve principalmente RAG?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Hace que el modelo responda más rápido reduciendo la latencia de la API</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Permite al LLM responder sobre datos privados o recientes que no estaban en su entrenamiento</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Reduce el coste de las llamadas a la API comprimiendo los tokens</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Mejora la calidad gramatical de las respuestas del modelo</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Verificar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>2.</strong> ¿Cuál es el orden correcto del pipeline RAG?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Embedding → chunking → almacenamiento → generación → recuperación</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Fine-tuning → recuperación → inyección → generación</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Chunking → embedding → almacenamiento → (en query) embedding de la pregunta → recuperación → inyección en prompt → generación</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Almacenamiento → chunking → recuperación → embedding → generación</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Verificar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0034-gestion-conversaciones-memoria.html">← 5.6 Gestión de conversaciones</a>
+  <a href="0036-embeddings-busqueda-semantica.html">5.8 Embeddings y búsqueda semántica →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

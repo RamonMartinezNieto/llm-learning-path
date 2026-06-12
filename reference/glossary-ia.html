@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glosario de IA — Referencia Rápida</title>
+<style>
+  :root {
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: system-ui, -apple-system, sans-serif;
+    --text: #1a1a1a;
+    --muted: #555;
+    --accent: #1d4ed8;
+    --bg: #fffef7;
+    --border: #d1d5db;
+    --tag-bg: #eff6ff;
+    --tag-text: #1e40af;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); max-width: 900px; margin: 0 auto; padding: 2.5rem 2rem 5rem; line-height: 1.6; }
+  h1 { font-family: var(--serif); font-size: 2rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+  h2 { font-family: var(--serif); font-size: 1.25rem; margin: 2.5rem 0 1rem; color: var(--accent); letter-spacing: 0.01em; }
+  .term { margin-bottom: 1.5rem; }
+  .term dt { font-weight: 700; font-size: 1rem; margin-bottom: 0.2rem; }
+  .term dd { color: var(--muted); font-size: 0.9rem; margin-left: 0; }
+  .avoid { font-size: 0.8rem; color: #9ca3af; margin-top: 0.2rem; font-style: italic; }
+  .avoid span { color: #ef4444; }
+  .tag { display: inline-block; font-size: 0.72rem; font-family: var(--sans); background: var(--tag-bg); color: var(--tag-text); padding: 0.15rem 0.5rem; border-radius: 999px; margin-right: 0.3rem; margin-bottom: 0.3rem; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2.5rem; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  footer { margin-top: 4rem; font-size: 0.8rem; color: #9ca3af; border-top: 1px solid var(--border); padding-top: 1rem; }
+</style>
+</head>
+<body>
+
+<h1>Glosario de IA</h1>
+<p class="subtitle">Terminología canónica del workspace de aprendizaje. Actualizado conforme el usuario domina cada concepto.</p>
+
+<div class="grid">
+<div>
+
+<h2>Modelos y Arquitectura</h2>
+
+<dl class="term">
+  <dt>LLM (Large Language Model)</dt>
+  <dd>Modelo de red neuronal entrenado sobre grandes volúmenes de texto para predecir la siguiente palabra (token). Capaz de generación, razonamiento y conversación.</dd>
+  <div class="avoid"><span>Evitar:</span> "IA generativa" como sinónimo exacto, "chatbot" para referirse al modelo.</div>
+</dl>
+
+<dl class="term">
+  <dt>Token</dt>
+  <dd>Unidad mínima de texto que procesa un LLM. Puede ser una palabra completa, una parte de palabra o un signo de puntuación. ~0.75 palabras en promedio en inglés.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Ventana de contexto (Context Window)</dt>
+  <dd>Número máximo de tokens que un modelo puede procesar en una sola inferencia, incluyendo prompt y respuesta. Lo que queda fuera de esta ventana, el modelo no lo "ve".</dd>
+  <div class="avoid"><span>Evitar:</span> "memoria del modelo" (confunde con fine-tuning).</div>
+</dl>
+
+<dl class="term">
+  <dt>Temperatura</dt>
+  <dd>Parámetro (0.0–2.0) que controla la aleatoriedad de la generación. Temperatura 0 → respuestas deterministas; temperatura alta → respuestas más variadas y creativas.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Embedding</dt>
+  <dd>Representación numérica densa (vector) de un texto en un espacio de alta dimensión, donde la proximidad entre vectores refleja similitud semántica.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Transformer</dt>
+  <dd>Arquitectura de red neuronal basada en mecanismo de atención, que es la base de todos los LLMs modernos (GPT, Claude, Gemini).</dd>
+</dl>
+
+<dl class="term">
+  <dt>Alucinación (Hallucination)</dt>
+  <dd>Generación por parte del LLM de información plausible pero factualmente incorrecta o inventada, presentada con confianza.</dd>
+</dl>
+
+<h2>Prompting</h2>
+
+<dl class="term">
+  <dt>Prompt</dt>
+  <dd>Texto de entrada que se proporciona al LLM para obtener una respuesta. Incluye instrucciones, contexto, ejemplos y la pregunta o tarea.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Zero-shot</dt>
+  <dd>Técnica de prompting donde se pide al modelo realizar una tarea sin proporcionar ejemplos previos.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Few-shot</dt>
+  <dd>Técnica donde se incluyen 2–5 ejemplos de entrada/salida dentro del prompt para guiar el formato o razonamiento del modelo.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Chain-of-Thought (CoT)</dt>
+  <dd>Técnica que instruye al modelo a razonar paso a paso antes de dar una respuesta final. Mejora significativamente tareas de razonamiento complejo.</dd>
+</dl>
+
+<dl class="term">
+  <dt>System prompt</dt>
+  <dd>Instrucciones de alto nivel que definen el rol, comportamiento y restricciones del modelo, separadas del mensaje del usuario.</dd>
+</dl>
+
+</div>
+<div>
+
+<h2>APIs y Construcción</h2>
+
+<dl class="term">
+  <dt>Inferencia</dt>
+  <dd>El proceso de ejecutar un modelo entrenado para generar una respuesta. Lo que ocurre cada vez que llamas a la API.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Tool use / Function calling</dt>
+  <dd>Capacidad de un LLM de invocar funciones externas predefinidas (buscar en web, ejecutar código, consultar BD) durante su razonamiento.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Structured output</dt>
+  <dd>Respuesta del modelo en formato estructurado garantizado (JSON, XML) según un schema predefinido.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Streaming</dt>
+  <dd>Entrega de la respuesta del modelo token a token en tiempo real, en lugar de esperar a que esté completa.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Prompt caching</dt>
+  <dd>Mecanismo que reutiliza el procesamiento de partes del prompt que no cambian entre llamadas, reduciendo latencia y coste.</dd>
+</dl>
+
+<h2>Sistemas Agénticos</h2>
+
+<dl class="term">
+  <dt>Agente (Agent)</dt>
+  <dd>Sistema donde un LLM actúa en un bucle de razonamiento–acción–observación para completar tareas complejas de forma autónoma.</dd>
+</dl>
+
+<dl class="term">
+  <dt>ReAct</dt>
+  <dd>Patrón de agente que alterna entre Razonamiento (Reasoning) y Acción (Acting), usando los resultados de las acciones para continuar el razonamiento.</dd>
+</dl>
+
+<dl class="term">
+  <dt>RAG (Retrieval-Augmented Generation)</dt>
+  <dd>Patrón que combina recuperación de documentos relevantes (búsqueda) con generación del LLM, inyectando el contexto recuperado en el prompt.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Orquestador</dt>
+  <dd>Componente que coordina y dirige múltiples agentes o herramientas hacia un objetivo común en un sistema multi-agente.</dd>
+</dl>
+
+<h2>Producción</h2>
+
+<dl class="term">
+  <dt>Fine-tuning</dt>
+  <dd>Proceso de continuar el entrenamiento de un modelo base con datos específicos del dominio para especializar su comportamiento.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Eval (Evaluación)</dt>
+  <dd>Conjunto de tests y métricas para medir sistemáticamente la calidad de las respuestas de un LLM en una tarea específica.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Prompt injection</dt>
+  <dd>Ataque donde entrada maliciosa del usuario intenta sobreescribir o ignorar las instrucciones del system prompt.</dd>
+</dl>
+
+<dl class="term">
+  <dt>Latencia (TTFT)</dt>
+  <dd>Time To First Token: tiempo desde que se envía la petición hasta que llega el primer token de respuesta. Métrica clave de rendimiento en producción.</dd>
+</dl>
+
+</div>
+</div>
+
+<footer>
+  Workspace: De Usuario a Experto en IA — 
+  <a href="../lessons/0001-como-funcionan-los-llms.html">Primera lección →</a>
+</footer>
+
+</body>
+</html>

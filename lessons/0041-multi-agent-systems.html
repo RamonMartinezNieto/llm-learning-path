@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>6.5 Multi-agent systems | MattPocockSkills</title>
+<style>
+:root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#0891b2;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+nav a{color:var(--accent);text-decoration:none}
+h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+.meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+p{margin-bottom:1rem}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.3rem}
+.callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+.callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.83rem;line-height:1.6;overflow-x:auto;margin:1rem 0}
+.quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+.q{margin-bottom:1.75rem}
+.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+.options{display:flex;flex-direction:column;gap:0.5rem}
+.opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+.opt input{accent-color:var(--accent)}
+.check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+.feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+.feedback.ok{color:var(--ok)}
+.feedback.err{color:var(--err)}
+.source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+.source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+.source a{color:#0369a1}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+.lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 6: Código Agéntico</a> › Lección 6.5</nav>
+<h1>6.5 — Multi-agent systems: orquestación y comunicación</h1>
+<div class="meta">Lección 41 de 55 · ~16 min · Fase 6: Código Agéntico</div>
+
+<p>A veces una tarea es demasiado grande, demasiado variada, o demasiado lenta para un único agente. Los <strong>sistemas multi-agente</strong> dividen el trabajo entre varios agentes especializados, cada uno con su propio contexto, herramientas y rol. Pero con mayor poder llega mayor complejidad.</p>
+
+<h2>Por qué usar múltiples agentes</h2>
+
+<ul>
+  <li><strong>Paralelismo:</strong> Varios agentes pueden trabajar simultáneamente en subtareas independientes, reduciendo el tiempo total.</li>
+  <li><strong>Especialización:</strong> Un agente de investigación con acceso a búsqueda web, otro de escritura con contexto editorial, otro revisor con criterios específicos — cada uno hace lo que mejor sabe.</li>
+  <li><strong>Aislamiento de contexto:</strong> Los LLMs degradan en contextos muy largos. Dividir el trabajo mantiene cada agente en su ventana óptima de contexto.</li>
+  <li><strong>Modularidad:</strong> Puedes mejorar, sustituir o monitorizar cada agente de forma independiente.</li>
+</ul>
+
+<h2>Patrones de arquitectura multi-agente</h2>
+
+<p><strong>Orchestrator-Worker:</strong> Un agente orquestador recibe la tarea, la descompone y delega subtareas a agentes trabajadores especializados. El orquestador recoge y sintetiza los resultados.</p>
+
+<pre>
+Orchestrator
+  ├── ResearchAgent  (busca información, usa web_search)
+  ├── WriterAgent    (redacta, usa context del researcher)
+  └── ReviewerAgent  (revisa, sugiere mejoras al writer)
+</pre>
+
+<p><strong>Pipeline:</strong> Los agentes se conectan en secuencia. El output de un agente se convierte en el input del siguiente. Ideal para procesos con etapas bien definidas.</p>
+
+<p><strong>Peer-to-peer:</strong> Los agentes pueden comunicarse entre sí sin un orquestador central. Más flexible pero más difícil de razonar sobre su comportamiento.</p>
+
+<h2>Comunicación entre agentes</h2>
+
+<table>
+  <tr><th>Mecanismo</th><th>Descripción</th><th>Cuándo usarlo</th></tr>
+  <tr><td>Memoria compartida</td><td>Un estado central que todos pueden leer/escribir</td><td>Tareas colaborativas donde los agentes se bloquean mutuamente</td></tr>
+  <tr><td>Message passing</td><td>Los agentes se envían mensajes estructurados</td><td>Pipelines con flujo de datos claro entre etapas</td></tr>
+  <tr><td>Resultados como contexto</td><td>El output de un agente se inyecta en el prompt del siguiente</td><td>El caso más simple y más fácil de depurar</td></tr>
+</table>
+
+<h2>Confianza y seguridad entre agentes</h2>
+
+<p>Un agente orquestador puede instruir a agentes trabajadores. Pero ¿debería un agente trabajador confiar ciegamente en las instrucciones del orquestador? No necesariamente. Si el orquestador fue comprometido por prompt injection, podría intentar hacer que los trabajadores ejecuten acciones maliciosas. Cada agente debe aplicar sus propias validaciones de seguridad.</p>
+
+<h2>¿Cuándo NO usar multi-agent?</h2>
+
+<p>La complejidad de un sistema multi-agente crece no linealmente. Antes de añadir más agentes, responde:</p>
+<ul>
+  <li>¿Puede un único agente resolver esto con herramientas adecuadas?</li>
+  <li>¿El tiempo de coordinación entre agentes supera el beneficio del paralelismo?</li>
+  <li>¿Tienes observabilidad suficiente para depurar N agentes en paralelo?</li>
+</ul>
+
+<div class="callout">
+  <strong>Regla de oro</strong>
+  Los sistemas multi-agente introducen complejidad no lineal. Empieza siempre con un solo agente y añade más solo cuando sea necesario y justificado.
+</div>
+
+<div class="source">
+  <strong>Fuente principal</strong>
+  Anthropic — Multi-agent systems guide<br>
+  <a href="https://docs.anthropic.com/en/docs/build-with-claude/agents" target="_blank">docs.anthropic.com/en/docs/build-with-claude/agents</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo que has aprendido</h3>
+
+  <div class="q">
+    <p><strong>P1.</strong> ¿Cuál es la principal ventaja de un sistema multi-agente frente a un único agente?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> a) Es más barato porque cada agente usa un modelo más pequeño y económico</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> b) Permite paralelizar tareas y especializar cada agente en lo que hace mejor, reduciendo el contexto que cada uno necesita</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> c) Elimina por completo la posibilidad de errores porque los agentes se supervisan mutuamente</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>P2.</strong> ¿Cuándo NO tiene sentido usar múltiples agentes?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> a) Cuando la tarea implica procesar texto en más de un idioma simultáneamente</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> b) Cuando se trabaja con APIs externas que tienen rate limits estrictos</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> c) Cuando una sola tarea secuencial puede resolverla un único agente, ya que la orquestación añade complejidad y puntos de fallo</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Comprobar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0040-agentes-codigo.html">← 6.4 Agentes de código</a>
+  <a href="0042-evaluacion-trazabilidad-agentes.html">6.6 Evaluación y trazabilidad →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

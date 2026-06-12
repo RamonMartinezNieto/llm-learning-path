@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5.5 — Streaming de respuestas</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#7c3aed;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
+  nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  pre,code{font-family:monospace;font-size:0.83rem}
+  pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;overflow-x:auto;line-height:1.6;margin:1rem 0}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .warning{background:#fff7ed;border-left:3px solid #f97316;padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .warning strong{font-family:var(--sans);font-size:0.8rem;color:#c2410c;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+  th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}
+  .q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f5f3ff}
+  .opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}
+  .feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+  .source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">Inicio</a> › <a href="index.html">Lecciones</a> › 5.5 Streaming de respuestas</nav>
+
+<h1>5.5 — Streaming de respuestas</h1>
+<div class="meta">Fase 5 · Lección 33 de 55 · ~12 min · Construcción con APIs de IA</div>
+
+<p>Por defecto, las APIs de LLM generan la respuesta completa antes de enviártela. Con <strong>streaming</strong>, los tokens llegan a medida que se generan, lo que transforma radicalmente la percepción de velocidad por parte del usuario.</p>
+
+<h2>¿Por qué importa el streaming?</h2>
+<p>Imagina que un modelo tarda 8 segundos en generar una respuesta de 400 palabras. Sin streaming, el usuario ve una pantalla en blanco durante 8 segundos y luego todo el texto de golpe. Con streaming, empieza a ver texto en los primeros 300ms y la experiencia parece mucho más rápida —aunque el tiempo total sea idéntico.</p>
+
+<div class="callout">
+  <strong>Percepción vs. realidad</strong>
+  El streaming mejora drásticamente la percepción de velocidad. Un modelo que tarda 5 segundos sin streaming parece mucho más lento que uno que empieza a responder en 0.3 segundos. El tiempo total es el mismo; la experiencia es completamente diferente.
+</div>
+
+<h2>Cómo funciona técnicamente</h2>
+<p>El streaming usa <strong>Server-Sent Events (SSE)</strong>: el servidor mantiene la conexión HTTP abierta y envía eventos con pequeños fragmentos (<em>delta chunks</em>) de texto a medida que los genera. Tu cliente acumula esos deltas para construir la respuesta completa.</p>
+
+<pre># Estructura de un evento SSE de Anthropic
+event: content_block_delta
+data: {"type": "content_block_delta", "index": 0, "delta": {"type": "text_delta", "text": "Hola"}}
+
+event: content_block_delta  
+data: {"type": "content_block_delta", "index": 0, "delta": {"type": "text_delta", "text": ", ¿cómo"}}
+
+event: content_block_delta
+data: {"type": "content_block_delta", "index": 0, "delta": {"type": "text_delta", "text": " puedo ayudarte?"}}</pre>
+
+<h2>Streaming con Anthropic</h2>
+<p>La librería oficial de Anthropic ofrece un context manager <code>stream()</code> que gestiona la acumulación automáticamente:</p>
+
+<pre>import anthropic
+
+client = anthropic.Anthropic()
+
+# Opción 1: streaming simplificado con helper
+with client.messages.stream(
+    model="claude-opus-4-5",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Explica la fotosíntesis en detalle."}]
+) as stream:
+    for fragmento in stream.text_stream:
+        print(fragmento, end="", flush=True)  # Imprime token a token
+    
+    # Al salir del context manager, la respuesta completa está disponible
+    mensaje_final = stream.get_final_message()
+    print(f"\n\nTokens usados: {mensaje_final.usage.input_tokens}")</pre>
+
+<pre>import anthropic
+
+client = anthropic.Anthropic()
+
+# Opción 2: control granular sobre los eventos
+with client.messages.stream(
+    model="claude-opus-4-5",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Explica la fotosíntesis."}]
+) as stream:
+    texto_acumulado = ""
+    
+    for evento in stream:
+        if hasattr(evento, 'delta') and hasattr(evento.delta, 'text'):
+            fragmento = evento.delta.text
+            texto_acumulado += fragmento
+            # Aquí podrías enviar el fragmento a tu frontend via WebSocket
+            print(fragmento, end="", flush=True)</pre>
+
+<h2>Streaming con OpenAI</h2>
+
+<pre>from openai import OpenAI
+
+client = OpenAI()
+
+stream = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Explica la fotosíntesis en detalle."}],
+    stream=True  # ← Activar streaming
+)
+
+texto_acumulado = ""
+for chunk in stream:
+    if chunk.choices[0].delta.content is not None:
+        fragmento = chunk.choices[0].delta.content
+        texto_acumulado += fragmento
+        print(fragmento, end="", flush=True)
+
+print()  # Nueva línea al final
+print(f"Respuesta completa: {len(texto_acumulado)} caracteres")</pre>
+
+<h2>Streaming en aplicaciones web con FastAPI</h2>
+<p>En una API web, usas <code>StreamingResponse</code> para reenviar los tokens al frontend:</p>
+
+<pre>from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+import anthropic
+
+app = FastAPI()
+client = anthropic.Anthropic()
+
+@app.post("/chat/stream")
+async def chat_stream(mensaje: str):
+    def generar():
+        with client.messages.stream(
+            model="claude-opus-4-5",
+            max_tokens=1024,
+            messages=[{"role": "user", "content": mensaje}]
+        ) as stream:
+            for fragmento in stream.text_stream:
+                # Formato SSE para el cliente
+                yield f"data: {fragmento}\n\n"
+        yield "data: [DONE]\n\n"
+    
+    return StreamingResponse(generar(), media_type="text/event-stream")</pre>
+
+<h2>¿Cuándo NO usar streaming?</h2>
+
+<table>
+  <thead>
+    <tr><th>Situación</th><th>¿Streaming?</th><th>Razón</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Chatbot conversacional</td><td>✅ Sí</td><td>Mejora mucho la experiencia del usuario</td></tr>
+    <tr><td>Structured outputs / JSON</td><td>❌ No</td><td>Necesitas el JSON completo para parsearlo</td></tr>
+    <tr><td>Function calling / tool use</td><td>❌ No</td><td>Necesitas la respuesta completa antes de ejecutar</td></tr>
+    <tr><td>Procesamiento en batch</td><td>❌ No</td><td>No hay usuario esperando, el throughput importa más</td></tr>
+    <tr><td>Generación de documentos</td><td>⚠️ Opcional</td><td>Depende de si el usuario ve la generación en tiempo real</td></tr>
+  </tbody>
+</table>
+
+<div class="warning">
+  <strong>No uses streaming con structured outputs</strong>
+  Si necesitas parsear el JSON de la respuesta, debes esperar a tener el texto completo. El streaming y el parsing de structured outputs son incompatibles a menos que implementes un parser de streaming JSON, lo cual es complejo y raramente vale la pena.
+</div>
+
+<div class="source">
+  <strong>Fuente oficial</strong>
+  <a href="https://docs.anthropic.com/en/api/messages-streaming" target="_blank">Anthropic Streaming Messages — docs.anthropic.com</a>
+</div>
+
+<div class="quiz">
+  <h3>Comprueba lo aprendido</h3>
+
+  <div class="q">
+    <p><strong>1.</strong> ¿Cuándo NO deberías usar streaming?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Cuando la respuesta va a ser muy larga</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Cuando necesitas el output completo antes de procesarlo, como en structured outputs o function calling</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Cuando el modelo es muy rápido</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> En aplicaciones móviles por limitaciones de red</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Verificar</button>
+    <div class="feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="q">
+    <p><strong>2.</strong> ¿Qué métrica mejora principalmente el streaming desde la perspectiva del usuario?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> El tiempo total de generación de la respuesta (end-to-end latency)</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> La calidad y precisión de las respuestas generadas</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> El tiempo hasta el primer token visible (TTFT), que define la percepción de velocidad de respuesta</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> El número de tokens por segundo que genera el modelo</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','c')">Verificar</button>
+    <div class="feedback" id="fb-q2"></div>
+  </div>
+</div>
+
+<div class="lesson-nav">
+  <a href="0032-structured-outputs.html">← 5.4 Structured outputs</a>
+  <a href="0034-gestion-conversaciones-memoria.html">5.6 Gestión de conversaciones →</a>
+</div>
+
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.2 — Generación y mantenimiento de pipelines CI/CD con IA</title>
+<style>
+  :root {
+    --accent: #dc2626;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: system-ui, -apple-system, sans-serif;
+    --bg: #fffef7;
+    --card: #fff;
+    --border: #e5e7eb;
+    --ok: #15803d;
+    --err: #dc2626;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--serif); background: var(--bg); color: #1a1a1a; line-height: 1.7; font-size: 1.05rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .page-wrap { max-width: 740px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .breadcrumb { font-family: var(--sans); font-size: 0.78rem; color: #6b7280; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
+  .breadcrumb a { color: #6b7280; }
+  .breadcrumb a:hover { color: var(--accent); }
+  .breadcrumb span { color: #9ca3af; }
+
+  .lesson-header { border-bottom: 2px solid var(--accent); padding-bottom: 1.25rem; margin-bottom: 2rem; }
+  h1 { font-family: var(--serif); font-size: 1.9rem; font-weight: 700; line-height: 1.25; color: #111; }
+  .meta { font-family: var(--sans); font-size: 0.8rem; color: #6b7280; margin-top: 0.6rem; letter-spacing: 0.03em; }
+  .meta strong { color: var(--accent); }
+
+  h2 { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: #111; margin: 2.5rem 0 0.9rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  p { margin-bottom: 1rem; }
+  ul, ol { margin: 0.75rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.4rem; }
+  code { font-family: 'Courier New', monospace; font-size: 0.88em; background: #f3f4f6; padding: 0.1em 0.35em; border-radius: 3px; color: #374151; }
+  pre { background: #1e1e2e; color: #cdd6f4; padding: 1.25rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.6; margin: 1rem 0 1.25rem; }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  .callout { background: #fef2f2; border-left: 4px solid var(--accent); padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .callout p { margin: 0; font-style: italic; color: #374151; }
+  .callout strong { color: var(--accent); font-style: normal; display: block; margin-bottom: 0.35rem; font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .warning { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .warning p { margin: 0; color: #374151; }
+  .warning strong { color: #b45309; font-style: normal; display: block; margin-bottom: 0.35rem; font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .quiz { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
+  .quiz h2 { border: none; margin-top: 0; padding-bottom: 0; font-size: 1.1rem; margin-bottom: 1.25rem; }
+  .quiz-q { margin-bottom: 1.5rem; }
+  .quiz-q:last-child { margin-bottom: 0; }
+  .quiz-q p { font-weight: 600; margin-bottom: 0.6rem; }
+  .quiz-q label { display: block; margin-bottom: 0.35rem; font-size: 0.95rem; cursor: pointer; padding: 0.3rem 0; }
+  .quiz-q label:hover { color: var(--accent); }
+  .quiz-q input[type=radio] { accent-color: var(--accent); margin-right: 0.45rem; }
+  .btn { font-family: var(--sans); font-size: 0.85rem; background: var(--accent); color: #fff; border: none; padding: 0.45rem 1.1rem; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; }
+  .btn:hover { background: #b91c1c; }
+  .feedback { display: none; font-family: var(--sans); font-size: 0.88rem; margin-top: 0.5rem; padding: 0.45rem 0.75rem; border-radius: 4px; font-weight: 600; }
+  .feedback.ok { background: #f0fdf4; color: var(--ok); }
+  .feedback.err { background: #fef2f2; color: var(--err); }
+
+  .source { background: #f9fafb; border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; margin: 2rem 0; font-family: var(--sans); font-size: 0.85rem; }
+  .source strong { display: block; margin-bottom: 0.3rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+
+  .teacher { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 2rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+  .teacher-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .teacher-body { font-size: 0.9rem; color: #374151; }
+  .teacher-body strong { display: block; font-family: var(--sans); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; margin-bottom: 0.3rem; }
+
+  .lesson-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--sans); font-size: 0.85rem; }
+  .lesson-nav a { display: flex; flex-direction: column; gap: 0.2rem; max-width: 45%; }
+  .lesson-nav a span:first-child { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
+  .lesson-nav a span:last-child { color: var(--accent); font-weight: 600; }
+  .lesson-nav .nav-next { text-align: right; margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Misión</a>
+    <span>›</span>
+    <a href="#">Fase 4: IA en el Ciclo DevOps</a>
+    <span>›</span>
+    <span>Lección 4.2</span>
+  </nav>
+
+  <header class="lesson-header">
+    <h1>4.2 — Generación y mantenimiento de pipelines CI/CD con IA</h1>
+    <p class="meta"><strong>Fase 4</strong> · Lección 24 de 55 · ~13 min · IA en el Ciclo DevOps</p>
+  </header>
+
+  <h2>Por qué la IA es especialmente buena generando pipelines</h2>
+  <p>Los pipelines de CI/CD son uno de los casos de uso más claros para la generación de código con IA. El YAML de GitHub Actions o GitLab CI sigue patrones estructurados y repetitivos: define un evento, configura el entorno, ejecuta pasos en orden. Esta previsibilidad lo hace ideal para generación automática.</p>
+  <p>La fricción principal al escribir pipelines manualmente es recordar la sintaxis exacta de cada acción, los nombres de los triggers, las claves de configuración específicas del runner y las mejores prácticas de seguridad. La IA puede manejar todo esto si le das el contexto adecuado.</p>
+  <p>Patrones de pipeline que la IA genera con alta calidad:</p>
+  <ul>
+    <li><strong>Test pipeline:</strong> instalar dependencias, ejecutar linter, ejecutar tests unitarios e integración.</li>
+    <li><strong>Build pipeline:</strong> compilar, crear imagen Docker, publicar a registry.</li>
+    <li><strong>Deploy pipeline:</strong> desplegar a staging, ejecutar smoke tests, desplegar a producción con aprobación manual.</li>
+    <li><strong>Release pipeline:</strong> generar changelog, crear tag, publicar a npm/PyPI/etc.</li>
+  </ul>
+
+  <h2>Prompt template para generar pipelines con IA</h2>
+  <p>El contexto que debes proveer a la IA para obtener un pipeline útil:</p>
+  <pre><code>Genera un pipeline de GitHub Actions para un proyecto con estas características:
+- Stack: [Node.js 20 / Python 3.11 / etc.]
+- Comando de tests: [npm test / pytest / etc.]
+- Comando de build: [npm run build / etc.]
+- Target de despliegue: [AWS ECS / Vercel / Railway / etc.]
+- Branches: main (producción), develop (staging)
+- Requisitos especiales: [cache de dependencias, matrix testing, etc.]
+
+El pipeline debe ejecutarse en cada push y PR, con deploy
+automático a staging y deploy a producción solo desde main
+con aprobación manual.</code></pre>
+
+  <p>Con este contexto, la IA puede generar un <code>.github/workflows/ci-cd.yml</code> completo y funcional que solo requerirá ajustes menores de variables de entorno y secrets.</p>
+
+  <h2>Mantenimiento y debugging de pipelines con IA</h2>
+  <p>Los pipelines fallan. Los errores en CI/CD tienen mensajes crípticos, dependencias de versiones, problemas de caché o incompatibilidades de entorno difíciles de diagnosticar. Aquí la IA también aporta valor:</p>
+  <ul>
+    <li><strong>Debugging de errores:</strong> pega el log completo del pipeline fallido y pide a la IA que identifique la causa raíz.</li>
+    <li><strong>Actualización de dependencias:</strong> cuando una Action queda deprecada, la IA puede sugerir el reemplazo actualizado.</li>
+    <li><strong>Optimización de velocidad:</strong> la IA puede identificar pasos que se pueden paralelizar o cachear para reducir el tiempo total.</li>
+    <li><strong>Migración entre plataformas:</strong> convertir un pipeline de CircleCI a GitHub Actions o de Jenkins a GitLab CI.</li>
+  </ul>
+
+  <div class="callout">
+    <strong>💡 Principio clave</strong>
+    <p>Los pipelines de CI/CD tienen mucha boilerplate repetitiva — exactamente el tipo de código donde la IA tiene ventaja. Siempre revisa los permisos y secrets que el pipeline necesita.</p>
+  </div>
+
+  <p>Al revisar un pipeline generado por IA, presta especial atención a:</p>
+  <ul>
+    <li>Los permisos declarados en <code>permissions:</code> — principio de mínimo privilegio.</li>
+    <li>Cómo se manejan los <code>secrets</code> — nunca deben aparecer en logs ni en outputs.</li>
+    <li>Las versiones de las Actions usadas — fíjalas a un SHA específico en producción.</li>
+    <li>Las condiciones de ejecución — qué branches y eventos disparan cada job.</li>
+  </ul>
+
+  <section class="quiz">
+    <h2>🧠 Comprueba lo aprendido</h2>
+
+    <div class="quiz-q">
+      <p>1. ¿Qué información es imprescindible para que la IA genere un pipeline CI/CD útil?</p>
+      <label><input type="radio" name="q1" value="a"> Solo el nombre del repositorio y el lenguaje de programación</label>
+      <label><input type="radio" name="q1" value="b"> El stack tecnológico, los comandos de test/build y el target de despliegue</label>
+      <label><input type="radio" name="q1" value="c"> El número de desarrolladores en el equipo y la cadencia de releases</label>
+      <label><input type="radio" name="q1" value="d"> La arquitectura del sistema y los diagramas de infraestructura</label>
+      <button class="btn" onclick="check('q1','b')">Verificar</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="quiz-q">
+      <p>2. ¿En qué parte de un pipeline debes ser especialmente cuidadoso al usar código generado por IA?</p>
+      <label><input type="radio" name="q2" value="a"> En los pasos de instalación de dependencias, que pueden ser lentos</label>
+      <label><input type="radio" name="q2" value="b"> En los comentarios del YAML, que pueden estar desactualizados</label>
+      <label><input type="radio" name="q2" value="c"> En la gestión de secrets, permisos y credenciales de despliegue</label>
+      <label><input type="radio" name="q2" value="d"> En la sintaxis de las condiciones if/else del pipeline</label>
+      <button class="btn" onclick="check('q2','c')">Verificar</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+  </section>
+
+  <div class="source">
+    <strong>📚 Fuente principal</strong>
+    <a href="https://docs.github.com/en/actions" target="_blank" rel="noopener">GitHub Actions documentation</a>
+    <p style="margin-top:0.4rem;color:#6b7280;font-size:0.82rem;">docs.github.com · Documentación oficial de GitHub Actions</p>
+  </div>
+
+  <div class="teacher">
+    <div class="teacher-avatar">👨‍🏫</div>
+    <div class="teacher-body">
+      <strong>Nota del instructor</strong>
+      Un patrón de seguridad que recomiendo siempre: en pipelines generados por IA, agrega <code>permissions: read-all</code> como default global y luego eleva permisos solo en los jobs que los necesitan. Esto limita el radio de impacto si el pipeline es comprometido. También, fija las versiones de Actions externas a un SHA de commit, no a una tag como <code>v3</code> que puede moverse.
+    </div>
+  </div>
+
+  <nav class="lesson-nav">
+    <a href="0023-ia-pull-requests.html">
+      <span>← Anterior</span>
+      <span>4.1 — IA en análisis de Pull Requests</span>
+    </a>
+    <a href="0025-ia-seguridad.html" class="nav-next">
+      <span>Siguiente →</span>
+      <span>4.3 — IA para seguridad</span>
+    </a>
+  </nav>
+
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2.1 — IA como motor de investigación y síntesis</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#0891b2;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .template{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:1rem 0;font-family:monospace;font-size:0.83rem;line-height:1.6}
+  .template .label{font-family:var(--sans);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:0.4rem;display:block}
+  .use-cases{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin:1.5rem 0}
+  .uc{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.85rem}
+  .uc h3{font-family:var(--sans);font-size:0.85rem;font-weight:700;margin-bottom:0.3rem}
+  .uc p{font-size:0.82rem;color:var(--muted);margin:0}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#ecfeff}.opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}.feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 2: Chat Mode Avanzado</a> › Lección 2.1</nav>
+<h1>IA como motor de investigación y síntesis</h1>
+<p class="meta">Fase 2 · Lección 11 de 55 · ~13 min · Chat Mode Avanzado</p>
+
+<h2>La IA como acelerador de comprensión</h2>
+<p>La IA no reemplaza la investigación — la comprime. En lugar de leer 15 artículos para construir un mapa mental de un tema, puedes usar un LLM para obtener una síntesis inicial, identificar los puntos de disensión, y luego ir directamente a las fuentes primarias más relevantes.</p>
+
+<div class="callout">
+  <strong>El flujo correcto</strong>
+  IA → síntesis rápida → identifica fuentes primarias → lee las fuentes críticas → IA para consolidar y generar preguntas. No: IA → confiar en el output como verdad final.
+</div>
+
+<h2>Casos de uso de alto valor</h2>
+<div class="use-cases">
+  <div class="uc"><h3>🗺️ Mapa de un nuevo dominio</h3><p>"Explícame el estado del arte en [X] como si tuviera background en [Y] pero no en [X]. Dame los 5 conceptos que debo dominar y las 3 fuentes que debería leer primero."</p></div>
+  <div class="uc"><h3>⚖️ Análisis de trade-offs</h3><p>"¿Cuáles son los argumentos a favor y en contra de [decisión técnica]? Lista los factores más importantes para decidir."</p></div>
+  <div class="uc"><h3>🔗 Conexión de conceptos</h3><p>"¿Cómo se relaciona [concepto A] con [concepto B] que ya conozco? Dame una analogía y un caso donde elegirías uno sobre el otro."</p></div>
+  <div class="uc"><h3>❓ Generación de preguntas</h3><p>"Acabo de leer [resumen]. ¿Qué preguntas debería hacerme para asegurarme de que realmente lo entiendo y no estoy cayendo en la trampa de la fluidez?"</p></div>
+</div>
+
+<h2>Plantilla de investigación rápida</h2>
+<div class="template">
+  <span class="label">Prompt de exploración de nuevo dominio</span>
+  Contexto: Soy [perfil] y quiero entender [tema] para poder [objetivo concreto].<br><br>
+  Por favor:<br>
+  1. Dame un mapa de 5 conceptos clave con una frase cada uno<br>
+  2. Identifica los 2 puntos de mayor debate/controversia en este campo<br>
+  3. Sugiere 3 recursos de alta calidad (no Wikipedia) para profundizar<br>
+  4. Dime qué conceptos previos debo tener sólidos para entender este tema
+</div>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+  <div class="q">
+    <p>¿Cuál es el riesgo principal de usar IA para investigación sin verificar las fuentes?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Que el modelo tarde demasiado en generar la respuesta</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Que las alucinaciones se presenten como hechos verificados, creando un mapa mental incorrecto</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Que el modelo rechace responder preguntas de investigación avanzada</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Que la síntesis sea demasiado detallada para ser útil</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+  <div class="q">
+    <p>En el flujo de investigación con IA, ¿cuál debe ser el rol de las fuentes primarias?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Son opcionales si el modelo da una respuesta detallada y confiada</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Deben leerse para verificar y profundizar los puntos críticos identificados por la IA</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Solo son necesarias para temas muy técnicos o científicos</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Reemplazarlas con más preguntas al modelo ahorra tiempo sin pérdida de calidad</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','b')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://www.oneusefulthing.org/p/how-to-use-ai-to-do-research" target="_blank">Ethan Mollick — "How to Use AI to Do Research" (One Useful Thing)</a><br>
+  Un investigador de Wharton con visión práctica sobre cómo integrar LLMs en procesos reales de investigación académica y profesional.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregunta al agente: "Dame un ejemplo de cómo usarías este flujo para investigar si debo usar Kubernetes o Docker Compose para mi proyecto" o cualquier dominio de tu interés.
+</div>
+
+<div class="lesson-nav">
+  <a href="0010-evaluacion-refinamiento-prompts.html">← 1.6 Refinamiento de prompts</a>
+  <a href="0012-ia-analisis-documentos.html">2.2 IA para análisis de documentos →</a>
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

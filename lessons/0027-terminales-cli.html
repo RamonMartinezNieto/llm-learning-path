@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.5 — Terminales y CLI asistidos por IA</title>
+<style>
+  :root {
+    --accent: #dc2626;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: system-ui, -apple-system, sans-serif;
+    --bg: #fffef7;
+    --card: #fff;
+    --border: #e5e7eb;
+    --ok: #15803d;
+    --err: #dc2626;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--serif); background: var(--bg); color: #1a1a1a; line-height: 1.7; font-size: 1.05rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .page-wrap { max-width: 740px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .breadcrumb { font-family: var(--sans); font-size: 0.78rem; color: #6b7280; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
+  .breadcrumb a { color: #6b7280; }
+  .breadcrumb a:hover { color: var(--accent); }
+  .breadcrumb span { color: #9ca3af; }
+
+  .lesson-header { border-bottom: 2px solid var(--accent); padding-bottom: 1.25rem; margin-bottom: 2rem; }
+  h1 { font-family: var(--serif); font-size: 1.9rem; font-weight: 700; line-height: 1.25; color: #111; }
+  .meta { font-family: var(--sans); font-size: 0.8rem; color: #6b7280; margin-top: 0.6rem; letter-spacing: 0.03em; }
+  .meta strong { color: var(--accent); }
+
+  h2 { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: #111; margin: 2.5rem 0 0.9rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  p { margin-bottom: 1rem; }
+  ul, ol { margin: 0.75rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.4rem; }
+  code { font-family: 'Courier New', monospace; font-size: 0.88em; background: #f3f4f6; padding: 0.1em 0.35em; border-radius: 3px; color: #374151; }
+  pre { background: #1e1e2e; color: #cdd6f4; padding: 1.25rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.6; margin: 1rem 0 1.25rem; }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  .callout { background: #fef2f2; border-left: 4px solid var(--accent); padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .callout p { margin: 0; font-style: italic; color: #374151; }
+  .callout strong { color: var(--accent); font-style: normal; display: block; margin-bottom: 0.35rem; font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .warning { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .warning p { margin: 0; color: #374151; }
+  .warning strong { color: #b45309; font-style: normal; display: block; margin-bottom: 0.35rem; font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .quiz { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
+  .quiz h2 { border: none; margin-top: 0; padding-bottom: 0; font-size: 1.1rem; margin-bottom: 1.25rem; }
+  .quiz-q { margin-bottom: 1.5rem; }
+  .quiz-q:last-child { margin-bottom: 0; }
+  .quiz-q p { font-weight: 600; margin-bottom: 0.6rem; }
+  .quiz-q label { display: block; margin-bottom: 0.35rem; font-size: 0.95rem; cursor: pointer; padding: 0.3rem 0; }
+  .quiz-q label:hover { color: var(--accent); }
+  .quiz-q input[type=radio] { accent-color: var(--accent); margin-right: 0.45rem; }
+  .btn { font-family: var(--sans); font-size: 0.85rem; background: var(--accent); color: #fff; border: none; padding: 0.45rem 1.1rem; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; }
+  .btn:hover { background: #b91c1c; }
+  .feedback { display: none; font-family: var(--sans); font-size: 0.88rem; margin-top: 0.5rem; padding: 0.45rem 0.75rem; border-radius: 4px; font-weight: 600; }
+  .feedback.ok { background: #f0fdf4; color: var(--ok); }
+  .feedback.err { background: #fef2f2; color: var(--err); }
+
+  .source { background: #f9fafb; border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; margin: 2rem 0; font-family: var(--sans); font-size: 0.85rem; }
+  .source strong { display: block; margin-bottom: 0.3rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+
+  .teacher { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 2rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+  .teacher-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .teacher-body { font-size: 0.9rem; color: #374151; }
+  .teacher-body strong { display: block; font-family: var(--sans); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; margin-bottom: 0.3rem; }
+
+  .lesson-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--sans); font-size: 0.85rem; }
+  .lesson-nav a { display: flex; flex-direction: column; gap: 0.2rem; max-width: 45%; }
+  .lesson-nav a span:first-child { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
+  .lesson-nav a span:last-child { color: var(--accent); font-weight: 600; }
+  .lesson-nav .nav-next { text-align: right; margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Misión</a>
+    <span>›</span>
+    <a href="#">Fase 4: IA en el Ciclo DevOps</a>
+    <span>›</span>
+    <span>Lección 4.5</span>
+  </nav>
+
+  <header class="lesson-header">
+    <h1>4.5 — Terminales y CLI asistidos por IA</h1>
+    <p class="meta"><strong>Fase 4</strong> · Lección 27 de 55 · ~12 min · IA en el Ciclo DevOps</p>
+  </header>
+
+  <h2>Herramientas de terminal asistidas por IA</h2>
+  <p>El terminal es el entorno donde los desarrolladores pasan una fracción enorme de su tiempo, y es uno de los últimos espacios en integrar asistencia de IA de forma nativa. Esto está cambiando rápidamente con herramientas que convierten el lenguaje natural en comandos de shell precisos.</p>
+  <p>Las principales herramientas disponibles hoy:</p>
+  <ul>
+    <li><strong>GitHub Copilot en el terminal:</strong> integrado en <code>gh</code> CLI y en terminales compatibles como iTerm2 y Windows Terminal. Permite preguntar en lenguaje natural y obtener el comando correspondiente. Usa <code>gh copilot suggest</code> para sugerencias o <code>gh copilot explain</code> para entender un comando.</li>
+    <li><strong>Warp:</strong> terminal nativo para macOS y Linux con IA integrada. Permite escribir "I want to find all files modified in the last 7 days larger than 1MB" y obtiene el comando <code>find</code> correcto.</li>
+    <li><strong>llm (Simon Willison):</strong> herramienta CLI que permite interactuar con múltiples modelos de lenguaje directamente desde el terminal. Ideal para pipelines de texto, transformaciones de datos y scripting.</li>
+    <li><strong>aider:</strong> agente de coding desde el terminal que edita archivos de código directamente usando instrucciones en lenguaje natural.</li>
+  </ul>
+
+  <h2>Casos de uso: de lenguaje natural a comandos precisos</h2>
+  <p>El valor principal de la IA en el terminal es traducir intenciones expresadas en lenguaje natural a la sintaxis exacta de comandos complejos. Los comandos donde esto es más útil:</p>
+  <ul>
+    <li><strong>awk y sed:</strong> procesamiento de texto con sintaxis críptica que nadie recuerda de memoria. Ejemplo: "extrae la tercera columna de un CSV ignorando la primera línea de cabecera".</li>
+    <li><strong>jq:</strong> transformación de JSON desde el terminal. La sintaxis de filtros de jq es poderosa pero difícil de escribir correctamente a la primera.</li>
+    <li><strong>git con flags específicos:</strong> comandos como <code>git log --oneline --graph --decorate --all --since="2 weeks ago"</code> son difíciles de recordar pero la IA los genera al instante.</li>
+    <li><strong>find con condiciones complejas:</strong> buscar archivos con múltiples criterios combinados (tipo, fecha, tamaño, permisos).</li>
+    <li><strong>curl con headers y autenticación:</strong> llamadas a APIs REST con headers específicos, autenticación Bearer y cuerpo JSON.</li>
+  </ul>
+  <pre><code># Ejemplo de prompt para la IA en terminal:
+# "Encuentra todos los archivos .log en /var/log modificados
+#  en las últimas 24 horas y comprímalos en un archivo tar.gz"
+
+find /var/log -name "*.log" -mtime -1 | \
+  tar -czf logs-$(date +%Y%m%d).tar.gz -T -</code></pre>
+
+  <div class="warning">
+    <strong>⚠️ Regla de oro del terminal con IA</strong>
+    <p>Nunca ejecutes un comando generado por IA sin entender qué hace, especialmente si involucra <code>rm</code>, <code>chmod</code>, <code>sudo</code> o acceso a la red. Pide siempre a la IA que explique el comando antes de ejecutarlo.</p>
+  </div>
+
+  <div class="callout">
+    <strong>💡 Ideal para la IA</strong>
+    <p>Los comandos de una sola línea con pipes (<code>|</code>), sed, awk y jq son perfectos para la IA — son difíciles de recordar pero siguen patrones precisos.</p>
+  </div>
+
+  <h2>Uso avanzado: llm en pipelines de texto</h2>
+  <p>La herramienta <code>llm</code> de Simon Willison permite integrar modelos de lenguaje en pipelines de Unix, tratando la IA como un filtro de texto más:</p>
+  <pre><code># Resumir el output de un comando
+git log --oneline -20 | llm "Resume estos commits en un párrafo"
+
+# Analizar logs de error
+tail -n 100 app.log | grep ERROR | llm "¿Cuál parece ser el problema principal?"
+
+# Transformar datos
+cat data.csv | llm "Convierte esto a JSON con los campos name y value"</code></pre>
+  <p>Este paradigma convierte la IA en una herramienta de línea de comandos más, componible con <code>grep</code>, <code>cat</code>, <code>pipe</code> y el resto del ecosistema Unix.</p>
+
+  <section class="quiz">
+    <h2>🧠 Comprueba lo aprendido</h2>
+
+    <div class="quiz-q">
+      <p>1. ¿Cuál es la regla más importante antes de ejecutar un comando generado por IA en el terminal?</p>
+      <label><input type="radio" name="q1" value="a"> Ejecutarlo primero en un entorno de staging para verificar que funciona</label>
+      <label><input type="radio" name="q1" value="b"> Entender qué hace el comando antes de ejecutarlo, especialmente si involucra operaciones destructivas o privilegios</label>
+      <label><input type="radio" name="q1" value="c"> Guardar el comando en un script antes de ejecutarlo directamente</label>
+      <label><input type="radio" name="q1" value="d"> Verificar que el modelo de IA usado tenga más de 70B de parámetros</label>
+      <button class="btn" onclick="check('q1','b')">Verificar</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="quiz-q">
+      <p>2. ¿Para qué tipo de comandos CLI es especialmente útil la IA?</p>
+      <label><input type="radio" name="q2" value="a"> Comandos básicos como ls, cd y mkdir que cualquier desarrollador conoce</label>
+      <label><input type="radio" name="q2" value="b"> Comandos de instalación de dependencias como npm install o pip install</label>
+      <label><input type="radio" name="q2" value="c"> Comandos con sintaxis compleja y difícil de memorizar como awk, sed, jq y git con flags específicos</label>
+      <label><input type="radio" name="q2" value="d"> Comandos interactivos que requieren confirmación del usuario</label>
+      <button class="btn" onclick="check('q2','c')">Verificar</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+  </section>
+
+  <div class="source">
+    <strong>📚 Fuente principal</strong>
+    <a href="https://llm.datasette.io/" target="_blank" rel="noopener">llm — A CLI utility and Python library for interacting with Large Language Models</a>
+    <p style="margin-top:0.4rem;color:#6b7280;font-size:0.82rem;">llm.datasette.io · Herramienta CLI de Simon Willison para integrar LLMs en pipelines de Unix</p>
+  </div>
+
+  <div class="teacher">
+    <div class="teacher-avatar">👨‍🏫</div>
+    <div class="teacher-body">
+      <strong>Nota del instructor</strong>
+      Un ejercicio práctico excelente: instala <code>gh</code> CLI de GitHub y prueba <code>gh copilot explain "git rebase -i HEAD~3"</code>. Esta capacidad de explicar comandos existentes es tan valiosa como generar nuevos — entender comandos ajenos que encuentras en documentación o scripts de tu empresa. El conocimiento del terminal se construye así, un comando a la vez.
+    </div>
+  </div>
+
+  <nav class="lesson-nav">
+    <a href="0026-documentacion-tecnica-proyectos.html">
+      <span>← Anterior</span>
+      <span>4.4 — Documentación técnica</span>
+    </a>
+    <a href="0028-ia-gestion-proyectos.html" class="nav-next">
+      <span>Siguiente →</span>
+      <span>4.6 — IA para gestión de proyectos</span>
+    </a>
+  </nav>
+
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

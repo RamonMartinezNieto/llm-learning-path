@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3.4 — Debugging y análisis de errores con IA</title>
+<style>
+  :root{--accent:#059669;--serif:Georgia,serif;--sans:system-ui,sans-serif;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:#1f2937;line-height:1.7;font-size:1rem}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem}
+  .breadcrumb{font-size:.8rem;color:#6b7280;margin-bottom:2rem}
+  .breadcrumb span{color:#9ca3af}
+  h1{font-family:var(--serif);font-size:2rem;line-height:1.2;color:#111827;margin-bottom:.5rem}
+  .meta{font-size:.85rem;color:#6b7280;margin-bottom:2.5rem;display:flex;flex-wrap:wrap;gap:.5rem .75rem;align-items:center}
+  .meta .tag{background:#ecfdf5;color:var(--accent);border-radius:999px;padding:.15rem .65rem;font-weight:600;font-size:.75rem}
+  h2{font-family:var(--serif);font-size:1.35rem;color:#111827;margin:2.5rem 0 .75rem;padding-bottom:.35rem;border-bottom:1px solid var(--border)}
+  p{margin-bottom:1rem}
+  ul,ol{margin:0 0 1rem 1.4rem}
+  li{margin-bottom:.35rem}
+  code{background:#f3f4f6;border-radius:4px;padding:.1rem .4rem;font-size:.9em;font-family:'Courier New',monospace;color:#374151}
+  pre{background:#f3f4f6;border-radius:8px;padding:1rem 1.25rem;overflow-x:auto;margin-bottom:1rem;font-size:.88rem;line-height:1.6}
+  .callout{border-left:3px solid var(--accent);background:#ecfdf5;padding:.85rem 1.1rem;border-radius:0 6px 6px 0;margin:1.5rem 0;font-style:italic;color:#065f46}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem}
+  .quiz{margin:2.5rem 0}
+  .quiz h2{margin-top:0}
+  .question{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem}
+  .question p{font-weight:600;margin-bottom:.75rem}
+  .question label{display:block;margin-bottom:.45rem;cursor:pointer;font-weight:400;padding:.35rem .5rem;border-radius:5px;transition:background .15s}
+  .question label:hover{background:#f9fafb}
+  .question input[type=radio]{margin-right:.5rem;accent-color:var(--accent)}
+  .btn{display:inline-block;margin-top:.75rem;padding:.45rem 1.1rem;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.9rem;font-family:var(--sans);font-weight:600;transition:opacity .15s}
+  .btn:hover{opacity:.88}
+  .feedback{display:none;margin-top:.65rem;padding:.45rem .75rem;border-radius:5px;font-size:.9rem;font-weight:600}
+  .feedback.ok{background:#dcfce7;color:var(--ok)}
+  .feedback.err{background:#fee2e2;color:var(--err)}
+  .source{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.4rem;margin:2rem 0}
+  .source strong{display:block;margin-bottom:.3rem;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
+  .teacher{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:1.1rem 1.4rem;margin:1.5rem 0}
+  .teacher strong{display:block;margin-bottom:.35rem;color:#92400e;font-size:.9rem}
+  .teacher p{color:#78350f;font-size:.9rem;margin:0}
+  .lesson-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.75rem}
+  .lesson-nav a{font-size:.9rem;font-weight:600;color:var(--accent)}
+  .lesson-nav .prev::before{content:'← '}
+  .lesson-nav .next::after{content:' →'}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="breadcrumb">
+    <a href="../MISSION.md">Misión</a>
+    <span> › </span>Fase 3: IA en el Entorno de Desarrollo
+    <span> › </span>Lección 3.4
+  </nav>
+
+  <h1>3.4 — Debugging y análisis de errores con IA</h1>
+  <div class="meta">
+    <span class="tag">Fase 3</span>
+    <span>Lección 20 de 55</span>
+    <span>·</span>
+    <span>⏱ ~13 min</span>
+    <span>·</span>
+    <span>IA en el Entorno de Desarrollo</span>
+  </div>
+
+  <!-- SECCIÓN 1 -->
+  <h2>El principio del pato de goma aplicado a la IA</h2>
+  <p>El <em>rubber duck debugging</em> es una técnica clásica: explicarle un bug a un objeto inanimado (o a un compañero) con el máximo detalle posible. El acto de articular el problema en voz alta frecuentemente revela la solución antes de recibir respuesta.</p>
+  <p>La IA es el pato de goma definitivo: disponible 24/7, nunca se aburre de tus preguntas, y además <em>sí</em> puede responder. Más importante, al forzarte a describir el problema con precisión —qué pasa, qué esperabas que pasara, qué ya probaste— activas el mismo mecanismo cognitivo que hace funcionar la técnica original.</p>
+  <p>Esta es la razón por la que la estructura del prompt de debugging importa tanto: no es solo para el modelo, es también para ti.</p>
+
+  <!-- SECCIÓN 2 -->
+  <h2>Qué incluir en un prompt de debugging</h2>
+  <p>Un prompt de debugging incompleto genera respuestas genéricas. Los cuatro ingredientes esenciales:</p>
+  <div class="card">
+    <ol style="margin-top:.25rem">
+      <li><strong>El mensaje de error</strong>: copia el stack trace completo, no solo la primera línea.</li>
+      <li><strong>El código relevante</strong>: la función o bloque donde ocurre el error, con contexto suficiente.</li>
+      <li><strong>Lo que ya intentaste</strong>: evita que el modelo sugiera lo que ya sabes que no funciona.</li>
+      <li><strong>El entorno</strong>: versión del lenguaje/framework, sistema operativo si es relevante, datos de entrada que reproducen el error.</li>
+    </ol>
+  </div>
+  <p>Plantilla lista para usar:</p>
+  <pre>Tengo este error: [stack trace completo]
+
+El código relevante es:
+[código]
+
+Ya intenté: [lista de lo probado]
+
+¿Cuál es la causa más probable y cómo lo solucionaría?</pre>
+
+  <!-- SECCIÓN 3 -->
+  <h2>Superpoderes de la IA en debugging</h2>
+  <p>La IA destaca especialmente en categorías de bugs donde el patrón del error es reconocible aunque el desarrollador no tenga experiencia con esa tecnología específica:</p>
+  <ul>
+    <li><strong>Expresiones regulares</strong>: interpretar regex complejas, detectar por qué no captura el patrón esperado, reescribir con explicación.</li>
+    <li><strong>SQL y optimización de queries</strong>: analizar planes de ejecución, detectar N+1, sugerir índices, reescribir subqueries como JOINs.</li>
+    <li><strong>CSS y layout</strong>: problemas de flexbox, grid, z-index, especificidad, box model.</li>
+    <li><strong>Ficheros de configuración</strong>: YAML con indentación incorrecta, JSON malformado, variables de entorno mal referenciadas, conflictos en webpack/vite/tsconfig.</li>
+    <li><strong>Errores de tipos</strong>: mensajes de TypeScript crípticos, discrepancias de tipos genéricos, aserciones incorrectas.</li>
+  </ul>
+
+  <div class="callout">
+    💡 "Incluir siempre 'ya intenté X' evita que el modelo sugiera lo que ya sabes que no funciona."
+  </div>
+
+  <!-- QUIZ -->
+  <section class="quiz">
+    <h2>Comprueba lo aprendido</h2>
+
+    <div class="question">
+      <p>Q1 — ¿Qué elemento es más crítico incluir en un prompt de debugging?</p>
+      <label><input type="radio" name="q1" value="a"> a) Una descripción detallada de la arquitectura general del proyecto</label>
+      <label><input type="radio" name="q1" value="b"> b) El stack trace completo y el código relevante donde ocurre el error</label>
+      <label><input type="radio" name="q1" value="c"> c) Los nombres de todos los ficheros que podrían estar relacionados</label>
+      <label><input type="radio" name="q1" value="d"> d) El historial de cambios de git de los últimos tres commits del fichero</label>
+      <button class="btn" onclick="check('q1','b')">Comprobar</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="question">
+      <p>Q2 — ¿En qué tipo de bugs destaca especialmente la IA?</p>
+      <label><input type="radio" name="q1b" value="a"> a) Condiciones de carrera complejas en sistemas distribuidos con alta concurrencia</label>
+      <label><input type="radio" name="q1b" value="b"> b) Bugs que solo ocurren bajo carga en producción y no se reproducen en local</label>
+      <label><input type="radio" name="q1b" value="c"> c) Errores de sintaxis, regex, queries SQL y configuración donde el patrón es reconocible</label>
+      <label><input type="radio" name="q1b" value="d"> d) Fallos en la lógica de negocio que requieren conocer el dominio de la empresa</label>
+      <button class="btn" onclick="check('q1b','c')">Comprobar</button>
+      <div class="feedback" id="fb-q1b"></div>
+    </div>
+  </section>
+
+  <!-- SOURCE -->
+  <div class="source">
+    <strong>📖 Recurso primario recomendado</strong>
+    <a href="https://docs.github.com/en/copilot/github-copilot-chat/about-github-copilot-chat" target="_blank" rel="noopener">
+      GitHub Copilot Chat — Documentación oficial
+    </a>
+    <p style="margin:.3rem 0 0;font-size:.85rem;color:#6b7280">Guía oficial sobre cómo usar Copilot Chat para debugging, incluyendo comandos de barra diagonal como <code>/fix</code> y <code>/explain</code>.</p>
+  </div>
+
+  <!-- TEACHER -->
+  <div class="teacher">
+    <strong>🤖 Pregunta al agente para profundizar</strong>
+    <p>La próxima vez que tengas un error real, usa la plantilla de esta lección y pégala al agente: stack trace completo + código + lo que ya intentaste. Luego pregunta: <em>"¿Hay algún detalle del stack trace que yo podría estar ignorando que sea relevante para encontrar la causa raíz?"</em></p>
+  </div>
+
+  <!-- NAV -->
+  <nav class="lesson-nav">
+    <a class="prev" href="0019-generacion-tests.html">3.3 Generación de tests</a>
+    <a class="next" href="0021-documentacion-automatica.html">3.5 Documentación automática</a>
+  </nav>
+
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3.5 — Documentación automática de código con IA</title>
+<style>
+  :root{--accent:#059669;--serif:Georgia,serif;--sans:system-ui,sans-serif;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:#1f2937;line-height:1.7;font-size:1rem}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem}
+  .breadcrumb{font-size:.8rem;color:#6b7280;margin-bottom:2rem}
+  .breadcrumb span{color:#9ca3af}
+  h1{font-family:var(--serif);font-size:2rem;line-height:1.2;color:#111827;margin-bottom:.5rem}
+  .meta{font-size:.85rem;color:#6b7280;margin-bottom:2.5rem;display:flex;flex-wrap:wrap;gap:.5rem .75rem;align-items:center}
+  .meta .tag{background:#ecfdf5;color:var(--accent);border-radius:999px;padding:.15rem .65rem;font-weight:600;font-size:.75rem}
+  h2{font-family:var(--serif);font-size:1.35rem;color:#111827;margin:2.5rem 0 .75rem;padding-bottom:.35rem;border-bottom:1px solid var(--border)}
+  p{margin-bottom:1rem}
+  ul,ol{margin:0 0 1rem 1.4rem}
+  li{margin-bottom:.35rem}
+  code{background:#f3f4f6;border-radius:4px;padding:.1rem .4rem;font-size:.9em;font-family:'Courier New',monospace;color:#374151}
+  pre{background:#f3f4f6;border-radius:8px;padding:1rem 1.25rem;overflow-x:auto;margin-bottom:1rem;font-size:.88rem;line-height:1.6}
+  .callout{border-left:3px solid var(--accent);background:#ecfdf5;padding:.85rem 1.1rem;border-radius:0 6px 6px 0;margin:1.5rem 0;font-style:italic;color:#065f46}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem}
+  .quiz{margin:2.5rem 0}
+  .quiz h2{margin-top:0}
+  .question{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem}
+  .question p{font-weight:600;margin-bottom:.75rem}
+  .question label{display:block;margin-bottom:.45rem;cursor:pointer;font-weight:400;padding:.35rem .5rem;border-radius:5px;transition:background .15s}
+  .question label:hover{background:#f9fafb}
+  .question input[type=radio]{margin-right:.5rem;accent-color:var(--accent)}
+  .btn{display:inline-block;margin-top:.75rem;padding:.45rem 1.1rem;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.9rem;font-family:var(--sans);font-weight:600;transition:opacity .15s}
+  .btn:hover{opacity:.88}
+  .feedback{display:none;margin-top:.65rem;padding:.45rem .75rem;border-radius:5px;font-size:.9rem;font-weight:600}
+  .feedback.ok{background:#dcfce7;color:var(--ok)}
+  .feedback.err{background:#fee2e2;color:var(--err)}
+  .source{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.4rem;margin:2rem 0}
+  .source strong{display:block;margin-bottom:.3rem;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
+  .teacher{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:1.1rem 1.4rem;margin:1.5rem 0}
+  .teacher strong{display:block;margin-bottom:.35rem;color:#92400e;font-size:.9rem}
+  .teacher p{color:#78350f;font-size:.9rem;margin:0}
+  .lesson-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.75rem}
+  .lesson-nav a{font-size:.9rem;font-weight:600;color:var(--accent)}
+  .lesson-nav .prev::before{content:'← '}
+  .lesson-nav .next::after{content:' →'}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="breadcrumb">
+    <a href="../MISSION.md">Misión</a>
+    <span> › </span>Fase 3: IA en el Entorno de Desarrollo
+    <span> › </span>Lección 3.5
+  </nav>
+
+  <h1>3.5 — Documentación automática de código con IA</h1>
+  <div class="meta">
+    <span class="tag">Fase 3</span>
+    <span>Lección 21 de 55</span>
+    <span>·</span>
+    <span>⏱ ~11 min</span>
+    <span>·</span>
+    <span>IA en el Entorno de Desarrollo</span>
+  </div>
+
+  <!-- SECCIÓN 1 -->
+  <h2>Tipos de documentación que la IA genera bien</h2>
+  <p>La documentación es una de las tareas más postergadas en el desarrollo de software. La IA elimina gran parte de la fricción inicial porque puede producir documentación estructurada a partir del código en segundos.</p>
+  <p>Tipos donde el modelo aporta más valor:</p>
+  <ul>
+    <li><strong>Docstrings</strong>: Python (Google style, NumPy, reStructuredText), con parámetros, tipo de retorno y descripción de excepciones.</li>
+    <li><strong>JSDoc / TSDoc</strong>: comentarios tipados para JavaScript y TypeScript, con <code>@param</code>, <code>@returns</code>, <code>@throws</code>, <code>@example</code>.</li>
+    <li><strong>Secciones de README</strong>: instalación, uso, ejemplos, configuración, contribución.</li>
+    <li><strong>Comentarios inline</strong>: explicación de lógica compleja, regex difíciles, algoritmos no triviales.</li>
+    <li><strong>Changelogs</strong>: generados a partir del diff de commits.</li>
+  </ul>
+
+  <!-- SECCIÓN 2 -->
+  <h2>Plantilla de prompt para docstrings y JSDoc</h2>
+  <p>Para obtener documentación en el formato correcto, el prompt debe especificar explícitamente el estilo. Un formato genérico produce documentación que no se integra con las herramientas del proyecto (TypeDoc, Sphinx, pdoc, etc.).</p>
+  <pre>Genera la documentación JSDoc completa para esta función TypeScript.
+Usa el formato TSDoc. Incluye: @param con tipos, @returns,
+@throws si aplica, y un @example con un caso de uso real.
+
+[Pegar la función aquí]</pre>
+
+  <div class="card">
+    <strong>Cuándo NO sobre-documentar:</strong>
+    <ul style="margin-top:.5rem">
+      <li>Evita comentarios que repiten lo que el nombre ya dice: <code>// incrementa el contador</code> en <code>counter++</code> es ruido, no señal.</li>
+      <li>El código legible no necesita comentarios de traducción. Necesita comentarios de <em>intención</em>.</li>
+      <li>La IA tiende a documentar el <em>qué</em> (más fácil de inferir del código); tu tarea es asegurarte de que también documente el <em>por qué</em> cuando no sea obvio.</li>
+    </ul>
+  </div>
+
+  <!-- SECCIÓN 3 -->
+  <h2>Documentación viva: que evolucione con el código</h2>
+  <p>El mayor riesgo de la documentación no es no tenerla, sino tener documentación desactualizada. Una estrategia efectiva es adoptar el enfoque de <strong>"documentación viva"</strong>:</p>
+  <ul>
+    <li>Al modificar una función, incluye en tu prompt al agente: "Actualiza también el JSDoc para que refleje este cambio."</li>
+    <li>En revisiones de PR, pide: "¿La documentación existente sigue siendo precisa tras estos cambios?"</li>
+    <li>Para módulos sin documentación, usa: "Genera docstrings en formato [X] para todas las funciones públicas de este fichero."</li>
+  </ul>
+  <p>La clave es tratar la documentación como parte del ciclo de desarrollo, no como una tarea separada al final del sprint.</p>
+
+  <div class="callout">
+    💡 "El mejor comentario explica el 'por qué', no el 'qué'. La IA tiende a documentar el 'qué' — revisa que incluya el 'por qué' cuando sea importante."
+  </div>
+
+  <!-- QUIZ -->
+  <section class="quiz">
+    <h2>Comprueba lo aprendido</h2>
+
+    <div class="question">
+      <p>Q1 — ¿Qué tipo de comentario añade más valor en el código?</p>
+      <label><input type="radio" name="q1" value="a"> a) El que describe paso a paso todas las líneas que ejecuta la función</label>
+      <label><input type="radio" name="q1" value="b"> b) El que explica por qué se tomó una decisión técnica no obvia, no qué hace el código</label>
+      <label><input type="radio" name="q1" value="c"> c) El que lista todos los parámetros con su tipo aunque ya estén tipados en la firma</label>
+      <label><input type="radio" name="q1" value="d"> d) El que indica la fecha y el autor de cada bloque de código modificado</label>
+      <button class="btn" onclick="check('q1','b')">Comprobar</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="question">
+      <p>Q2 — ¿Qué necesitas especificar para que la IA genere documentación en el formato correcto?</p>
+      <label><input type="radio" name="q2" value="a"> a) El número de líneas máximo que debe tener el bloque de documentación</label>
+      <label><input type="radio" name="q2" value="b"> b) El nivel de experiencia del lector al que va dirigida la documentación</label>
+      <label><input type="radio" name="q2" value="c"> c) El estilo de documentación del proyecto (JSDoc, Google style, NumPy, etc.)</label>
+      <label><input type="radio" name="q2" value="d"> d) El lenguaje natural en el que se debe escribir la documentación generada</label>
+      <button class="btn" onclick="check('q2','c')">Comprobar</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+  </section>
+
+  <!-- SOURCE -->
+  <div class="source">
+    <strong>📖 Recurso primario recomendado</strong>
+    <a href="https://docs.anthropic.com/" target="_blank" rel="noopener">
+      Anthropic Docs — Writing documentation with Claude
+    </a>
+    <p style="margin:.3rem 0 0;font-size:.85rem;color:#6b7280">Guías y ejemplos oficiales de Anthropic sobre generación de documentación técnica, incluyendo prompts de sistema para mantener consistencia de estilo.</p>
+  </div>
+
+  <!-- TEACHER -->
+  <div class="teacher">
+    <strong>🤖 Pregunta al agente para profundizar</strong>
+    <p>Elige una función de tu proyecto sin documentación y pide al agente: <em>"Genera el JSDoc/docstring completo para esta función en formato [el de tu proyecto]. Después dime qué comentario inline añadirías tú que yo debería verificar que es correcto y completo."</em></p>
+  </div>
+
+  <!-- NAV -->
+  <nav class="lesson-nav">
+    <a class="prev" href="0020-debugging-con-ia.html">3.4 Debugging con IA</a>
+    <a class="next" href="0022-herramientas-cursor-copilot.html">3.6 Herramientas: Cursor, Copilot, Claude Code</a>
+  </nav>
+
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

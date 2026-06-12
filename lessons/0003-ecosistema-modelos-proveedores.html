@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0.3 — El ecosistema actual: modelos, proveedores y benchmarks</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#1d4ed8;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .provider-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+  .provider-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem}
+  .provider-card h3{font-family:var(--sans);font-size:0.9rem;font-weight:700;margin-bottom:0.4rem}
+  .provider-card p{font-size:0.85rem;color:var(--muted);margin-bottom:0}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+  th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+  .quiz{margin:2.5rem 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .quiz h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--accent)}
+  .q{margin-bottom:1.75rem}.q p{font-size:0.95rem;margin-bottom:0.75rem;font-family:var(--sans)}
+  .options{display:flex;flex-direction:column;gap:0.5rem}
+  .opt{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:0.88rem;transition:background 0.15s}
+  .opt:hover{background:#f0f4ff}.opt input{accent-color:var(--accent)}
+  .check-btn{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:0.55rem 1.25rem;border-radius:6px;font-family:var(--sans);font-size:0.88rem;cursor:pointer;font-weight:600}
+  .feedback{margin-top:0.75rem;font-family:var(--sans);font-size:0.88rem;display:none}
+  .feedback.ok{color:var(--ok)}.feedback.err{color:var(--err)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><a href="../MISSION.md">Misión</a> › <a href="#">Fase 0: Fundamentos</a> › Lección 0.3</nav>
+<h1>El ecosistema actual: modelos, proveedores y benchmarks</h1>
+<p class="meta">Fase 0 · Lección 3 de 55 · ~12 min · Fundamentos Conceptuales</p>
+
+<h2>Los tres grandes proveedores</h2>
+<div class="provider-grid">
+  <div class="provider-card"><h3>🟢 Anthropic</h3><p>Familia Claude (Haiku, Sonnet, Opus). Foco en seguridad y razonamiento largo. Contexto hasta 200K tokens.</p></div>
+  <div class="provider-card"><h3>🔵 OpenAI</h3><p>Familia GPT-4o y o1/o3. Ecosistema más maduro, gran comunidad. DALL-E, Whisper, Embeddings.</p></div>
+  <div class="provider-card"><h3>🔴 Google DeepMind</h3><p>Familia Gemini. Multimodal nativo, contexto de 1M tokens, integrado en Google Workspace.</p></div>
+  <div class="provider-card"><h3>⚫ Meta / Open Source</h3><p>Llama 3.x: modelos abiertos que puedes ejecutar localmente. No pagan por token. Base de muchas alternativas.</p></div>
+</div>
+
+<h2>Familias de modelos: rápido vs. potente</h2>
+<p>Cada proveedor ofrece una jerarquía de modelos. La regla general:</p>
+<table>
+  <tr><th>Tier</th><th>Anthropic</th><th>OpenAI</th><th>Cuándo usarlo</th></tr>
+  <tr><td>Rápido / barato</td><td>Claude Haiku</td><td>GPT-4o mini</td><td>Tareas simples, alto volumen, prototipos</td></tr>
+  <tr><td>Equilibrado</td><td>Claude Sonnet</td><td>GPT-4o</td><td>Uso general, código, análisis</td></tr>
+  <tr><td>Máxima capacidad</td><td>Claude Opus</td><td>o1 / o3</td><td>Razonamiento complejo, tareas críticas</td></tr>
+</table>
+
+<h2>Benchmarks: cómo comparar modelos</h2>
+<p>Los benchmarks miden capacidades específicas. Los más relevantes para desarrolladores:</p>
+<ul style="margin:0 0 1rem 1.5rem;font-size:0.95rem">
+  <li><strong>MMLU</strong> — Conocimiento general en 57 materias</li>
+  <li><strong>HumanEval / SWE-bench</strong> — Generación y corrección de código</li>
+  <li><strong>MATH</strong> — Razonamiento matemático</li>
+  <li><strong>GPQA</strong> — Preguntas de nivel PhD en ciencias</li>
+</ul>
+
+<div class="callout">
+  <strong>Advertencia sobre benchmarks</strong>
+  Los benchmarks pueden estar contaminados (el modelo vio los datos de test durante entrenamiento) o no reflejar tu caso de uso real. El mejor benchmark es evaluar el modelo en <em>tu tarea concreta</em>.
+</div>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+  <div class="q">
+    <p>¿Qué modelo deberías usar para una tarea de clasificación simple que procesa 10.000 peticiones al día?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Claude Opus (máxima capacidad)</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> GPT-4o (equilibrado)</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Claude Haiku o GPT-4o mini (rápido / barato)</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Un modelo Llama local (sin coste por token)</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','c')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+  <div class="q">
+    <p>¿Cuál es la principal limitación de los benchmarks públicos de LLMs?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Solo miden velocidad de respuesta, no calidad</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Pueden estar contaminados y no reflejan tu caso de uso real</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Solo funcionan con modelos de OpenAI</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Son demasiado técnicos para que los entiendan los desarrolladores</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','b')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://lmarena.ai/" target="_blank">LMSYS Chatbot Arena (lmarena.ai)</a><br>
+  El ranking de modelos más fiable: basado en votaciones humanas ciegas, no en benchmarks. Permite comparar modelos en tus propias preguntas.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregúntale al agente: "¿Cuándo tiene sentido ejecutar un modelo Llama localmente en vez de usar la API de Anthropic?" o "¿Qué modelo debería usar para mi proyecto X?"
+</div>
+
+<div class="lesson-nav">
+  <a href="0002-tokens-contexto-temperatura-embeddings.html">← 0.2 Tokens y contexto</a>
+  <a href="0004-limitaciones-alucinaciones.html">0.4 Limitaciones y alucinaciones →</a>
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.4 — Automatización de documentación técnica de proyectos</title>
+<style>
+  :root {
+    --accent: #dc2626;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: system-ui, -apple-system, sans-serif;
+    --bg: #fffef7;
+    --card: #fff;
+    --border: #e5e7eb;
+    --ok: #15803d;
+    --err: #dc2626;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--serif); background: var(--bg); color: #1a1a1a; line-height: 1.7; font-size: 1.05rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .page-wrap { max-width: 740px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .breadcrumb { font-family: var(--sans); font-size: 0.78rem; color: #6b7280; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
+  .breadcrumb a { color: #6b7280; }
+  .breadcrumb a:hover { color: var(--accent); }
+  .breadcrumb span { color: #9ca3af; }
+
+  .lesson-header { border-bottom: 2px solid var(--accent); padding-bottom: 1.25rem; margin-bottom: 2rem; }
+  h1 { font-family: var(--serif); font-size: 1.9rem; font-weight: 700; line-height: 1.25; color: #111; }
+  .meta { font-family: var(--sans); font-size: 0.8rem; color: #6b7280; margin-top: 0.6rem; letter-spacing: 0.03em; }
+  .meta strong { color: var(--accent); }
+
+  h2 { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: #111; margin: 2.5rem 0 0.9rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  p { margin-bottom: 1rem; }
+  ul, ol { margin: 0.75rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.4rem; }
+  code { font-family: 'Courier New', monospace; font-size: 0.88em; background: #f3f4f6; padding: 0.1em 0.35em; border-radius: 3px; color: #374151; }
+  pre { background: #1e1e2e; color: #cdd6f4; padding: 1.25rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.6; margin: 1rem 0 1.25rem; }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  .callout { background: #fef2f2; border-left: 4px solid var(--accent); padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .callout p { margin: 0; font-style: italic; color: #374151; }
+  .callout strong { color: var(--accent); font-style: normal; display: block; margin-bottom: 0.35rem; font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .warning { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .warning p { margin: 0; color: #374151; }
+  .warning strong { color: #b45309; font-style: normal; display: block; margin-bottom: 0.35rem; font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .quiz { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
+  .quiz h2 { border: none; margin-top: 0; padding-bottom: 0; font-size: 1.1rem; margin-bottom: 1.25rem; }
+  .quiz-q { margin-bottom: 1.5rem; }
+  .quiz-q:last-child { margin-bottom: 0; }
+  .quiz-q p { font-weight: 600; margin-bottom: 0.6rem; }
+  .quiz-q label { display: block; margin-bottom: 0.35rem; font-size: 0.95rem; cursor: pointer; padding: 0.3rem 0; }
+  .quiz-q label:hover { color: var(--accent); }
+  .quiz-q input[type=radio] { accent-color: var(--accent); margin-right: 0.45rem; }
+  .btn { font-family: var(--sans); font-size: 0.85rem; background: var(--accent); color: #fff; border: none; padding: 0.45rem 1.1rem; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; }
+  .btn:hover { background: #b91c1c; }
+  .feedback { display: none; font-family: var(--sans); font-size: 0.88rem; margin-top: 0.5rem; padding: 0.45rem 0.75rem; border-radius: 4px; font-weight: 600; }
+  .feedback.ok { background: #f0fdf4; color: var(--ok); }
+  .feedback.err { background: #fef2f2; color: var(--err); }
+
+  .source { background: #f9fafb; border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; margin: 2rem 0; font-family: var(--sans); font-size: 0.85rem; }
+  .source strong { display: block; margin-bottom: 0.3rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+
+  .teacher { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 2rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+  .teacher-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .teacher-body { font-size: 0.9rem; color: #374151; }
+  .teacher-body strong { display: block; font-family: var(--sans); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; margin-bottom: 0.3rem; }
+
+  .lesson-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--sans); font-size: 0.85rem; }
+  .lesson-nav a { display: flex; flex-direction: column; gap: 0.2rem; max-width: 45%; }
+  .lesson-nav a span:first-child { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
+  .lesson-nav a span:last-child { color: var(--accent); font-weight: 600; }
+  .lesson-nav .nav-next { text-align: right; margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Misión</a>
+    <span>›</span>
+    <a href="#">Fase 4: IA en el Ciclo DevOps</a>
+    <span>›</span>
+    <span>Lección 4.4</span>
+  </nav>
+
+  <header class="lesson-header">
+    <h1>4.4 — Automatización de documentación técnica de proyectos</h1>
+    <p class="meta"><strong>Fase 4</strong> · Lección 26 de 55 · ~12 min · IA en el Ciclo DevOps</p>
+  </header>
+
+  <h2>Qué documentación técnica genera bien la IA</h2>
+  <p>La documentación técnica es uno de los artefactos más abandonados del desarrollo de software. No por falta de intención, sino porque documentar consume tiempo que siempre parece más urgente dedicar a escribir código. La IA cambia esta ecuación drásticamente: el costo de generar documentación cae de horas a minutos.</p>
+  <p>Tipos de documentación donde la IA produce resultados de alta calidad:</p>
+  <ul>
+    <li><strong>README:</strong> descripción del proyecto, instrucciones de instalación, ejemplos de uso, badges de estado.</li>
+    <li><strong>Documentación de arquitectura:</strong> diagramas textuales (Mermaid, PlantUML), descripciones de componentes y sus responsabilidades.</li>
+    <li><strong>Architecture Decision Records (ADRs):</strong> dado el contexto de una decisión técnica, la IA puede generar el ADR con el formato estándar.</li>
+    <li><strong>Changelogs:</strong> a partir del historial de commits o PRs, generar un CHANGELOG.md estructurado siguiendo Keep a Changelog.</li>
+    <li><strong>Documentación de API:</strong> a partir de una especificación OpenAPI, generar guías de uso con ejemplos y casos de error.</li>
+    <li><strong>Docstrings y comentarios inline:</strong> documentación a nivel de función y módulo.</li>
+  </ul>
+
+  <h2>Prompt template para documentación README</h2>
+  <p>El README es el documento más importante de cualquier proyecto. Aquí un prompt efectivo para generarlo:</p>
+  <pre><code>Genera un README.md completo para este proyecto. Incluye:
+- Badge de licencia, tests y versión
+- Descripción clara del problema que resuelve (no solo "qué es")
+- Requisitos y dependencias
+- Instalación paso a paso
+- Ejemplo de uso mínimo (quickstart)
+- Configuración disponible (tabla con todas las opciones)
+- Cómo contribuir
+- Licencia
+
+Contexto del proyecto:
+- Nombre: [nombre]
+- Stack: [tecnologías]
+- Propósito: [qué problema resuelve, para quién]
+- Principales features: [lista]
+
+[PEGAR CÓDIGO PRINCIPAL O ESTRUCTURA DEL PROYECTO]</code></pre>
+
+  <h2>Docs as Code: mantener la documentación sincronizada</h2>
+  <p>El mayor problema de la documentación no es crearla, sino mantenerla actualizada. La solución moderna es el enfoque <strong>docs as code</strong>: la documentación vive en el mismo repositorio que el código, se versiona con git y se actualiza en el mismo PR que cambia el código.</p>
+  <p>La IA encaja perfectamente en este flujo:</p>
+  <ul>
+    <li><strong>En cada PR:</strong> pide a la IA que identifique qué documentación existente queda desactualizada por los cambios del PR.</li>
+    <li><strong>Generación de changelog:</strong> automatiza la generación del changelog a partir de los mensajes de commit usando la IA como intermediario entre commits crudos y texto legible.</li>
+    <li><strong>Actualización de ADRs:</strong> cuando se toma una decisión técnica, generar el ADR inmediatamente con el contexto fresco.</li>
+  </ul>
+
+  <div class="callout">
+    <strong>💡 Momento óptimo para documentar</strong>
+    <p>El mejor momento para documentar es justo después de escribir el código, mientras el contexto está fresco. La IA puede generar el 80% — tú aportas el contexto y las decisiones de diseño.</p>
+  </div>
+
+  <p>La división de responsabilidades óptima entre humano e IA en la documentación:</p>
+  <ul>
+    <li><strong>IA genera:</strong> estructura, boilerplate, ejemplos de código, tablas de configuración, descripciones de funciones.</li>
+    <li><strong>Humano aporta:</strong> decisiones de diseño, trade-offs considerados, razones por las que se eligió un enfoque sobre otro, contexto histórico del proyecto.</li>
+  </ul>
+
+  <section class="quiz">
+    <h2>🧠 Comprueba lo aprendido</h2>
+
+    <div class="quiz-q">
+      <p>1. ¿Cuándo es el mejor momento para usar IA para documentar código?</p>
+      <label><input type="radio" name="q1" value="a"> Al final del sprint, cuando hay más tiempo disponible para revisar</label>
+      <label><input type="radio" name="q1" value="b"> Inmediatamente después de escribir o modificar el código, mientras el contexto está fresco en el prompt</label>
+      <label><input type="radio" name="q1" value="c"> Solo cuando el código entra en producción y ya está estabilizado</label>
+      <label><input type="radio" name="q1" value="d"> Cuando un nuevo desarrollador se une al equipo y necesita entender el sistema</label>
+      <button class="btn" onclick="check('q1','b')">Verificar</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="quiz-q">
+      <p>2. ¿Qué parte de la documentación técnica debe aportar el desarrollador y no dejar a la IA?</p>
+      <label><input type="radio" name="q2" value="a"> La estructura y el formato del documento README</label>
+      <label><input type="radio" name="q2" value="b"> Los ejemplos de uso básico y los comandos de instalación</label>
+      <label><input type="radio" name="q2" value="c"> Las tablas de configuración con todas las opciones disponibles</label>
+      <label><input type="radio" name="q2" value="d"> Las decisiones de diseño, trade-offs y el razonamiento detrás de las elecciones arquitectónicas</label>
+      <button class="btn" onclick="check('q2','d')">Verificar</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+  </section>
+
+  <div class="source">
+    <strong>📚 Fuente principal</strong>
+    <a href="https://diataxis.fr/" target="_blank" rel="noopener">Diátaxis — A systematic framework for technical documentation</a>
+    <p style="margin-top:0.4rem;color:#6b7280;font-size:0.82rem;">diataxis.fr · Framework de referencia que divide la documentación en tutoriales, guías, referencias y explicaciones</p>
+  </div>
+
+  <div class="teacher">
+    <div class="teacher-avatar">👨‍🏫</div>
+    <div class="teacher-body">
+      <strong>Nota del instructor</strong>
+      El framework Diátaxis es uno de los marcos más útiles para pensar en documentación técnica. Antes de pedir a la IA que genere documentación, decide qué tipo necesitas: ¿un tutorial (aprendizaje guiado), una how-to guide (tarea específica), una reference (información técnica precisa) o una explanation (comprensión conceptual)? Cada tipo tiene una estructura diferente y la IA necesita ese contexto para generar algo útil.
+    </div>
+  </div>
+
+  <nav class="lesson-nav">
+    <a href="0025-ia-seguridad.html">
+      <span>← Anterior</span>
+      <span>4.3 — IA para seguridad</span>
+    </a>
+    <a href="0027-terminales-cli.html" class="nav-next">
+      <span>Siguiente →</span>
+      <span>4.5 — Terminales y CLI con IA</span>
+    </a>
+  </nav>
+
+</div>
+<script>
+function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
+</script>
+</body>
+</html>
