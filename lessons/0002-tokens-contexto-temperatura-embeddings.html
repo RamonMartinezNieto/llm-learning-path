@@ -114,6 +114,43 @@
   </div>
 </details>
 
+
+<details class="drop">
+  <summary>¿Cómo afecta la ventana de contexto al coste de la API?</summary>
+  <div class="drop-content">
+    <p>La <strong>ventana de contexto</strong> (el límite de tokens que la IA puede "recordar" en una sola conversación) afecta al coste de la API de una manera muy específica y, a veces, un poco engañosa.</p>
+
+    <p>Para entenderlo, hay que recordar la regla de oro de las APIs de IA: <strong>no solo pagas por lo que la IA te responde (tokens de salida), sino también por todo lo que tú le envías (tokens de entrada)</strong>.</p>
+
+    <p>A continuación, se detalla cómo la ventana de contexto dispara los costes y qué soluciones existen actualmente:</p>
+
+    <h3>1. El "efecto bola de nieve" en el chat</h3>
+    <p>Cuando chateas con una IA, el modelo no tiene memoria a largo plazo por sí mismo. Para que "recuerde" lo que dijeron hace cinco minutos, la aplicación tiene que <strong>volver a enviar todo el historial de la conversación</strong> en cada nuevo mensaje.</p>
+    <p>Mira cómo crece el gasto en una conversación:</p>
+    <ul>
+      <li><strong>Mensaje 1:</strong> Tú envías 10 tokens -> pagas <strong>10 tokens</strong>.</li>
+      <li><strong>Mensaje 2:</strong> Tú envías otros 10 tokens. Pero la API tiene que leer el Mensaje 1 + la Respuesta 1 + tu Mensaje 2 -> pagas <strong>50 tokens</strong>.</li>
+      <li><strong>Mensaje 10:</strong> Para cuando vas por el décimo mensaje, la API tiene que releer toda la conversación acumulada en la ventana de contexto. Un solo mensaje nuevo te puede costar <strong>2,000 tokens de entrada</strong>.</li>
+    </ul>
+    <p><strong>Conclusión:</strong> cuanto más grande sea la ventana de contexto que uses para mantener la conversación viva, más costará cada nueva pregunta que hagas.</p>
+
+    <h3>2. Modelos con ventanas gigantes = tarifas más altas</h3>
+    <p>Los modelos que ofrecen ventanas de contexto enormes (como Gemini con 1 o 2 millones de tokens, o las versiones avanzadas de GPT) requieren una infraestructura de servidores muy exigente para procesar toda esa información a la vez.</p>
+    <p>Por ello, las empresas de IA suelen cobrar una tarifa por token más alta en los modelos que soportan contextos gigantes, en comparación con los modelos de contexto corto. Además, en algunos proveedores, si tu consulta consume una parte masiva de la ventana de contexto, el precio por token puede aumentar.</p>
+
+    <h3>3. ¿Cómo se soluciona esto para no quebrar en el intento?</h3>
+    <p>Hoy en día, los desarrolladores usan varias estrategias para que la ventana de contexto no destruya sus finanzas:</p>
+    <ul>
+      <li><strong>Context Caching (caché de contexto):</strong> Esta es la tecnología clave actualmente. Si le envías a la IA un documento de 100,000 tokens (como un manual de la empresa) y le haces 10 preguntas seguidas, proveedores como Google u OpenAI te permiten "congelar" ese documento en la memoria de la API. Las siguientes preguntas leen de la caché y suelen tener un <strong>descuento de hasta el 50% o 80%</strong> en el coste de esos tokens de entrada.</li>
+      <li><strong>Poda de historial (sliding window):</strong> Consiste en configurar la API para que solo recuerde los últimos, por ejemplo, 10 mensajes. Lo más antiguo se borra de la ventana de contexto. Es más barato, aunque la IA "olvidará" el inicio de la charla.</li>
+      <li><strong>RAG (Generación Aumentada por Recuperación):</strong> En lugar de meter un libro entero de 500 páginas en la ventana de contexto, se usa una base de datos para buscar solo los 3 párrafos que responden a la pregunta del usuario y se le envía <em>únicamente</em> eso a la IA. Pasar de 200,000 tokens a 500 tokens reduce el coste drásticamente.</li>
+    </ul>
+
+    <p class="mini-title">Pregunta guía:</p>
+    <p>¿Estás planeando desarrollar una aplicación con la API y te preocupa un volumen de datos grande, o es más por curiosidad de cómo optimizar tus prompts?</p>
+  </div>
+</details>
+
 <h2>Ventana de contexto</h2>
 <p>La <strong>ventana de contexto</strong> es el límite de tokens que el modelo puede "ver" a la vez. Todo lo que ocurre dentro de una conversación — tu historial, documentos adjuntos, la respuesta generada — compite por ese espacio.</p>
 
@@ -232,7 +269,7 @@
 
 <div class="teacher">
   <strong>💬 ¿Tienes dudas?</strong>
-  Pregúntale a tu agente: "¿Por qué el número de tokens en español es mayor que en inglés?" o "¿Cómo afecta la ventana de contexto al coste de la API?"
+  Pregúntale a tu agente: "¿Cómo estimo tokens rápido sin usar calculadora?" o "¿Cómo reducir coste sin perder calidad en conversaciones largas?"
 </div>
 
 <div class="lesson-nav">
@@ -243,4 +280,3 @@
 <script src="../js/quiz.js"></script>
 </body>
 </html>
-
