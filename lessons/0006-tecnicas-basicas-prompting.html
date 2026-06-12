@@ -117,8 +117,7 @@
   <a href="0005-anatomia-buen-prompt.html">← 1.1 Anatomía de un buen prompt</a>
   <a href="0007-tecnicas-avanzadas-prompting.html">1.3 Técnicas avanzadas →</a>
 </div>
-<script>
-function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
-</script>
+<script src="../js/quiz.js"></script>
 </body>
 </html>
+

@@ -133,8 +133,7 @@ Email: [PEGAR AQUÍ]"
   <a href="0054-ia-analisis-datos.html">8.5 IA para análisis de datos →</a>
 </div>
 
-<script>
-function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
-</script>
+<script src="../js/quiz.js"></script>
 </body>
 </html>
+

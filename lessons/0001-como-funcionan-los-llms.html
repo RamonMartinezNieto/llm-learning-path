@@ -141,20 +141,7 @@
   <a href="0002-tokens-contexto-temperatura-embeddings.html">Siguiente: Tokens, contexto y temperatura →</a>
 </div>
 
-<script>
-function check(qid, correct) {
-  const sel = document.querySelector(`input[name="${qid}"]:checked`);
-  const fb = document.getElementById(`fb-${qid}`);
-  if (!sel) { fb.textContent = 'Selecciona una opción primero.'; fb.className='feedback err'; fb.style.display='block'; return; }
-  if (sel.value === correct) {
-    fb.textContent = '✓ Correcto.';
-    fb.className = 'feedback ok';
-  } else {
-    fb.textContent = '✗ Incorrecto. Vuelve a leer la sección y reintenta.';
-    fb.className = 'feedback err';
-  }
-  fb.style.display = 'block';
-}
-</script>
+<script src="../js/quiz.js"></script>
 </body>
 </html>
+

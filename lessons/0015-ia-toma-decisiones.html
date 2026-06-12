@@ -103,8 +103,7 @@
   <a href="0014-ia-escritura-tecnica.html">← 2.4 IA para escritura</a>
   <a href="0016-comparativa-modelos.html">2.6 Comparativa de modelos →</a>
 </div>
-<script>
-function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
-</script>
+<script src="../js/quiz.js"></script>
 </body>
 </html>
+

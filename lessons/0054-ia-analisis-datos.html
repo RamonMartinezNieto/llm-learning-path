@@ -142,8 +142,7 @@ df['crecimiento'] = df['ventas'].pct_change() * 100
   <a href="0055-automatizacion-zapier-make-n8n.html">8.6 Automatización con IA →</a>
 </div>
 
-<script>
-function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
-</script>
+<script src="../js/quiz.js"></script>
 </body>
 </html>
+

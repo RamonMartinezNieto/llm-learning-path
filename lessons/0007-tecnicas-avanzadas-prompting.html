@@ -119,8 +119,7 @@
   <a href="0006-tecnicas-basicas-prompting.html">← 1.2 Técnicas básicas</a>
   <a href="0008-prompts-codigo-vs-texto.html">1.4 Prompts para código vs. texto →</a>
 </div>
-<script>
-function check(qid,correct){const sel=document.querySelector(`input[name="${qid}"]:checked`);const fb=document.getElementById(`fb-${qid}`);if(!sel){fb.textContent='Selecciona una opción.';fb.className='feedback err';fb.style.display='block';return;}fb.textContent=sel.value===correct?'✓ Correcto.':'✗ Incorrecto. Revisa la sección correspondiente.';fb.className=sel.value===correct?'feedback ok':'feedback err';fb.style.display='block';}
-</script>
+<script src="../js/quiz.js"></script>
 </body>
 </html>
+
