@@ -18,6 +18,6 @@ Este curso está estructurado en 9 fases progresivas:
 
 ## 🎬 Créditos
 
-Este curso fue creado utilizando los skills de **Matt Pocock** presentados en su charla educativa sobre structured learning:
+Este curso fue creado utilizando los skills de **Matt Pocock** [@mattpocock](https://github.com/mattpocock) presentados en su charla educativa sobre structured learning:
 - 📹 [Video: Skills for Learning on YouTube](https://www.youtube.com/watch?v=s5T5oQJcJ6U)
 - 📦 [Repository: mattpocock/skills](https://github.com/mattpocock/skills) 
