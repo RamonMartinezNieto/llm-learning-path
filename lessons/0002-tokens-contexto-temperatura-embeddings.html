@@ -37,6 +37,18 @@
   .source a{color:#0369a1}
   .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
   .teacher strong{display:block;margin-bottom:0.3rem}
+  .drop{margin:1.25rem 0 1.75rem;border:1px solid var(--border);border-radius:10px;background:#f8fafc}
+  .drop summary{list-style:none;cursor:pointer;padding:0.9rem 1rem;font-family:var(--sans);font-weight:700;color:#1e3a8a}
+  .drop summary::-webkit-details-marker{display:none}
+  .drop summary::before{content:'▸ ';color:#1e3a8a}
+  .drop[open] summary::before{content:'▾ '}
+  .drop-content{padding:0 1rem 0.9rem}
+  .drop-content p{margin-bottom:0.95rem}
+  .drop-content h3{font-family:var(--sans);font-size:1rem;line-height:1.35;margin:1rem 0 0.65rem;color:#0f172a}
+  .drop-content ol,.drop-content ul{margin:0.4rem 0 1rem 1.4rem;padding-left:0.3rem}
+  .drop-content li{margin:0.35rem 0;padding-left:0.2rem}
+  .drop-content ul li::marker{color:#1d4ed8}
+  .drop-content .mini-title{font-family:var(--sans);font-weight:700;color:#1e3a8a;margin:0.8rem 0 0.35rem}
   .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
   .lesson-nav a{color:var(--accent);text-decoration:none}
 </style>
@@ -96,6 +108,46 @@
 </div>
 
 <p>Los embeddings son la base de RAG (Retrieval-Augmented Generation), que verás en la Fase 5.</p>
+
+<details class="drop">
+  <summary>Explicación adicional de embeddings (clic para expandir)</summary>
+  <div class="drop-content">
+    <p>Piensa en un embedding como una "huella semántica" del texto. No guarda frases legibles, sino números que resumen su significado general. Dos textos pueden usar palabras distintas y, aun así, acabar cerca si hablan de lo mismo.</p>
+
+    <p>Flujo típico en una aplicación real:</p>
+    <table>
+      <tr><th>Paso</th><th>Qué ocurre</th><th>Resultado</th></tr>
+      <tr><td>1. Indexación</td><td>Conviertes documentos en embeddings y los guardas en una base vectorial</td><td>Corpus preparado para búsqueda semántica</td></tr>
+      <tr><td>2. Consulta</td><td>Conviertes la pregunta del usuario en embedding</td><td>Vector de consulta</td></tr>
+      <tr><td>3. Similitud</td><td>Comparas consulta y documentos (normalmente con similitud coseno)</td><td>Ranking por relevancia semántica</td></tr>
+      <tr><td>4. Respuesta</td><td>Envías al LLM los fragmentos top-k recuperados</td><td>Respuesta más precisa y con contexto útil</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>Idea clave</strong>
+      Embeddings no "razonan" ni "verifican hechos": solo miden cercanía semántica. La calidad final depende de buen troceado de documentos, limpieza del texto y una recuperación bien configurada.
+    </div>
+    <h3>¿Cómo funciona? El "espacio geográfico" del significado</h3>
+    <p>Para entenderlo de forma visual, imagina un mapa gigante. En este mapa, los conceptos no se ubican por su longitud y latitud, sino por sus características.</p>
+
+    <p>Si creáramos un embedding muy simple de solo 2 dimensiones (dos números) para clasificar animales, podríamos usar estos dos ejes:</p>
+    <ol>
+      <li>¿Qué tan doméstico es? (De -1 salvaje a +1 doméstico)</li>
+      <li>¿Qué tan grande es? (De -1 pequeño a +1 grande)</li>
+    </ol>
+
+    <p class="mini-title">Si asignamos valores en este "mapa":</p>
+    <ul>
+      <li>Perro: [0.9, -0.2] (Muy doméstico, tamaño mediano/pequeño)</li>
+      <li>Gato: [0.8, -0.5] (Bastante doméstico, tamaño pequeño)</li>
+      <li>Lobo: [-0.9, 0.1] (Muy salvaje, tamaño mediano)</li>
+      <li>Sofá: [1.0, 0.7] (No es un animal, pero nota cómo los tres animales anteriores quedaron mucho más cerca entre sí matemáticamente)</li>
+    </ul>
+
+    <p>En la IA real, los embeddings no tienen 2 dimensiones, tienen cientos o miles de dimensiones. Cada dimensión representa una característica sutil que la IA ha aprendido por sí misma (como el género, la formalidad o el tiempo verbal).</p>
+    <p>Limitaciones importantes: pueden confundirse con textos semánticamente parecidos pero incorrectos, perder detalle muy fino (fechas, cifras exactas) y degradarse si mezclas idiomas o dominios muy técnicos sin estrategia.</p>
+  </div>
+</details>
 
 <div class="quiz">
   <h3>🧠 Comprueba lo que recuerdas</h3>
