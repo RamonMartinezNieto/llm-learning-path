@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.6.4 — PAL y Directional Stimulus Prompting</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#1d4ed8;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .prompt-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:1rem 0;font-family:monospace;font-size:0.83rem;line-height:1.6}
+  .prompt-box .label{font-family:var(--sans);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:0.4rem;display:block}
+  table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
+  th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
+  td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+  .extra-badge{display:inline-block;font-family:var(--sans);font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;background:#ede9fe;color:#7c3aed;padding:0.2rem 0.5rem;border-radius:4px;margin-left:0.5rem;vertical-align:middle}
+</style>
+<link rel="stylesheet" href="../styles/quiz.css">
+</head>
+<body>
+<nav><a href="../index.html">Índice</a> › <a href="#">Fase 1: Prompt Engineering</a> › Lección 1.6.4 <span class="extra-badge">Extra</span></nav>
+<h1>PAL y Directional Stimulus Prompting</h1>
+<p class="meta">Fase 1 · Lección extra 1.6.4 · ~15 min · Prompt Engineering</p>
+
+<h2>Program-Aided Language Models (PAL)</h2>
+<p>Chain-of-Thought hace razonar al modelo en lenguaje natural — pero el lenguaje natural es un mal lenguaje para aritmética exacta. <strong>PAL</strong> propone algo distinto: en vez de pedirle al modelo que "piense en palabras", le pides que traduzca el problema a <em>código</em> (normalmente Python), y dejas que un interpretador real ejecute ese código para obtener el resultado exacto.</p>
+
+<div class="prompt-box">
+  <span class="label">CoT vs. PAL para el mismo problema</span>
+  Problema: "Si tengo 3 cajas con 12 manzanas cada una y regalo 7 manzanas, ¿cuántas me quedan?"<br><br>
+  CoT (razonamiento en texto): "3 cajas × 12 = 36 manzanas. 36 − 7 = 29." ← el modelo puede equivocarse en la aritmética.<br><br>
+  PAL (razonamiento en código):<br>
+  <code>boxes = 3<br>
+  apples_per_box = 12<br>
+  given_away = 7<br>
+  result = boxes * apples_per_box - given_away</code><br>
+  → el código se ejecuta de verdad, el resultado (29) es exacto por construcción.
+</div>
+
+<div class="callout">
+  <strong>Por qué es más fiable que CoT puro</strong>
+  El modelo solo necesita generar la lógica correcta (qué operación hacer), no ejecutar la aritmética él mismo. La ejecución se delega a un intérprete determinista que nunca "alucina" un cálculo.
+</div>
+
+<h2>Directional Stimulus Prompting (DSP)</h2>
+<p>A veces no quieres reescribir todo el prompt, solo darle al modelo un <em>empujón</em> hacia el tipo de respuesta que necesitas. DSP inserta una pequeña "pista" o "estímulo direccional" (palabras clave, conceptos a tocar, un hint específico) antes de la instrucción principal, generada normalmente por un modelo auxiliar más pequeño y entrenado para esa tarea.</p>
+
+<div class="prompt-box">
+  <span class="label">Ejemplo: resumen guiado por palabras clave</span>
+  Pista (estímulo direccional): "palabras clave a incluir: presupuesto, plazo, riesgo principal"<br><br>
+  Prompt: "Resume esta acta de reunión en 3 frases. Asegúrate de mencionar: presupuesto, plazo, riesgo principal."
+</div>
+
+<table>
+  <tr><th>Técnica</th><th>Qué resuelve</th><th>Mecanismo</th></tr>
+  <tr><td>PAL</td><td>Errores de cálculo/lógica exacta en CoT</td><td>Delega la ejecución a un intérprete de código real</td></tr>
+  <tr><td>DSP</td><td>Falta de control fino sobre el contenido de la salida</td><td>Inyecta pistas/hints específicos antes de la instrucción</td></tr>
+</table>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+  <div class="q">
+    <p>¿Por qué PAL reduce los errores de aritmética frente a Chain-of-Thought puro?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Porque usa una temperatura más baja</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Porque el modelo solo genera la lógica como código y un intérprete real ejecuta el cálculo exacto</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Porque PAL usa un modelo más grande automáticamente</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Porque elimina la necesidad de dar contexto al modelo</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+  <div class="q">
+    <p>¿Qué hace, en esencia, Directional Stimulus Prompting?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Reemplaza por completo la instrucción original con otra generada automáticamente</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Inserta una pista o hint específico (p. ej. palabras clave) antes de la instrucción para guiar la salida sin reescribir todo el prompt</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Ejecuta el prompt varias veces y vota la mejor respuesta</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Convierte el prompt en código ejecutable</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','b')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://www.promptingguide.ai/techniques/pal" target="_blank">Prompt Engineering Guide — PAL (DAIR.AI)</a> y
+  <a href="https://www.promptingguide.ai/techniques/dsp" target="_blank">Directional Stimulus Prompting (DAIR.AI)</a><br>
+  Ambas páginas incluyen los papers originales (Gao et al. 2022 para PAL; Li et al. 2023 para DSP) y ejemplos ejecutables.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregunta al agente: "¿Cómo implemento PAL con la API de Claude o OpenAI ejecutando el código generado?" o "¿DSP es lo mismo que few-shot con hints?"
+</div>
+
+<div class="lesson-nav">
+  <a href="0010.3-generated-knowledge-prompting.html">← 1.6.3 Generated Knowledge Prompting</a>
+  <a href="0010.5-ape-active-prompt.html">1.6.5 APE y Active-Prompt →</a>
+</div>
+<script src="../js/quiz.js"></script>
+</body>
+</html>

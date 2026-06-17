@@ -24,6 +24,11 @@ const modules = [
       { file: '0008-prompts-codigo-vs-texto.html',                title: '1.4 — Prompts para código vs. prompts para texto' },
       { file: '0009-gestion-contexto.html',                       title: '1.5 — Gestión del contexto y ventana de contexto' },
       { file: '0010-evaluacion-refinamiento-prompts.html',        title: '1.6 — Evaluación y refinamiento iterativo de prompts' },
+      { file: '0010.1-prompt-chaining.html',                      title: '1.6.1 — Extra: Prompt Chaining' },
+      { file: '0010.2-meta-prompting.html',                       title: '1.6.2 — Extra: Meta Prompting' },
+      { file: '0010.3-generated-knowledge-prompting.html',        title: '1.6.3 — Extra: Generated Knowledge Prompting' },
+      { file: '0010.4-pal-directional-stimulus.html',             title: '1.6.4 — Extra: PAL y Directional Stimulus Prompting' },
+      { file: '0010.5-ape-active-prompt.html',                    title: '1.6.5 — Extra: Automatic Prompt Engineer y Active-Prompt' },
     ]
   },
   {

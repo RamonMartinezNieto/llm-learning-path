@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.6.5 — Automatic Prompt Engineer y Active-Prompt</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#1d4ed8;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .loop{display:flex;flex-direction:column;gap:0;margin:1.5rem 0}
+  .loop-step{background:var(--card);border:1px solid var(--border);padding:0.85rem 1rem;display:flex;align-items:flex-start;gap:0.75rem}
+  .loop-step:first-child{border-radius:8px 8px 0 0}
+  .loop-step:last-child{border-radius:0 0 8px 8px}
+  .loop-step:not(:last-child){border-bottom:none}
+  .loop-num{background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:0.1rem}
+  .loop-content h3{font-family:var(--sans);font-size:0.88rem;font-weight:700;margin-bottom:0.2rem}
+  .loop-content p{font-size:0.85rem;color:var(--muted);margin:0}
+  .prompt-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:1rem 0;font-family:monospace;font-size:0.83rem;line-height:1.6}
+  .prompt-box .label{font-family:var(--sans);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:0.4rem;display:block}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+  .extra-badge{display:inline-block;font-family:var(--sans);font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;background:#ede9fe;color:#7c3aed;padding:0.2rem 0.5rem;border-radius:4px;margin-left:0.5rem;vertical-align:middle}
+</style>
+<link rel="stylesheet" href="../styles/quiz.css">
+</head>
+<body>
+<nav><a href="../index.html">Índice</a> › <a href="#">Fase 1: Prompt Engineering</a> › Lección 1.6.5 <span class="extra-badge">Extra</span></nav>
+<h1>Automatic Prompt Engineer y Active-Prompt</h1>
+<p class="meta">Fase 1 · Lección extra 1.6.5 · ~14 min · Prompt Engineering</p>
+
+<p>Las lecciones 1.1 a 1.6 trataron el diseño y refinamiento de prompts como un proceso manual. Estas dos técnicas lo automatizan parcialmente, usando al propio LLM como herramienta de optimización.</p>
+
+<h2>Automatic Prompt Engineer (APE)</h2>
+<p>APE trata el diseño de instrucciones como un problema de búsqueda: usa un LLM para <em>generar</em> muchas variantes candidatas de una instrucción a partir de unos pocos ejemplos input/output, las evalúa contra un criterio objetivo, y se queda con la que obtiene mejor puntuación.</p>
+
+<div class="loop">
+  <div class="loop-step">
+    <div class="loop-num">1</div>
+    <div class="loop-content"><h3>Generar candidatos</h3><p>Un LLM "propone" decenas de instrucciones distintas que podrían producir los ejemplos de output dados los inputs.</p></div>
+  </div>
+  <div class="loop-step">
+    <div class="loop-num">2</div>
+    <div class="loop-content"><h3>Evaluar cada candidato</h3><p>Cada instrucción candidata se ejecuta contra un set de validación y se puntúa (exactitud, formato, etc.).</p></div>
+  </div>
+  <div class="loop-step">
+    <div class="loop-num">3</div>
+    <div class="loop-content"><h3>Seleccionar y refinar</h3><p>La mejor instrucción se selecciona; opcionalmente se generan variaciones de ella para una segunda ronda de búsqueda.</p></div>
+  </div>
+</div>
+
+<div class="prompt-box">
+  <span class="label">Prompt para que el LLM proponga instrucciones (meta-nivel)</span>
+  Aquí hay varios pares de entrada/salida. Genera 10 instrucciones distintas que, si se le dieran a un asistente, producirían esa salida a partir de esa entrada:<br><br>
+  Entrada: "2, 4, 6, 8" → Salida: "10, 12, 14, 16"<br>
+  Entrada: "1, 3, 5" → Salida: "7, 9, 11"
+</div>
+
+<div class="callout">
+  <strong>Relación con lo aprendido en 1.6</strong>
+  APE automatiza exactamente el bucle de refinamiento iterativo de la lección 1.6 (definir criterio → generar variantes → evaluar → quedarse con la mejor), pero delegando la generación de variantes al propio modelo en lugar de hacerlo a mano.
+</div>
+
+<h2>Active-Prompt</h2>
+<p>Few-shot y CoT funcionan mejor con buenos ejemplos anotados — pero anotar manualmente cadenas de razonamiento para cada tarea nueva es caro. <strong>Active-Prompt</strong> selecciona automáticamente <em>qué</em> ejemplos merece la pena anotar: genera varias respuestas para cada pregunta candidata sin anotar, mide el desacuerdo entre ellas (incertidumbre), y prioriza para anotación humana las preguntas donde el modelo está más "confundido".</p>
+
+<div class="prompt-box">
+  <span class="label">Esquema de selección por incertidumbre</span>
+  Pregunta A → 5 respuestas generadas → 5/5 coinciden → baja incertidumbre, no prioritaria<br>
+  Pregunta B → 5 respuestas generadas → 2/5 coinciden → alta incertidumbre, prioritaria para anotación humana con CoT<br><br>
+  → Las preguntas tipo B se convierten en los ejemplos few-shot de la próxima ronda.
+</div>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+  <div class="q">
+    <p>¿Qué hace APE de forma distinta al refinamiento manual de prompts visto en la lección 1.6?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Usa un LLM para generar y evaluar automáticamente muchas variantes de instrucción, en vez de que una persona las escriba a mano</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Elimina por completo la necesidad de evaluar los prompts</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Solo funciona con prompts de una sola palabra</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Requiere reentrenar el modelo base</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','a')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+  <div class="q">
+    <p>¿Cómo decide Active-Prompt qué ejemplos anotar con razonamiento humano?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Anota los ejemplos al azar</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Prioriza las preguntas donde las respuestas generadas por el modelo muestran mayor desacuerdo/incertidumbre</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Anota únicamente las preguntas más cortas</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> Anota todas las preguntas disponibles en el dataset</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','b')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://www.promptingguide.ai/techniques/ape" target="_blank">Prompt Engineering Guide — Automatic Prompt Engineer (DAIR.AI)</a> y
+  <a href="https://www.promptingguide.ai/techniques/activeprompt" target="_blank">Active-Prompt (DAIR.AI)</a><br>
+  Basadas en Zhou et al. (2022) para APE y Diao et al. (2023) para Active-Prompt, con diagramas del pipeline completo de cada técnica.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregunta al agente: "¿Cómo mido el desacuerdo entre respuestas generadas para implementar Active-Prompt?" o "¿APE sustituye los evals que vimos en la lección 1.6 o los complementa?"
+</div>
+
+<div class="lesson-nav">
+  <a href="0010.4-pal-directional-stimulus.html">← 1.6.4 PAL y Directional Stimulus Prompting</a>
+  <a href="0011-ia-investigacion-sintesis.html">2.1 IA como motor de investigación →</a>
+</div>
+<script src="../js/quiz.js"></script>
+</body>
+</html>

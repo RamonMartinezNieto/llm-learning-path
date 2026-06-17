@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.6.3 — Generated Knowledge Prompting</title>
+<style>
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#1d4ed8;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
+  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
+  p{margin-bottom:1rem}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
+  .prompt-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:1rem 0;font-family:monospace;font-size:0.83rem;line-height:1.6}
+  .prompt-box .label{font-family:var(--sans);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:0.4rem;display:block}
+  .chain{display:flex;flex-direction:column;gap:0;margin:1.5rem 0}
+  .chain-step{background:var(--card);border:1px solid var(--border);padding:0.85rem 1rem;display:flex;align-items:flex-start;gap:0.75rem}
+  .chain-step:first-child{border-radius:8px 8px 0 0}
+  .chain-step:last-child{border-radius:0 0 8px 8px}
+  .chain-step:not(:last-child){border-bottom:none}
+  .chain-num{background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:0.1rem}
+  .chain-content h3{font-family:var(--sans);font-size:0.88rem;font-weight:700;margin-bottom:0.2rem}
+  .chain-content p{font-size:0.85rem;color:var(--muted);margin:0}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
+  .extra-badge{display:inline-block;font-family:var(--sans);font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;background:#ede9fe;color:#7c3aed;padding:0.2rem 0.5rem;border-radius:4px;margin-left:0.5rem;vertical-align:middle}
+</style>
+<link rel="stylesheet" href="../styles/quiz.css">
+</head>
+<body>
+<nav><a href="../index.html">Índice</a> › <a href="#">Fase 1: Prompt Engineering</a> › Lección 1.6.3 <span class="extra-badge">Extra</span></nav>
+<h1>Generated Knowledge Prompting</h1>
+<p class="meta">Fase 1 · Lección extra 1.6.3 · ~13 min · Prompt Engineering</p>
+
+<p>En tareas de sentido común o razonamiento sobre el mundo real, los LLMs a veces fallan no porque no "sepan" el hecho relevante, sino porque no lo recuperan en el momento de responder. <strong>Generated Knowledge Prompting</strong> resuelve esto en dos pasos: primero le pides al modelo que genere los hechos relevantes, y después le pides que use esos hechos para responder.</p>
+
+<div class="chain">
+  <div class="chain-step">
+    <div class="chain-num">1</div>
+    <div class="chain-content"><h3>Generar conocimiento</h3><p>Prompt 1: "Genera 3-5 hechos relevantes sobre [tema] que sean útiles para responder preguntas sobre [pregunta]."</p></div>
+  </div>
+  <div class="chain-step">
+    <div class="chain-num">2</div>
+    <div class="chain-content"><h3>Integrar el conocimiento generado</h3><p>Prompt 2: incluye esos hechos generados como contexto y pide la respuesta final a la pregunta original.</p></div>
+  </div>
+</div>
+
+<div class="prompt-box">
+  <span class="label">Ejemplo clásico (sentido común sobre golf)</span>
+  Pregunta: "En golf, ¿es bueno tener una puntuación más alta que la del rival?"<br><br>
+  Paso 1 — Generar conocimiento: "Genera hechos sobre cómo se cuenta la puntuación en golf."<br>
+  → "En golf, el objetivo es completar el hoyo con el menor número de golpes posible. Una puntuación más baja es mejor."<br><br>
+  Paso 2 — Responder con ese conocimiento: "Usando el hecho anterior, responde: ¿es bueno tener una puntuación más alta que el rival?"<br>
+  → "No, en golf una puntuación más baja es mejor, así que tener una puntuación más alta que el rival es desfavorable."
+</div>
+
+<div class="callout">
+  <strong>Por qué funciona</strong>
+  Separar "recordar el hecho" de "aplicar el hecho" reduce la posibilidad de que el modelo combine mal su conocimiento implícito con el razonamiento de la respuesta — un fallo común en preguntas con trampas de sentido común (como esta, donde la intuición de "más alto = mejor" es incorrecta en golf).
+</div>
+
+<div class="callout">
+  <strong>Cuándo usarla</strong>
+  Tareas de razonamiento de sentido común, preguntas con conocimiento de dominio específico poco frecuente, o cuando sospechas que el modelo está mezclando hechos correctos con una aplicación incorrecta de los mismos.
+</div>
+
+<div class="quiz">
+  <h3>🧠 Comprueba lo que recuerdas</h3>
+  <div class="q">
+    <p>¿Qué problema concreto intenta resolver Generated Knowledge Prompting?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q1" value="a"> Que el modelo no tenga suficiente memoria de contexto</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Que el modelo "sepa" el hecho relevante pero no lo recupere o aplique correctamente al responder directamente</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> Que el modelo genere respuestas demasiado largas</label>
+      <label class="opt"><input type="radio" name="q1" value="d"> Que el modelo no soporte few-shot prompting</label>
+    </div>
+    <button class="check-btn" onclick="check('q1','b')">Comprobar</button>
+    <p class="feedback" id="fb-q1"></p>
+  </div>
+  <div class="q">
+    <p>¿En qué orden se aplican los dos pasos de esta técnica?</p>
+    <div class="options">
+      <label class="opt"><input type="radio" name="q2" value="a"> Primero se responde la pregunta y después se generan hechos para verificarla</label>
+      <label class="opt"><input type="radio" name="q2" value="b"> Primero se genera el conocimiento relevante, y después se usa ese conocimiento como contexto para responder</label>
+      <label class="opt"><input type="radio" name="q2" value="c"> Ambos pasos ocurren simultáneamente en una sola llamada</label>
+      <label class="opt"><input type="radio" name="q2" value="d"> El orden no afecta al resultado</label>
+    </div>
+    <button class="check-btn" onclick="check('q2','b')">Comprobar</button>
+    <p class="feedback" id="fb-q2"></p>
+  </div>
+</div>
+
+<div class="source">
+  <strong>Fuente recomendada</strong>
+  <a href="https://www.promptingguide.ai/techniques/knowledge" target="_blank">Prompt Engineering Guide — Generate Knowledge Prompting (DAIR.AI)</a><br>
+  Basado en Liu et al. (2022), incluye el ejemplo de sentido común sobre golf y comparativas de precisión con/sin conocimiento generado.
+</div>
+
+<div class="teacher">
+  <strong>💬 ¿Tienes dudas?</strong>
+  Pregunta al agente: "¿En qué se diferencia esto de RAG?" o "Dame un ejemplo de Generated Knowledge Prompting aplicado a una pregunta técnica de mi dominio."
+</div>
+
+<div class="lesson-nav">
+  <a href="0010.2-meta-prompting.html">← 1.6.2 Meta Prompting</a>
+  <a href="0010.4-pal-directional-stimulus.html">1.6.4 PAL y Directional Stimulus Prompting →</a>
+</div>
+<script src="../js/quiz.js"></script>
+</body>
+</html>
