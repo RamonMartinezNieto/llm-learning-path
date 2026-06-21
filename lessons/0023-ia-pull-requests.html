@@ -61,18 +61,10 @@
   .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
   .source a{color:#0369a1}
 
-  /* Teacher */
-  .teacher { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 2rem 0; display: flex; gap: 1rem; align-items: flex-start; }
-  .teacher-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
-  .teacher-body { font-size: 0.9rem; color: #374151; }
-  .teacher-body strong { display: block; font-family: var(--sans); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; margin-bottom: 0.3rem; }
-
-  /* Lesson nav */
-  .lesson-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--sans); font-size: 0.85rem; }
-  .lesson-nav a { display: flex; flex-direction: column; gap: 0.2rem; max-width: 45%; }
-  .lesson-nav a span:first-child { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
-  .lesson-nav a span:last-child { color: var(--accent); font-weight: 600; }
-  .lesson-nav .nav-next { text-align: right; margin-left: auto; }
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
 </style>
 <link rel="stylesheet" href="../styles/quiz.css">
 </head>
@@ -162,22 +154,13 @@ de principios SOLID o clean code. Sé específico con número de línea.
   </div>
 
   <div class="teacher">
-    <div class="teacher-avatar">👨‍🏫</div>
-    <div class="teacher-body">
-      <strong>Nota del instructor</strong>
-      Antes de activar Copilot Code Review en tu repositorio, revisa las políticas de tu organización sobre datos de código enviados a servicios externos. Para proyectos con código muy sensible, considera usar modelos locales o herramientas on-premise. La transparencia con el equipo sobre qué herramientas de IA se usan en el flujo de trabajo es fundamental.
-    </div>
+    <strong>Nota del instructor</strong>
+    Antes de activar Copilot Code Review en tu repositorio, revisa las políticas de tu organización sobre datos de código enviados a servicios externos. Para proyectos con código muy sensible, considera usar modelos locales o herramientas on-premise. La transparencia con el equipo sobre qué herramientas de IA se usan en el flujo de trabajo es fundamental.
   </div>
 
   <nav class="lesson-nav">
-    <a href="0022-herramientas-cursor-copilot.html">
-      <span>← Anterior</span>
-      <span>4.0 — Herramientas: Cursor y Copilot</span>
-    </a>
-    <a href="0024-pipelines-cicd.html" class="nav-next">
-      <span>Siguiente →</span>
-      <span>4.2 — Pipelines CI/CD con IA</span>
-    </a>
+    <a href="0022-herramientas-cursor-copilot.html">← 4.0 — Herramientas: Cursor y Copilot</a>
+    <a href="0024-pipelines-cicd.html">4.2 — Pipelines CI/CD con IA →</a>
   </nav>
 
 </div>
