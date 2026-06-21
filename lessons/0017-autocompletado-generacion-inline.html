@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>3.1 — Autocompletado y generación inline</title>
 <style>
-  :root{--accent:#1d4ed8;--serif:Georgia,serif;--sans:system-ui,sans-serif;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
+  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#1d4ed8;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:var(--sans);background:var(--bg);color:#1f2937;line-height:1.7;font-size:1rem}
+  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
   a{color:var(--accent);text-decoration:none}
   a:hover{text-decoration:underline}
   .wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem}
@@ -17,12 +17,12 @@
   .breadcrumb span{color:#9ca3af}
 
   /* header */
-  h1{font-family:var(--serif);font-size:2rem;line-height:1.2;color:#111827;margin-bottom:.5rem}
-  .meta{font-size:.85rem;color:#6b7280;margin-bottom:2.5rem;display:flex;flex-wrap:wrap;gap:.5rem .75rem;align-items:center}
+  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
+  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
   .meta .tag{background:#ecfdf5;color:var(--accent);border-radius:999px;padding:.15rem .65rem;font-weight:600;font-size:.75rem}
 
   /* sections */
-  h2{font-family:var(--serif);font-size:1.35rem;color:#111827;margin:2.5rem 0 .75rem;padding-bottom:.35rem;border-bottom:1px solid var(--border)}
+  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
   p{margin-bottom:1rem}
   ul,ol{margin:0 0 1rem 1.4rem}
   li{margin-bottom:.35rem}
@@ -30,7 +30,8 @@
   pre{background:#f3f4f6;border-radius:8px;padding:1rem 1.25rem;overflow-x:auto;margin-bottom:1rem;font-size:.88rem;line-height:1.6}
 
   /* callout */
-  .callout{border-left:3px solid var(--accent);background:#ecfdf5;padding:.85rem 1.1rem;border-radius:0 6px 6px 0;margin:1.5rem 0;font-style:italic;color:#065f46}
+  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
+  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
 
   /* card */
   .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem}
@@ -44,17 +45,18 @@
   .btn:hover{opacity:.88}
 
   /* source */
-  .source{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.4rem;margin:2rem 0}
-  .source strong{display:block;margin-bottom:.3rem;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
+  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
+  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+  .source a{color:#0369a1}
 
   /* teacher */
-  .teacher{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:1.1rem 1.4rem;margin:1.5rem 0}
-  .teacher strong{display:block;margin-bottom:.35rem;color:#92400e;font-size:.9rem}
+  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
+  .teacher strong{display:block;margin-bottom:0.3rem}
   .teacher p{color:#78350f;font-size:.9rem;margin:0}
 
   /* nav */
-  .lesson-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.75rem}
-  .lesson-nav a{font-size:.9rem;font-weight:600;color:var(--accent)}
+  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
+  .lesson-nav a{color:var(--accent);text-decoration:none}
   .lesson-nav .prev::before{content:'← '}
   .lesson-nav .next::after{content:' →'}
 </style>
