@@ -5,16 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1.6 — Evaluación y refinamiento iterativo de prompts</title>
 <style>
-  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#1d4ed8;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
-  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}nav a{color:var(--accent);text-decoration:none}
-  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
-  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
-  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
-  p{margin-bottom:1rem}
-  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
-  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
   .loop{display:flex;flex-direction:column;gap:0;margin:1.5rem 0}
   .loop-step{background:var(--card);border:1px solid var(--border);padding:0.85rem 1rem;display:flex;align-items:flex-start;gap:0.75rem}
   .loop-step:first-child{border-radius:8px 8px 0 0}
@@ -27,13 +17,8 @@
   .metric{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.85rem}
   .metric h3{font-family:var(--sans);font-size:0.82rem;font-weight:700;margin-bottom:0.3rem}
   .metric p{font-size:0.82rem;color:var(--muted);margin:0}
-  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
-  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}.source a{color:#0369a1}
-  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
-  .teacher strong{display:block;margin-bottom:0.3rem}
-  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
-  .lesson-nav a{color:var(--accent);text-decoration:none}
 </style>
+<link rel="stylesheet" href="../styles/lesson-base.css">
 <link rel="stylesheet" href="../styles/quiz.css">
 </head>
 <body>
