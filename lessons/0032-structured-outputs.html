@@ -5,32 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>5.4 — Structured outputs y parsing de respuestas</title>
 <style>
-  :root{--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,sans-serif;--text:#1a1a1a;--muted:#555;--accent:#1d4ed8;--bg:#fffef7;--card:#fff;--border:#e5e7eb;--ok:#15803d;--err:#dc2626}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:var(--serif);background:var(--bg);color:var(--text);max-width:680px;margin:0 auto;padding:3rem 2rem 6rem;line-height:1.75}
-  nav{font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem}
-  nav a{color:var(--accent);text-decoration:none}
-  h1{font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:0.5rem}
-  .meta{font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
-  h2{font-size:1.2rem;font-weight:700;margin:2rem 0 0.75rem;font-family:var(--sans)}
-  p{margin-bottom:1rem}
   pre,code{font-family:monospace;font-size:0.83rem}
   pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;overflow-x:auto;line-height:1.6;margin:1rem 0}
-  .callout{background:var(--card);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
-  .callout strong{font-family:var(--sans);font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
   .warning{background:#fff7ed;border-left:3px solid #f97316;padding:1rem 1.25rem;margin:1.5rem 0;border-radius:0 6px 6px 0}
   .warning strong{font-family:var(--sans);font-size:0.8rem;color:#c2410c;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem}
   table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--sans);font-size:0.85rem}
   th{background:#f3f4f6;text-align:left;padding:0.6rem 0.8rem;border:1px solid var(--border);font-weight:700}
   td{padding:0.6rem 0.8rem;border:1px solid var(--border)}
-  .source{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem}
-  .source strong{color:#0369a1;display:block;margin-bottom:0.3rem;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
-  .source a{color:#0369a1}
-  .teacher{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1rem 1.25rem;margin:2rem 0;font-family:var(--sans);font-size:0.88rem;color:#78350f}
-  .teacher strong{display:block;margin-bottom:0.3rem}
-  .lesson-nav{display:flex;justify-content:space-between;margin-top:3rem;font-family:var(--sans);font-size:0.85rem}
-  .lesson-nav a{color:var(--accent);text-decoration:none}
 </style>
+<link rel="stylesheet" href="../styles/lesson-base.css">
 <link rel="stylesheet" href="../styles/quiz.css">
 </head>
 <body>
