@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>7.5 Escalado y optimización de costes | MattPocockSkills</title>
+<title>7.5 Escalado y optimización de costes</title>
 <style>
 ul,ol{margin-left:1.5rem;margin-bottom:1rem}
 li{margin-bottom:0.3rem}
@@ -24,30 +24,30 @@ pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padd
 
 <p>El coste básico de cada llamada es: <code>tokens_entrada × precio_entrada + tokens_salida × precio_salida</code></p>
 
-<p>Los tokens de salida son 3-5x más caros que los de entrada. Una respuesta larga puede costar mucho más que el prompt que la generó.</p>
+<p>En la gama Claude actual, los tokens de salida cuestan 5x los de entrada. Una respuesta larga puede costar mucho más que el prompt que la generó.</p>
 
-<h2>Comparativa de costes por modelo (aproximado, por 1M tokens)</h2>
+<h2>Comparativa de costes por modelo (familia Claude, por 1M tokens)</h2>
 
 <table>
   <tr><th>Modelo</th><th>Entrada</th><th>Salida</th><th>Mejor para</th></tr>
-  <tr><td>GPT-4o mini</td><td>$0.15</td><td>$0.60</td><td>Clasificación, extracción simple</td></tr>
-  <tr><td>GPT-4o</td><td>$2.50</td><td>$10.00</td><td>Razonamiento complejo, generación</td></tr>
-  <tr><td>Claude Haiku 3.5</td><td>$0.80</td><td>$4.00</td><td>Tareas medianas con contexto largo</td></tr>
-  <tr><td>Claude Sonnet 3.5</td><td>$3.00</td><td>$15.00</td><td>Razonamiento, código complejo</td></tr>
-  <tr><td>Gemini Flash 1.5</td><td>$0.075</td><td>$0.30</td><td>Tareas simples de alto volumen</td></tr>
+  <tr><td>Claude Haiku 4.5</td><td>$1.00</td><td>$5.00</td><td>Clasificación, extracción, alto volumen</td></tr>
+  <tr><td>Claude Sonnet 4.6</td><td>$3.00</td><td>$15.00</td><td>Uso general, código, análisis</td></tr>
+  <tr><td>Claude Opus 4.8</td><td>$5.00</td><td>$25.00</td><td>Razonamiento complejo, tareas críticas</td></tr>
+  <tr><td>Claude Fable 5</td><td>$10.00</td><td>$50.00</td><td>Lo más exigente y de largo horizonte</td></tr>
 </table>
+<p style="font-size:0.85rem;color:var(--muted)">Precios de referencia (cambian con el tiempo; consulta la web oficial). La diferencia de ~5–10x entre el modelo más barato y el más caro es la base del <em>model routing</em>.</p>
 
 <h2>Estrategias de optimización</h2>
 
-<p><strong>1. Model routing (mayor impacto):</strong> Clasificar las peticiones entrantes y usar el modelo más económico que pueda resolver cada tipo de tarea. Una petición de clasificación simple no necesita GPT-4o.</p>
+<p><strong>1. Model routing (mayor impacto):</strong> Clasificar las peticiones entrantes y usar el modelo más económico que pueda resolver cada tipo de tarea. Una petición de clasificación simple no necesita Opus 4.8.</p>
 
 <pre>
 def route_request(user_query):
     complexity = classify_complexity(user_query)  # LLM barato
     if complexity == "simple":
-        return call_model("gpt-4o-mini", user_query)
+        return call_model("claude-haiku-4-5", user_query)
     else:
-        return call_model("gpt-4o", user_query)
+        return call_model("claude-opus-4-8", user_query)
 </pre>
 
 <p><strong>2. Prompt compression:</strong> Eliminar palabras innecesarias del system prompt. Un prompt de 2000 tokens se puede reducir a 800 sin perder comportamiento significativo.</p>
@@ -68,7 +68,7 @@ def route_request(user_query):
 <div class="source">
   <strong>Fuente principal</strong>
   Anthropic pricing and model overview<br>
-  <a href="https://docs.anthropic.com/en/docs/about-claude/models" target="_blank">docs.anthropic.com/en/docs/about-claude/models</a>
+  <a href="https://platform.claude.com/docs/en/about-claude/models" target="_blank">platform.claude.com/docs/en/about-claude/models</a>
 </div>
 
 <div class="quiz">

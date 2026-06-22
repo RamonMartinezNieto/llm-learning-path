@@ -29,7 +29,7 @@
 <h2>¿Cuándo es efectivo?</h2>
 <p>El caching tiene mayor impacto en estos escenarios:</p>
 <ul style="margin:0 0 1rem 1.5rem;line-height:2">
-  <li>System prompts extensos con instrucciones detalladas (>1024 tokens)</li>
+  <li>System prompts extensos con instrucciones detalladas (por encima del mínimo cacheable del modelo)</li>
   <li>Ejemplos few-shot numerosos al inicio del prompt</li>
   <li>Documentos de referencia o bases de conocimiento inyectados en el contexto</li>
   <li>Plantillas de análisis repetidas con distintos inputs variables</li>
@@ -37,11 +37,11 @@
 
 <div class="callout">
   <strong>Regla práctica</strong>
-  El caching es más efectivo cuando el prefijo del prompt tiene &gt;1024 tokens y se reutiliza en muchas llamadas. Un system prompt largo + RAG docs = candidato perfecto para caching.
+  El caching es más efectivo cuando el prefijo del prompt supera el mínimo cacheable y se reutiliza en muchas llamadas. Ese mínimo <strong>depende del modelo</strong> (no es fijo en 1024 tokens): ronda entre 1024 y 4096 tokens según el modelo —por ejemplo Sonnet 4.6 = 2048, Opus 4.8 = 4096, Haiku 4.5 = 4096—. Por debajo de ese umbral, el bloque no se cachea (sin error: simplemente <code>cache_creation_input_tokens</code> sale a 0). Un system prompt largo + RAG docs = candidato perfecto para caching.
 </div>
 
 <h2>Cómo habilitarlo en la API de Anthropic</h2>
-<p>Se añade el campo <code>cache_control</code> con <code>{"type": "ephemeral"}</code> al mensaje que quieres cachear. Anthropic mantiene la caché por 5 minutos (renovable con cada acceso):</p>
+<p>Se añade el campo <code>cache_control</code> con <code>{"type": "ephemeral"}</code> al mensaje que quieres cachear. Anthropic mantiene la caché por 5 minutos por defecto (renovable con cada acceso); existe además un TTL de 1 hora con <code>{"type": "ephemeral", "ttl": "1h"}</code>, útil para tráfico con pausas largas:</p>
 
 <pre>import anthropic
 
@@ -54,7 +54,7 @@ Eres un asistente especializado en análisis legal.
 """ * 50  # Simulando un prompt largo
 
 respuesta = client.messages.create(
-    model="claude-sonnet-4-5",
+    model="claude-sonnet-4-6",
     max_tokens=1024,
     system=[
         {
@@ -103,7 +103,7 @@ documento_referencia = open("manual_empresa.txt").read()
 
 def analizar_con_contexto(pregunta: str):
     return client.messages.create(
-        model="claude-sonnet-4-5",
+        model="claude-sonnet-4-6",
         max_tokens=512,
         system=[
             {
@@ -133,7 +133,7 @@ r2 = analizar_con_contexto("¿Cómo solicito días de enfermedad?")</pre>
 
 <div class="source">
   <strong>Fuente oficial</strong>
-  <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching" target="_blank">Anthropic Prompt Caching — docs.anthropic.com</a>
+  <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching" target="_blank">Anthropic Prompt Caching — platform.claude.com/docs</a>
 </div>
 
 <div class="quiz">

@@ -35,8 +35,13 @@
 <p>RAG ofrece una cuarta opción: en tiempo de consulta, recuperar solo los fragmentos del manual relevantes para la pregunta y pasarlos en el prompt. Eficiente, actualizable y con trazabilidad.</p>
 
 <div class="callout">
-  <strong>Estadística del sector</strong>
-  RAG es el patrón más importante para conectar LLMs con datos privados de empresas. El 80% de los casos de uso empresarial de IA generativa son RAG o variantes de RAG.
+  <strong>Antes de empezar: ¿qué es un <em>embedding</em>?</strong>
+  Un embedding es un vector de números que captura el <em>significado</em> de un texto. Dos textos con sentido parecido tienen vectores cercanos, y esa cercanía se mide con la <em>similitud coseno</em>. RAG usa esta primitiva para encontrar los fragmentos más parecidos a la pregunta. Aquí basta con esta intuición; la siguiente lección (Embeddings y búsqueda semántica) lo explica a fondo.
+</div>
+
+<div class="callout">
+  <strong>Por qué importa RAG</strong>
+  RAG es el patrón más importante para conectar LLMs con datos privados de empresas: la mayoría de los casos de uso empresarial de IA generativa son RAG o variantes de RAG.
 </div>
 
 <h2>El pipeline RAG: paso a paso</h2>
@@ -132,7 +137,7 @@ def preguntar(pregunta: str) -> str:
     
     # 3. Llamar al LLM con el contexto
     respuesta = anthropic_client.messages.create(
-        model="claude-opus-4-5",
+        model="claude-opus-4-8",
         max_tokens=512,
         system=f"""Eres un asistente de RRHH. Responde basándote SOLO en el siguiente 
 contexto. Si la respuesta no está en el contexto, dilo explícitamente.

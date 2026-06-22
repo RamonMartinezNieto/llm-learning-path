@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>6.3 Bucles de agente | MattPocockSkills</title>
+<title>6.3 Bucles de agente</title>
 <style>
 ul,ol{margin-left:1.5rem;margin-bottom:1rem}
 li{margin-bottom:0.3rem}
@@ -25,7 +25,7 @@ pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padd
 <p>En pseudocódigo, el bucle de un agente típico es:</p>
 
 <pre>
-def agent_loop(task, max_iterations=20, budget_tokens=50000):
+def agent_loop(task, max_iterations=20, token_budget=50000):
     context = [system_prompt, task]
     iterations = 0
     total_tokens = 0
@@ -34,7 +34,7 @@ def agent_loop(task, max_iterations=20, budget_tokens=50000):
         response = llm.call(context)
         total_tokens += response.tokens_used
 
-        if total_tokens > budget_tokens:
+        if total_tokens > token_budget:
             return error("Presupuesto de tokens agotado")
 
         if response.type == "final_answer":
@@ -50,6 +50,11 @@ def agent_loop(task, max_iterations=20, budget_tokens=50000):
 
     return error("Máximo de iteraciones alcanzado")
 </pre>
+
+<div class="callout">
+  <strong>De este pseudocódigo a la API real</strong>
+  En la API de Anthropic el bucle se guía por <code>stop_reason == "tool_use"</code> (el modelo pide ejecutar una herramienta) frente a <code>"end_turn"</code> (ha terminado). Y para el presupuesto de tokens existe <em>Task Budgets</em>, un mecanismo nativo: le dices al modelo cuántos tokens tiene para toda la tarea y él mismo se autorregula, en lugar de cortar el bucle a lo bruto.
+</div>
 
 <h2>Stopping conditions: cuándo parar</h2>
 
@@ -106,7 +111,7 @@ Action: search_web("Kafka release date site:apache.org")  # query más específi
 <div class="source">
   <strong>Fuente principal</strong>
   Anthropic — Agentic patterns<br>
-  <a href="https://docs.anthropic.com/en/docs/build-with-claude/agents" target="_blank">docs.anthropic.com/en/docs/build-with-claude/agents</a>
+  <a href="https://platform.claude.com/docs/en/build-with-claude/agents" target="_blank">platform.claude.com/docs/en/build-with-claude/agents</a>
 </div>
 
 <div class="quiz">

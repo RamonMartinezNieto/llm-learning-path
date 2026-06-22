@@ -30,8 +30,9 @@
   </thead>
   <tbody>
     <tr><td>Prompt: "responde en JSON"</td><td>~90%</td><td>Alta</td><td>Prototipos, uso informal</td></tr>
+    <tr><td>Anthropic <code>output_config.format</code> (nativo)</td><td>~99.9%</td><td>Media</td><td>Producción con Claude</td></tr>
     <tr><td>OpenAI <code>json_schema</code></td><td>~99.9%</td><td>Media</td><td>Producción con OpenAI</td></tr>
-    <tr><td>Anthropic + Pydantic</td><td>~95%+</td><td>Alta</td><td>Producción con Anthropic</td></tr>
+    <tr><td>Anthropic + Pydantic (parsing manual)</td><td>~95%+</td><td>Alta</td><td>Validación de tipos en Python</td></tr>
     <tr><td>Tool use como extractor</td><td>~99%</td><td>Alta</td><td>Cualquier modelo con tools</td></tr>
   </tbody>
 </table>
@@ -47,7 +48,7 @@ client = anthropic.Anthropic()
 texto_a_analizar = "El producto llegó roto y el servicio de atención fue horrible."
 
 respuesta = client.messages.create(
-    model="claude-opus-4-5",
+    model="claude-opus-4-8",
     max_tokens=512,
     system="""Eres un analizador de sentimientos. 
 Responde SIEMPRE en JSON válido con exactamente este schema:
@@ -75,7 +76,7 @@ import json
 client = OpenAI()
 
 respuesta = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-5",
     response_format={"type": "json_schema", "json_schema": {
         "name": "analisis_sentimiento",
         "strict": True,
@@ -118,7 +119,7 @@ class AnalisisSentimiento(BaseModel):
 
 def analizar_sentimiento(texto: str) -> AnalisisSentimiento:
     respuesta = client.messages.create(
-        model="claude-opus-4-5",
+        model="claude-opus-4-8",
         max_tokens=512,
         system=f"""Analiza el sentimiento. Responde SOLO en JSON con este schema:
 {AnalisisSentimiento.model_json_schema()}
@@ -138,6 +139,57 @@ Sin texto adicional fuera del JSON.""",
 resultado = analizar_sentimiento("El producto llegó roto.")
 print(resultado.sentimiento)   # Tipado, con autocompletado en el IDE
 print(resultado.puntuacion)    # Float garantizado</pre>
+
+<h2>Método 4: Structured outputs nativos de Anthropic (recomendado)</h2>
+<p>Hoy la API de Claude garantiza el schema de forma nativa, igual que OpenAI: ya no hace falta el parsing manual frágil del Método 3. Tienes dos vías:</p>
+<ul style="margin:0 0 1rem 1.5rem;line-height:2">
+  <li><code>output_config={"format": {"type": "json_schema", "schema": {...}}}</code> en <code>messages.create()</code>.</li>
+  <li><code>client.messages.parse()</code> con un modelo Pydantic, que valida y te devuelve el objeto ya tipado.</li>
+</ul>
+
+<pre>import anthropic
+from pydantic import BaseModel
+from typing import Literal, List
+
+client = anthropic.Anthropic()
+
+class AnalisisSentimiento(BaseModel):
+    sentimiento: Literal["positivo", "neutro", "negativo"]
+    puntuacion: float
+    aspectos: List[str]
+    resumen: str
+
+# Opción A: parse() con Pydantic — el schema se genera y valida solo
+respuesta = client.messages.parse(
+    model="claude-opus-4-8",
+    max_tokens=512,
+    messages=[{"role": "user", "content": "El producto llegó roto."}],
+    output_format=AnalisisSentimiento,
+)
+resultado = respuesta.parsed_output   # ya es un AnalisisSentimiento tipado
+print(resultado.sentimiento)
+
+# Opción B: output_config con JSON Schema explícito
+respuesta = client.messages.create(
+    model="claude-opus-4-8",
+    max_tokens=512,
+    messages=[{"role": "user", "content": "El producto llegó roto."}],
+    output_config={"format": {"type": "json_schema", "schema": {
+        "type": "object",
+        "properties": {
+            "sentimiento": {"type": "string", "enum": ["positivo", "neutro", "negativo"]},
+            "puntuacion": {"type": "number"},
+            "resumen": {"type": "string"}
+        },
+        "required": ["sentimiento", "puntuacion", "resumen"],
+        "additionalProperties": False
+    }}}
+)</pre>
+
+<div class="callout">
+  <strong>Nota</strong>
+  El JSON garantizado por schema <em>no</em> es exclusivo de OpenAI: Claude lo soporta de forma nativa con <code>output_config.format</code> y con <code>strict: True</code> en la definición de una tool. El Método 3 (Pydantic + <code>json.loads</code> manual) sigue siendo útil para entender qué ocurre por debajo, pero en producción con Claude usa el método nativo.
+</div>
 
 <div class="callout">
   <strong>Advertencia importante</strong>
@@ -159,7 +211,8 @@ print(resultado.puntuacion)    # Float garantizado</pre>
 </div>
 
 <div class="source">
-  <strong>Fuente oficial</strong>
+  <strong>Fuentes oficiales</strong>
+  <a href="https://platform.claude.com/docs/en/build-with-claude/structured-outputs" target="_blank">Anthropic Structured Outputs — platform.claude.com</a><br>
   <a href="https://platform.openai.com/docs/guides/structured-outputs" target="_blank">OpenAI Structured Outputs — platform.openai.com</a>
 </div>
 

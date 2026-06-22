@@ -82,7 +82,7 @@ Edge cases específicos que quiero cubrir: [lista]</pre>
   </div>
 
   <!-- SECCIÓN 3 -->
-  <h2>El riesgo crítico: tests que encodenan bugs</h2>
+  <h2>El riesgo crítico: tests que consolidan bugs</h2>
   <p>La IA genera tests <em>observando el comportamiento actual del código</em>. Si la función tiene un bug, el modelo puede escribir un test que <strong>espera el comportamiento incorrecto</strong> — pasando el test aunque el código esté mal.</p>
   <p>Esto es especialmente peligroso porque:</p>
   <ul>
@@ -103,7 +103,7 @@ Edge cases específicos que quiero cubrir: [lista]</pre>
     <div class="question">
       <p>Q1 — ¿Cuál es el riesgo principal de tests unitarios generados por IA sin revisión?</p>
       <label><input type="radio" name="q1" value="a"> a) Que usen un estilo de código diferente al del resto del proyecto</label>
-      <label><input type="radio" name="q1" value="b"> b) Pueden encodear los bugs del código original en lugar de detectarlos como fallos</label>
+      <label><input type="radio" name="q1" value="b"> b) Pueden consolidar los bugs del código original (fijarlos como comportamiento esperado) en lugar de detectarlos como fallos</label>
       <label><input type="radio" name="q1" value="c"> c) Que sean demasiado lentos y aumenten el tiempo de ejecución del pipeline</label>
       <label><input type="radio" name="q1" value="d"> d) Que no sean compatibles con el framework de tests del proyecto</label>
       <button class="btn" onclick="check('q1','b')">Comprobar</button>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>6.6 Evaluación y trazabilidad de agentes | MattPocockSkills</title>
+<title>6.6 Evaluación y trazabilidad de agentes</title>
 <style>
 ul,ol{margin-left:1.5rem;margin-bottom:1rem}
 li{margin-bottom:0.3rem}
@@ -57,9 +57,17 @@ pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padd
   <li><strong>Tests de coste:</strong> Verificar que tareas simples no usan más de N iteraciones/tokens.</li>
 </ol>
 
-<h2>Seeds reproducibles para depuración</h2>
+<h2>Reproducibilidad para depuración</h2>
 
-<p>Para depurar un fallo específico, necesitas poder reproducirlo. Configura siempre una <em>seed</em> de temperatura (temperatura = 0 + seed fija) en el test suite para hacer las ejecuciones deterministas. En producción puedes usar temperatura > 0, pero en tests la reproducibilidad es prioritaria.</p>
+<p>Para depurar un fallo específico necesitas poder reproducirlo, pero ten en cuenta una limitación importante: <strong>el determinismo total no está garantizado</strong>. La API de Claude no expone un parámetro <code>seed</code>, y en los modelos actuales (Opus 4.7/4.8) el parámetro <code>temperature</code> ni siquiera está disponible. Incluso con <code>temperature = 0</code> en modelos antiguos, la salida nunca era 100% idéntica.</p>
+
+<p>En lugar de perseguir un determinismo imposible, haz tus tests reproducibles así:</p>
+<ul style="margin:0 0 1rem 1.5rem;line-height:2">
+  <li><strong>Prompts y entradas fijas:</strong> congela el system prompt, las herramientas y los inputs del caso de test.</li>
+  <li><strong>Snapshots de trazas:</strong> guarda la traza completa (pasos, llamadas a tools, resultados) de una ejecución "buena" y compara las nuevas ejecuciones contra ella para detectar regresiones.</li>
+  <li><strong>Esfuerzo bajo:</strong> usa <code>effort</code> bajo en tests para reducir variabilidad y coste.</li>
+  <li><strong>Métricas estadísticas:</strong> ejecuta el mismo caso varias veces y mide tasas (de éxito, de error), no resultados puntuales.</li>
+</ul>
 
 <div class="callout">
   <strong>Principio de producción</strong>

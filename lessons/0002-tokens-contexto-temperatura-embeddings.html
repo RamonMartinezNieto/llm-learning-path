@@ -36,7 +36,7 @@
 
 <div class="callout">
   <strong>Regla práctica</strong>
-  ~1 token ≈ 0.75 palabras en inglés; ~0.6 palabras en español. 1000 tokens ≈ 750 palabras. Los costes de la API se miden en tokens.
+  ~1 token ≈ 0,6 palabras en español (≈ 0,75 en inglés). Por tanto, 1000 tokens ≈ 600 palabras en español. Los costes de la API se miden en tokens.
 </div>
 
 <details class="drop">
@@ -105,9 +105,6 @@
       <li><strong>Poda de historial (sliding window):</strong> Consiste en configurar la API para que solo recuerde los últimos, por ejemplo, 10 mensajes. Lo más antiguo se borra de la ventana de contexto. Es más barato, aunque la IA "olvidará" el inicio de la charla.</li>
       <li><strong>RAG (Generación Aumentada por Recuperación):</strong> En lugar de meter un libro entero de 500 páginas en la ventana de contexto, se usa una base de datos para buscar solo los 3 párrafos que responden a la pregunta del usuario y se le envía <em>únicamente</em> eso a la IA. Pasar de 200,000 tokens a 500 tokens reduce el coste drásticamente.</li>
     </ul>
-
-    <p class="mini-title">Pregunta guía:</p>
-    <p>¿Estás planeando desarrollar una aplicación con la API y te preocupa un volumen de datos grande, o es más por curiosidad de cómo optimizar tus prompts?</p>
   </div>
 </details>
 
@@ -116,9 +113,10 @@
 
 <table>
   <tr><th>Modelo</th><th>Contexto aprox.</th><th>Equivalente en páginas A4</th></tr>
-  <tr><td>GPT-4o</td><td>128K tokens</td><td>~96 páginas</td></tr>
-  <tr><td>Claude 3.5 Sonnet</td><td>200K tokens</td><td>~150 páginas</td></tr>
-  <tr><td>Gemini 1.5 Pro</td><td>1M tokens</td><td>~750 páginas</td></tr>
+  <tr><td>Claude Opus 4.8 / Sonnet 4.6</td><td>1M tokens</td><td>~750 páginas</td></tr>
+  <tr><td>Claude Haiku 4.5</td><td>200K tokens</td><td>~150 páginas</td></tr>
+  <tr><td>GPT (familia actual)</td><td>~128K–1M tokens</td><td>~96–750 páginas</td></tr>
+  <tr><td>Gemini (familia actual)</td><td>~1M tokens</td><td>~750 páginas</td></tr>
 </table>
 
 <h2>Temperatura</h2>

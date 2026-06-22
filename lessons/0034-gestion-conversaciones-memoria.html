@@ -46,7 +46,7 @@ class ChatSimple:
         
         # Llamar con TODO el historial
         respuesta = client.messages.create(
-            model="claude-opus-4-5",
+            model="claude-opus-4-8",
             max_tokens=1024,
             messages=self.historial
         )
@@ -85,7 +85,7 @@ class ChatVentanaDeslizante:
         self.historial.append({"role": "user", "content": mensaje_usuario})
         
         respuesta = client.messages.create(
-            model="claude-opus-4-5",
+            model="claude-opus-4-8",
             max_tokens=1024,
             system=self.system,
             messages=list(self.historial)  # Convierte deque a lista
@@ -123,7 +123,7 @@ class ChatConResumen:
         )
         
         respuesta_resumen = client.messages.create(
-            model="claude-opus-4-5",
+            model="claude-opus-4-8",
             max_tokens=512,
             messages=[{
                 "role": "user",
@@ -147,7 +147,7 @@ class ChatConResumen:
             system += f"\n\nResumen de la conversación anterior:\n{self.resumen}"
         
         respuesta = client.messages.create(
-            model="claude-opus-4-5",
+            model="claude-opus-4-8",
             max_tokens=1024,
             system=system,
             messages=self.historial
@@ -202,9 +202,14 @@ class ChatMemoriaSemantica:
   </tbody>
 </table>
 
+<div class="callout">
+  <strong>Hoy también lo hace la API por ti</strong>
+  Estos patrones son el "hazlo a mano" que conviene entender. Pero la API de Claude ya ofrece equivalentes gestionados: <em>compaction</em> (resume el historial automáticamente cuando se acerca al límite de contexto) y <em>context editing</em> (limpia resultados de herramientas y bloques antiguos). Aprende los patrones manuales primero; en producción, apóyate en estas funciones nativas.
+</div>
+
 <div class="source">
   <strong>Fuente oficial</strong>
-  <a href="https://docs.anthropic.com/en/docs/build-with-claude/conversation-history" target="_blank">Building conversational apps — docs.anthropic.com</a>
+  <a href="https://platform.claude.com/docs/en/build-with-claude/conversation-history" target="_blank">Building conversational apps — platform.claude.com/docs</a>
 </div>
 
 <div class="quiz">

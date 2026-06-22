@@ -34,7 +34,7 @@
 
 <pre>1. Tu código → API: "Aquí tienes las herramientas disponibles y la pregunta del usuario"
 2. Modelo → Tu código: "Quiero llamar a get_weather con ciudad='Madrid'"  (stop_reason: "tool_use")
-3. Tu código → Modelo: "El resultado de get_weather fue: 22°C, soleado"   (role: "tool")
+3. Tu código → Modelo: "El resultado de get_weather fue: 22°C, soleado"   (mensaje role: "user" con un bloque tool_result)
 4. Modelo → Tu código: "En Madrid ahora mismo hay 22°C y está soleado."   (respuesta final)</pre>
 
 <h2>Definir una herramienta en Anthropic</h2>
@@ -72,7 +72,7 @@ tools = [
 
 # Primera llamada: el modelo puede decidir usar la herramienta
 respuesta = client.messages.create(
-    model="claude-opus-4-5",
+    model="claude-opus-4-8",
     max_tokens=1024,
     tools=tools,
     messages=[
@@ -101,7 +101,7 @@ def llamar_con_tools(mensaje_usuario: str):
     
     while True:
         respuesta = client.messages.create(
-            model="claude-opus-4-5",
+            model="claude-opus-4-8",
             max_tokens=1024,
             tools=tools,  # definidos arriba
             messages=mensajes
@@ -110,7 +110,10 @@ def llamar_con_tools(mensaje_usuario: str):
         if respuesta.stop_reason == "end_turn":
             # El modelo terminó sin usar más herramientas
             return respuesta.content[0].text
-        
+
+        # En producción conviene manejar también otros stop_reason
+        # (max_tokens, refusal, pause_turn), no solo end_turn y tool_use.
+
         if respuesta.stop_reason == "tool_use":
             # Añadir respuesta del modelo al historial
             mensajes.append({"role": "assistant", "content": respuesta.content})
@@ -156,7 +159,7 @@ print(respuesta)</pre>
 
 <div class="source">
   <strong>Fuente oficial</strong>
-  <a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use" target="_blank">Anthropic Tool Use — docs.anthropic.com</a>
+  <a href="https://platform.claude.com/docs/en/build-with-claude/tool-use" target="_blank">Anthropic Tool Use — platform.claude.com/docs</a>
 </div>
 
 <div class="quiz">

@@ -51,7 +51,7 @@ client = anthropic.Anthropic()
 
 # Opción 1: streaming simplificado con helper
 with client.messages.stream(
-    model="claude-opus-4-5",
+    model="claude-opus-4-8",
     max_tokens=1024,
     messages=[{"role": "user", "content": "Explica la fotosíntesis en detalle."}]
 ) as stream:
@@ -68,7 +68,7 @@ client = anthropic.Anthropic()
 
 # Opción 2: control granular sobre los eventos
 with client.messages.stream(
-    model="claude-opus-4-5",
+    model="claude-opus-4-8",
     max_tokens=1024,
     messages=[{"role": "user", "content": "Explica la fotosíntesis."}]
 ) as stream:
@@ -88,7 +88,7 @@ with client.messages.stream(
 client = OpenAI()
 
 stream = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-5",
     messages=[{"role": "user", "content": "Explica la fotosíntesis en detalle."}],
     stream=True  # ← Activar streaming
 )
@@ -117,7 +117,7 @@ client = anthropic.Anthropic()
 async def chat_stream(mensaje: str):
     def generar():
         with client.messages.stream(
-            model="claude-opus-4-5",
+            model="claude-opus-4-8",
             max_tokens=1024,
             messages=[{"role": "user", "content": mensaje}]
         ) as stream:
@@ -136,35 +136,35 @@ async def chat_stream(mensaje: str):
   </thead>
   <tbody>
     <tr><td>Chatbot conversacional</td><td>✅ Sí</td><td>Mejora mucho la experiencia del usuario</td></tr>
-    <tr><td>Structured outputs / JSON</td><td>❌ No</td><td>Necesitas el JSON completo para parsearlo</td></tr>
-    <tr><td>Function calling / tool use</td><td>❌ No</td><td>Necesitas la respuesta completa antes de ejecutar</td></tr>
-    <tr><td>Procesamiento en batch</td><td>❌ No</td><td>No hay usuario esperando, el throughput importa más</td></tr>
+    <tr><td>Structured outputs / JSON</td><td>⚠️ Compatible</td><td>Puedes hacer streaming, pero esperas al mensaje final para parsear el JSON</td></tr>
+    <tr><td>Function calling / tool use</td><td>⚠️ Compatible</td><td>Puedes hacer streaming; actúas sobre el mensaje final (cuando llega el bloque tool_use completo)</td></tr>
+    <tr><td>Procesamiento en batch</td><td>❌ No aporta</td><td>No hay usuario esperando, el throughput importa más</td></tr>
     <tr><td>Generación de documentos</td><td>⚠️ Opcional</td><td>Depende de si el usuario ve la generación en tiempo real</td></tr>
   </tbody>
 </table>
 
 <div class="warning">
-  <strong>No uses streaming con structured outputs</strong>
-  Si necesitas parsear el JSON de la respuesta, debes esperar a tener el texto completo. El streaming y el parsing de structured outputs son incompatibles a menos que implementes un parser de streaming JSON, lo cual es complejo y raramente vale la pena.
+  <strong>Streaming + structured outputs / tool use: compatible, con matiz</strong>
+  El SDK de Anthropic permite hacer streaming también con structured outputs y tool use (p. ej. con el tool runner en modo stream, o un bucle manual con <code>stream()</code> + <code>get_final_message()</code>). El matiz no es "no se puede", sino que <strong>actúas sobre el mensaje final</strong>: muestras los tokens según llegan, pero esperas a tener el JSON o el bloque <code>tool_use</code> completo antes de parsearlo o ejecutar la herramienta.
 </div>
 
 <div class="source">
   <strong>Fuente oficial</strong>
-  <a href="https://docs.anthropic.com/en/api/messages-streaming" target="_blank">Anthropic Streaming Messages — docs.anthropic.com</a>
+  <a href="https://platform.claude.com/docs/en/api/messages-streaming" target="_blank">Anthropic Streaming Messages — platform.claude.com/docs</a>
 </div>
 
 <div class="quiz">
   <h3>Comprueba lo aprendido</h3>
 
   <div class="q">
-    <p><strong>1.</strong> ¿Cuándo NO deberías usar streaming?</p>
+    <p><strong>1.</strong> ¿En qué caso el streaming aporta poco o nada?</p>
     <div class="options">
       <label class="opt"><input type="radio" name="q1" value="a"> Cuando la respuesta va a ser muy larga</label>
-      <label class="opt"><input type="radio" name="q1" value="b"> Cuando necesitas el output completo antes de procesarlo, como en structured outputs o function calling</label>
-      <label class="opt"><input type="radio" name="q1" value="c"> Cuando el modelo es muy rápido</label>
+      <label class="opt"><input type="radio" name="q1" value="b"> Con structured outputs o function calling (son incompatibles con streaming)</label>
+      <label class="opt"><input type="radio" name="q1" value="c"> En procesamiento en batch, donde no hay un usuario esperando y prima el throughput</label>
       <label class="opt"><input type="radio" name="q1" value="d"> En aplicaciones móviles por limitaciones de red</label>
     </div>
-    <button class="check-btn" onclick="check('q1','b')">Verificar</button>
+    <button class="check-btn" onclick="check('q1','c')">Verificar</button>
     <div class="feedback" id="fb-q1"></div>
   </div>
 

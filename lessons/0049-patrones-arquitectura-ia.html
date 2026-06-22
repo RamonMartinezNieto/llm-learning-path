@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>7.6 Patrones de arquitectura IA | MattPocockSkills</title>
+<title>7.6 Patrones de arquitectura IA</title>
 <style>
 ul,ol{margin-left:1.5rem;margin-bottom:1rem}
 li{margin-bottom:0.3rem}
@@ -39,9 +39,9 @@ User Request → Prompt Gateway → [logging, routing, rate limit] → LLM API
 <pre>
 def call_with_fallback(prompt):
     try:
-        return call_model("claude-sonnet-3.5", prompt, timeout=10)
+        return call_model("claude-sonnet-4-6", prompt, timeout=10)
     except (Timeout, RateLimitError):
-        return call_model("claude-haiku-3.5", prompt, timeout=20)
+        return call_model("claude-haiku-4-5", prompt, timeout=20)
     except Exception:
         return fallback_response("Lo siento, el servicio no está disponible.")
 </pre>

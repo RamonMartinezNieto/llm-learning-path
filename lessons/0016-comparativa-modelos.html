@@ -17,32 +17,37 @@
 <p class="meta">Fase 2 · Lección 16 de 55 · ~13 min · Chat Mode Avanzado</p>
 
 <h2>No hay un modelo mejor, hay modelos mejores para cada tarea</h2>
-<p>Los tres grandes (Claude, GPT-4o, Gemini) son capaces en casi cualquier tarea. Las diferencias relevantes están en: estilo de respuesta, longitud del contexto, integración con herramientas, precio y comportamiento en casos específicos.</p>
+<p>Los tres grandes (Claude, GPT y Gemini) son capaces en casi cualquier tarea. Las diferencias relevantes están en: estilo de respuesta, longitud del contexto, integración con herramientas, precio y comportamiento en casos específicos.</p>
+
+<div class="callout">
+  <strong>Los nombres caducan, la jerarquía no</strong>
+  Los nombres concretos de modelos cambian cada pocos meses (a fecha de hoy, en Claude: Haiku 4.5, Sonnet 4.6, Opus 4.8 y el más capaz, Fable 5). No memorices versiones: aprende a elegir por <em>tier</em> (rápido / equilibrado / máxima capacidad) y por las fortalezas de cada familia.
+</div>
 
 <h2>Comparativa por fortalezas</h2>
 <table>
-  <tr><th>Criterio</th><th>Claude (Anthropic)</th><th>GPT-4o (OpenAI)</th><th>Gemini (Google)</th></tr>
-  <tr><td>Contexto máximo</td><td>200K tokens</td><td>128K tokens</td><td>1M tokens</td></tr>
+  <tr><th>Criterio</th><th>Claude (Anthropic)</th><th>GPT (OpenAI)</th><th>Gemini (Google)</th></tr>
+  <tr><td>Contexto máximo</td><td>1M tokens (200K en Haiku 4.5)</td><td>~128K–1M tokens</td><td>~1M tokens</td></tr>
   <tr><td>Código</td><td>⭐⭐⭐⭐⭐ Excelente</td><td>⭐⭐⭐⭐⭐ Excelente</td><td>⭐⭐⭐⭐ Muy bueno</td></tr>
-  <tr><td>Razonamiento largo</td><td>⭐⭐⭐⭐⭐ Destaca</td><td>⭐⭐⭐⭐ Muy bueno</td><td>⭐⭐⭐⭐ Muy bueno</td></tr>
+  <tr><td>Razonamiento largo</td><td>⭐⭐⭐⭐⭐ Destaca</td><td>⭐⭐⭐⭐⭐ Muy bueno</td><td>⭐⭐⭐⭐ Muy bueno</td></tr>
   <tr><td>Integración Google</td><td>❌</td><td>❌</td><td>✅ Nativa (Docs, Drive)</td></tr>
-  <tr><td>Ecosistema / herramientas</td><td>Bueno</td><td>⭐⭐⭐⭐⭐ El más maduro</td><td>Bueno</td></tr>
+  <tr><td>Ecosistema / herramientas</td><td>⭐⭐⭐⭐ Muy bueno</td><td>⭐⭐⭐⭐⭐ El más maduro</td><td>Bueno</td></tr>
   <tr><td>Seguir instrucciones</td><td>⭐⭐⭐⭐⭐ Destaca</td><td>⭐⭐⭐⭐ Muy bueno</td><td>⭐⭐⭐⭐ Muy bueno</td></tr>
   <tr><td>Precio (tier medio)</td><td>Competitivo</td><td>Competitivo</td><td>Generoso (free tier)</td></tr>
 </table>
 
 <div class="callout">
   <strong>Regla práctica para desarrolladores</strong>
-  Para uso diario en código y razonamiento: Claude Sonnet o GPT-4o son intercambiables. Para documentos muy largos: Claude o Gemini. Para integración con workflows Google: Gemini. Para el ecosistema más maduro (plugins, fine-tuning, más SDKs): OpenAI.
+  Para uso diario en código y razonamiento: Claude Sonnet 4.6 o el GPT equivalente son intercambiables. Para documentos muy largos: hoy Claude (1M), Gemini (1M) o GPT de contexto largo sirven por igual. Para integración con workflows Google: Gemini. Para el ecosistema más maduro (plugins, fine-tuning, más SDKs): OpenAI.
 </div>
 
-<h2>Los modelos de razonamiento (o1, o3, Claude Thinking)</h2>
-<p>Una nueva categoría: modelos que "piensan antes de responder" usando chain-of-thought interno. Son significativamente mejores en matemáticas, lógica y código complejo, pero más lentos y más caros. Úsalos cuando la tarea lo justifica, no por defecto.</p>
+<h2>Los modelos de razonamiento</h2>
+<p>Una categoría que "piensa antes de responder" usando un razonamiento interno (chain-of-thought) antes de dar la respuesta final. Son significativamente mejores en matemáticas, lógica y código complejo, pero más lentos y más caros. En Claude esto no es una familia aparte: se integra como <em>adaptive thinking</em> regulado por un parámetro de esfuerzo (<em>effort</em>) en los modelos actuales. Úsalo cuando la tarea lo justifica, no por defecto.</p>
 
 <div class="quiz">
   <h3>🧠 Comprueba lo que recuerdas</h3>
   <div class="q">
-    <p>¿Cuándo tiene más sentido usar Gemini sobre Claude o GPT-4o?</p>
+    <p>¿Cuándo tiene más sentido usar Gemini sobre Claude o GPT?</p>
     <div class="options">
       <label class="opt"><input type="radio" name="q1" value="a"> Cuando necesitas el razonamiento matemático más avanzado disponible</label>
       <label class="opt"><input type="radio" name="q1" value="b"> Cuando necesitas procesar documentos muy largos o integrar con el ecosistema Google</label>
@@ -53,7 +58,7 @@
     <p class="feedback" id="fb-q1"></p>
   </div>
   <div class="q">
-    <p>¿Para qué tipo de tarea deberías usar un modelo de razonamiento (o1, o3) en vez del modelo estándar?</p>
+    <p>¿Para qué tipo de tarea deberías usar un modelo de razonamiento (que piensa antes de responder) en vez del modelo estándar?</p>
     <div class="options">
       <label class="opt"><input type="radio" name="q2" value="a"> Para tareas simples y repetitivas de alto volumen</label>
       <label class="opt"><input type="radio" name="q2" value="b"> Para problemas complejos de lógica, matemáticas o código donde la calidad justifica el coste y latencia extra</label>

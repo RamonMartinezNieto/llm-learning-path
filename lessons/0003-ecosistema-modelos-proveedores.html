@@ -21,20 +21,30 @@
 
 <h2>Los tres grandes proveedores</h2>
 <div class="provider-grid">
-  <div class="provider-card"><h3>🟢 Anthropic</h3><p>Familia Claude (Haiku, Sonnet, Opus). Foco en seguridad y razonamiento largo. Contexto hasta 200K tokens.</p></div>
-  <div class="provider-card"><h3>🔵 OpenAI</h3><p>Familia GPT-4o y o1/o3. Ecosistema más maduro, gran comunidad. DALL-E, Whisper, Embeddings.</p></div>
-  <div class="provider-card"><h3>🔴 Google DeepMind</h3><p>Familia Gemini. Multimodal nativo, contexto de 1M tokens, integrado en Google Workspace.</p></div>
-  <div class="provider-card"><h3>⚫ Meta / Open Source</h3><p>Llama 3.x: modelos abiertos que puedes ejecutar localmente. No pagan por token. Base de muchas alternativas.</p></div>
+  <div class="provider-card"><h3>🟢 Anthropic</h3><p>Familia Claude (Haiku 4.5, Sonnet 4.6, Opus 4.8 y el más capaz, Fable 5). Foco en seguridad y razonamiento largo. Contexto de hasta 1M tokens (200K en Haiku).</p></div>
+  <div class="provider-card"><h3>🔵 OpenAI</h3><p>Familia GPT actual. Ecosistema más maduro, gran comunidad. DALL-E, Whisper, Embeddings.</p></div>
+  <div class="provider-card"><h3>🔴 Google DeepMind</h3><p>Familia Gemini. Multimodal nativo, contexto de ~1M tokens, integrado en Google Workspace.</p></div>
+  <div class="provider-card"><h3>⚫ Meta / Open Source</h3><p>Familia Llama y equivalentes: modelos abiertos que puedes ejecutar localmente. No pagan por token. Base de muchas alternativas.</p></div>
 </div>
 
 <h2>Familias de modelos: rápido vs. potente</h2>
 <p>Cada proveedor ofrece una jerarquía de modelos. La regla general:</p>
 <table>
   <tr><th>Tier</th><th>Anthropic</th><th>OpenAI</th><th>Cuándo usarlo</th></tr>
-  <tr><td>Rápido / barato</td><td>Claude Haiku</td><td>GPT-4o mini</td><td>Tareas simples, alto volumen, prototipos</td></tr>
-  <tr><td>Equilibrado</td><td>Claude Sonnet</td><td>GPT-4o</td><td>Uso general, código, análisis</td></tr>
-  <tr><td>Máxima capacidad</td><td>Claude Opus</td><td>o1 / o3</td><td>Razonamiento complejo, tareas críticas</td></tr>
+  <tr><td>Rápido / barato</td><td>Claude Haiku 4.5</td><td>GPT (modelo mini)</td><td>Tareas simples, alto volumen, prototipos</td></tr>
+  <tr><td>Equilibrado</td><td>Claude Sonnet 4.6</td><td>GPT (modelo estándar)</td><td>Uso general, código, análisis</td></tr>
+  <tr><td>Máxima capacidad</td><td>Claude Opus 4.8 / Fable 5</td><td>GPT (modelo tope de gama)</td><td>Razonamiento complejo, tareas críticas</td></tr>
 </table>
+
+<div class="callout">
+  <strong>Modelos de razonamiento</strong>
+  Una categoría que "piensa antes de responder": el modelo elabora un razonamiento interno antes de dar la respuesta final. Son mejores en lógica, matemáticas y código difícil, pero más lentos y más caros. En Claude esto se integra como <em>adaptive thinking</em> regulado por un parámetro de esfuerzo (<em>effort</em>) en los modelos actuales, no como una familia aparte.
+</div>
+
+<div class="callout">
+  <strong>Los nombres caducan, la jerarquía no</strong>
+  Los nombres concretos de los modelos cambian cada pocos meses. Lo que perdura es la jerarquía: un modelo <strong>rápido/barato</strong>, uno <strong>equilibrado</strong> y uno de <strong>máxima capacidad</strong>. Aprende a elegir por tier, no a memorizar versiones.
+</div>
 
 <h2>Benchmarks: cómo comparar modelos</h2>
 <p>Los benchmarks miden capacidades específicas. Los más relevantes para desarrolladores:</p>
